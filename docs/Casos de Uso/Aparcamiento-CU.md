@@ -1,18 +1,19 @@
 ```mermaid
 flowchart LR
-  actorUser([👤 Usuario])
+  actorUser([👤 User])
 
-  subgraph CasosDeUso
-    U1((Crear aparcamiento))
-    U2((Modificar aparcamiento))
-    U3((Eliminar aparcamiento))
-    U4((Listar aparcamientos))
-
+  subgraph UseCases
+    U1((createParking))
+    U2((readParking))
+    U3((updateParking))
+    U4((deleteParking))
+    U5((readAllParkings))
   end
 
   actorUser --> U1
   actorUser --> U2
   actorUser --> U3
   actorUser --> U4
+  actorUser --> U5
 
 ```
