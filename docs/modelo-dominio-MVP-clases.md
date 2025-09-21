@@ -4,47 +4,47 @@
 classDiagram
   direction LR
 
-  class Usuario {
+  class User {
     long id - PK Autoincrement
-    String nombre
+    String name
     String email
     String password
-    boolean estado
+    boolean status
   }
 
-  class Aparcamiento {
+  class Parking {
     long id - PK Autoincrement
-    int longitud
-    int latitud
-    double precio
-    boolean estado
-  }
-
-
-  class Reserva {
-    long id - PK Autoincrement
-    long usuarioId - FK
-    long aparcamientoId - FK
-    LocalDate fechaRes
-    LocalTime horaRes
-    double importe
-    boolean estado
+    int longitude
+    int latitude
+    double price
+    boolean status
   }
 
 
-  class Liberacion {
+  class Reservation {
     long id - PK Autoincrement
-    long usuarioId - FK
-    long aparcamientoId - FK
-    LocalDate fechaLib
-    LocalTime horaLib
-    double importe
-    boolean estado
+    long userId - FK
+    long ParkingId - FK
+    LocalDate reservationDate
+    LocalTime reservationTime
+    double amount
+    boolean status
+  }
+
+
+  class Release {
+    long id - PK Autoincrement
+    long userId - FK
+    long parkingId - FK
+    LocalDate releaseDate
+    LocalTime releaseTime
+    double amount
+    boolean status
   }
 
   %% Relaciones
-  Usuario "1" -- "N" Liberacion : crea
-  Reserva "N" -- "1" Usuario : solicita
-  Aparcamiento "1" -- "N" Reserva : contiene
-  Liberacion "N" -- "1" Aparcamiento : contiene
+  User "1" -- "N" Release : creates
+  Reservation "N" -- "1" User : request
+  Parking "1" -- "N" Reservation : contains
+  Release "N" -- "1" Parking : contains
 ```
