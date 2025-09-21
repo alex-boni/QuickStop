@@ -1,8 +1,8 @@
 ```mermaid
 flowchart LR
-  actorUser([👤 Usuario])
+  actorUser([👤 User])
 
-  subgraph CasosDeUso
+  subgraph UseCases
     U1((createReservation))
     U2((readReservation))
     U3((updateReservation))
