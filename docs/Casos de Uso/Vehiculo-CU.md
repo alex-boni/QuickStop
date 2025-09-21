@@ -2,7 +2,7 @@
 flowchart LR
   actorUser([👤 User])
 
-  subgraph CasosDeUso
+  subgraph UseCases
     U1((createVehicle))
     U2((readVehicle))
     U3((updateVehicle))
