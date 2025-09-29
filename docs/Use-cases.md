@@ -5,22 +5,22 @@ flowchart LR
   Client([👤 Client])
 
   subgraph OwnerUseCases
-    O1((Register account))
-    O2((Add parking))
-    O3((Edit parking))
-    O4((Delete parking))
-    O5((View reservation requests))
-    O6((Accept reservation request))
-    O7((Cancel reservation request))
+    O1((registerAccount))
+    O2((addParking))
+    O3((editParking))
+    O4((deleteParking))
+    O5((viewReservationRequests))
+    O6((acceptReservationRequest))
+    O7((cancelReservationRequest))
   end
 
   subgraph ClientUseCases
-    C1((Register account))
-    C2((Search parking))
-    C3((View parking details))
-    C4((Request reservation))
-    C5((Cancel reservation))
-    C6((Check reservation status))
+    C1((registerAccount))
+    C2((searchParking))
+    C3((viewParkingDetails))
+    C4((requestReservation))
+    C5((cancelReservation))
+    C6((checkReservationStatus))
   end
 
   Owner --> O1
