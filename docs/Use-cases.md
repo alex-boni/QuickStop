@@ -2,7 +2,7 @@
 
 flowchart LR
   Owner([🏠 Owner])
-  Driver([👤 Client])
+  Driver([👤 Driver])
 
   subgraph OwnerUseCases
     O1((registerAccount))
