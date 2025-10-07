@@ -9,11 +9,13 @@ classDiagram
     String name
     String email
     String password
+    String rol
     boolean status
   }
 
   class Parking {
     long id - PK Autoincrement
+    long ownerId - FK
     int longitude
     int latitude
     double price
@@ -23,8 +25,8 @@ classDiagram
 
   class Reservation {
     long id - PK Autoincrement
-    long userId - FK
-    long ParkingId - FK
+    long driverId - FK
+    long parkingId - FK
     LocalDate reservationDate
     LocalTime reservationTime
     double amount
@@ -32,19 +34,11 @@ classDiagram
   }
 
 
-  class Release {
-    long id - PK Autoincrement
-    long userId - FK
-    long parkingId - FK
-    LocalDate releaseDate
-    LocalTime releaseTime
-    double amount
-    boolean status
-  }
+
 
   %% Relaciones
-  User "1" -- "N" Release : creates
-  Reservation "N" -- "1" User : request
+  User "1" -- "N" Parking : creates
+  Reservation "N" -- "1" User : driver request
+  Reservation "N" -- "1" User : owner accept/reject
   Parking "1" -- "N" Reservation : contains
-  Release "N" -- "1" Parking : contains
 ```
