@@ -1,0 +1,3 @@
+-- Activa PostGIS
+CREATE EXTENSION IF NOT EXISTS postgis;
+

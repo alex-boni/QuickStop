@@ -1,0 +1,39 @@
+{
+  "name": "quickstop",
+  "version": "1.0.0",
+  "description": "Este proyecto es una **Aplicación Web Progresiva (PWA)** que permite a los usuarios **buscar parkings cercanos**, **ver disponibilidad en tiempo real**, **realizar reservas**, **compartir disponibilidad de tus parkings** y **rebicir cobros y generar pagos**.   Todo ello cumpliendo con la **normativa europea de accesibilidad (EAA 2025)** y con una arquitectura moderna, escalable y profesional.",
+  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "app"
+  ],
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev:db": "docker-compose up -d",
+    "dev:app": "npm --workspace=app run dev",
+    "dev:windows:api": "dotenv -e .env -- cmd /c \"cd api && mvnw spring-boot:run\"",
+    "dev:api": "dotenv -e .env -- cd api && ./mvnw spring-boot:run",
+    "dev": "npm run dev:db && concurrently -n WEB,API -c auto \"npm run dev:app\" \"npm run dev:api\"",
+    "dev:windows": "npm run dev:db && concurrently -n WEB,API -c auto \"npm run dev:app\" \"npm run dev:windows:api\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alex-boni/QuickStop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/alex-boni/QuickStop/issues"
+  },
+  "homepage": "https://github.com/alex-boni/QuickStop#readme",
+  "devDependencies": {
+    "dotenv-cli": "^10.0.0"
+  },
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
