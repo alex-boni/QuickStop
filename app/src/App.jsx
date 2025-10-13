@@ -1,5 +1,6 @@
 import { Routes, Route, Outlet, Link } from "react-router-dom";
-import Register from "./pages/Register";
+import MapPage from "./pages/MapPage";
+import RegisterPage from "./pages/RegisterPage";
 import Login from "./pages/Login";
 
 function Layout() {
@@ -19,8 +20,8 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<Register />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/" element={<MapPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<Login />} />
         {/* Add more routes as needed */}
       </Route>
