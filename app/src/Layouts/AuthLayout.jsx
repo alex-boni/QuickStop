@@ -10,7 +10,7 @@ const AuthLayout = ({ children, title }) => {
         {/* Título y Logo */}
         <header className="text-center space-y-2">
           <h1 className="text-3xl font-bold text-indigo-700">
-            QuickStop / ParkIT
+            QuickStop
           </h1>
           <h2 className="text-xl font-semibold text-gray-700">{title}</h2>
         </header>

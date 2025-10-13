@@ -1,12 +1,12 @@
 // app/src/features/auth/components/RegisterForm.jsx
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
 
   // Simulación de validación de error (para futura implementación ARIA)
@@ -18,16 +18,18 @@ const RegisterForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Intento de Registro:', formData);
+    console.log("Intento de Registro:", formData);
     // Lógica real: Llamar al servicio de registro (features/auth/services/authService.js)
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      
       {/* 1. Campo Nombre Completo */}
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="name"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           Nombre completo
         </label>
         <input
@@ -44,7 +46,10 @@ const RegisterForm = () => {
 
       {/* 2. Campo Correo Electrónico */}
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="email"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           Correo Electrónico
         </label>
         <input
@@ -61,7 +66,10 @@ const RegisterForm = () => {
 
       {/* 3. Campo Contraseña */}
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="password"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           Contraseña
         </label>
         <input
@@ -73,15 +81,20 @@ const RegisterForm = () => {
           autoComplete="new-password" // EAA / WCAG 1.3.5
           aria-invalid={isPasswordInvalid ? "true" : "false"} // WCAG 4.1.3: Indica si el valor es inválido
           className={`w-full p-3 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition-colors ${
-            isPasswordInvalid ? 'border-red-500 ring-red-500' : 'border-gray-300'
+            isPasswordInvalid
+              ? "border-red-500 ring-red-500"
+              : "border-gray-300"
           }`}
           placeholder="Mínimo 8 caracteres, seguro"
         />
       </div>
-      
+
       {/* 4. Campo Confirmar Contraseña */}
       <div>
-        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="confirmPassword"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           Confirmar Contraseña
         </label>
         <input
@@ -108,7 +121,13 @@ const RegisterForm = () => {
 
       {/* 6. Enlace a Login */}
       <p className="text-center text-sm text-gray-600 mt-4">
-        ¿Ya tienes cuenta? <a href="/login" className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors">Iniciar Sesión</a>
+        ¿Ya tienes cuenta?{" "}
+        <a
+          href="/login"
+          className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+        >
+          Iniciar Sesión
+        </a>
       </p>
     </form>
   );
