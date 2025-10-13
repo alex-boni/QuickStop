@@ -17,6 +17,64 @@ Todo ello cumpliendo con la **normativa europea de accesibilidad (EAA 2025)** y 
 root/
 ├── package.json
 ├── app/           ← Frontend (React + Vite + PWA)
+├    ├── public/                     # Archivos estáticos (íconos, manifest.json, assets)
+│    │   ├── manifest.webmanifest    # Requerido para PWA
+│    │   └── icons/                  # Íconos de aplicación
+|    |
+├    ├── src/
+│         ├── assets/                 # Imágenes, fuentes (no dinámicas)
+│         │   └── logo.svg
+│         │
+│         ├── components/             # Componentes de UI reutilizables (Botón, Input, Tarjeta) y que comparten las demas features
+│         │   └── shared/             # (Opcional) Elementos muy genéricos
+│         │       ├── Button.jsx
+│         │       └── Card.jsx
+│         │
+│         ├── features/               # El núcleo: Lógica y componentes agrupados por dominio
+│         │   ├── users/               # Gestión de Login, Registro, Logout, Contraseña
+│         │   │   ├── components/     # Componentes específicos de Auth (ej: LoginForm)
+│         │   │   ├── hooks/          # Hooks de Auth (ej: useAuth)
+│         │   │   └── services/       # Lógica de la API de Auth
+│         │   │
+│         │   ├── parking/            # Lógica y UI para la búsqueda y gestión de parkings
+│         │   │   ├── components/     # ParkingsMap, SearchBarOverlay, ParkingDetailsCard
+│         │   │   ├── hooks/          
+│         │   │   └── services/       # Conexión con la API de Parkings (REST, WebSockets)
+│         │   │
+│         │   ├── owner/             
+│         │   │   ├── components/     
+│         │   │   ├── hooks/          
+│         │   │   └── services/      
+│         │   ├── driver/            
+│         │   │   ├── components/     
+│         │   │   ├── hooks/          
+│         │   │   └── services/        Parkings (REST, WebSockets)
+│         │   └── reservations/       # Gestión de reservas, historial, etc.
+│         │   │   ├── components/     
+│         │   │   ├── hooks/          
+│         │   │   └── services/       
+│         │
+│         ├── layouts/                # Componentes estructurales de alto nivel
+│         │   ├── AppLayout.jsx       # El componente principal que definimos (Header, Main, Footer)
+│         │   └── AuthLayout.jsx      # Layout para Login/Registro (centrado, sin nav principal)
+│         │
+│         ├── pages/                  # Componentes que se mapean directamente a rutas (pages)
+│         │   ├── HomePage.jsx        # Muestra el AppLayout con el ParkingMap
+│         │   ├── LoginPage.jsx       # Usa el AuthLayout con el LoginForm
+│         │   └── RegisterPage.jsx    # Usa el AuthLayout con el RegisterForm
+│         │
+│         ├── services/               # Lógica global no ligada a un dominio específico
+│         │   ├── apiClient.js        # Instancia de Axios o Fetch configurada (para el proxy de Vite)
+│         │   └── msWWorker.js        # Configuración de MSW para mocking
+│         │
+│         ├── hooks/                  # Hooks reutilizables a nivel global (ej: useLocalStorage)
+│         │
+│         ├── context/                # Contextos globales de React (ej: AuthProvider)
+│         │
+│         ├── styles/                 # Archivos CSS globales y configuración de Tailwind
+│         │   └── index.css           # Punto de entrada de Tailwind
+│         │
+│         └── main.jsx                # Punto de entrada de la aplicación (Router, Providers)
 ├── api/           ← Backend (Spring Boot + PostGIS)
 └── README.md
 ```
