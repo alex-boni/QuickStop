@@ -75,6 +75,8 @@ root/
 │         │   └── index.css           # Punto de entrada de Tailwind
 │         │
 │         └── main.jsx                # Punto de entrada de la aplicación (Router, Providers)
+│         
+│         
 ├── api/src/main/java/es/quickstop         ← Backend (Spring Boot + PostGIS)
 │    ├── common/                  # Elementos generales o reutilizables
 │    │   ├── dto/                 # DTOs globales (ej. ErrorResponse, TokenResponse)
@@ -98,6 +100,20 @@ root/
 │    │   ├── repository/          # ParkingRepository, ParkingSpecification
 │    │   ├── model/               # Parking.java (@Entity con PostGIS Geometry)
 │    │   └── dto/                 # ParkingDTO, ParkingCreationRequest
+│    │
+│    ├── owner/                 # DOMINIO: Búsqueda y Gestión de Owners
+│    │   ├── controller/          # OwnerController (GET /owners, POST /owners)
+│    │   ├── service/             # OwnerService (Lógica de búsqueda con PostGIS)
+│    │   ├── repository/          # OwnerRepository, OwnerSpecification
+│    │   ├── model/               # Owner.java (@Entity con PostGIS Geometry)
+│    │   └── dto/                 # OwnerDTO, OwnerCreationRequest
+│    │
+│    ├── driver/                 # DOMINIO: Búsqueda y Gestión de Drivers
+│    │   ├── controller/          # DriverController (GET /drivers, POST /drivers)
+│    │   ├── service/             # DriverService (Lógica de búsqueda con PostGIS)
+│    │   ├── repository/          # DriverRepository, DriverSpecification
+│    │   ├── model/               # Driver.java (@Entity con PostGIS Geometry)
+│    │   └── dto/                 # DriverDTO, DriverCreationRequest
 │    │
 │    └── reservation/             # DOMINIO: Reservas y Tiempo Real
 │        ├── controller/          # ReservationController (CRUD)
