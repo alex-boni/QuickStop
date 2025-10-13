@@ -101,6 +101,13 @@ root/
 │    │   ├── model/               # Parking.java (@Entity con PostGIS Geometry)
 │    │   └── dto/                 # ParkingDTO, ParkingCreationRequest
 │    │
+│    ├── user/                 # DOMINIO: Búsqueda y Gestión de Users
+│    │   ├── controller/          # UserController (GET /users, POST /users)
+│    │   ├── service/             # UserService (Lógica de búsqueda con PostGIS)
+│    │   ├── repository/          # UserRepository, UserSpecification
+│    │   ├── model/               # User.java (@Entity con PostGIS Geometry)
+│    │   └── dto/                 # UserDTO, UserCreationRequest
+│    │
 │    ├── owner/                 # DOMINIO: Búsqueda y Gestión de Owners
 │    │   ├── controller/          # OwnerController (GET /owners, POST /owners)
 │    │   ├── service/             # OwnerService (Lógica de búsqueda con PostGIS)
