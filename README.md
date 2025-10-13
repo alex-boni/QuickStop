@@ -75,7 +75,35 @@ root/
 │         │   └── index.css           # Punto de entrada de Tailwind
 │         │
 │         └── main.jsx                # Punto de entrada de la aplicación (Router, Providers)
-├── api/           ← Backend (Spring Boot + PostGIS)
+├── api/src/main/java/es/quickstop         ← Backend (Spring Boot + PostGIS)
+│    ├── common/                  # Elementos generales o reutilizables
+│    │   ├── dto/                 # DTOs globales (ej. ErrorResponse, TokenResponse)
+│    │   ├── exception/           # Excepciones personalizadas (ej. ResourceNotFoundException)
+│    │   └── util/                
+│    │
+│    ├── config/                  # Archivos de configuración de Spring
+│    │   ├── SecurityConfig.java  # Configuración de Spring Security (JWT, CORS)
+│    │   └── WebSocketConfig.java # Configuración de WebSockets STOMP
+│    │
+│    ├── auth/                    # DOMINIO: Autenticación y Usuarios
+│    │   ├── controller/          # AuthController (Login, Register)
+│    │   ├── service/             # AuthService.java (Lógica de registro/login, encriptación)
+│    │   ├── repository/          # UserRepository (Spring Data JPA)
+│    │   ├── model/               # User.java (@Entity), Role.java (Enum)
+│    │   └── dto/                 # RegisterRequestDTO, LoginRequestDTO, AuthResponseDTO
+│    │
+│    ├── parking/                 # DOMINIO: Búsqueda y Gestión de Parkings
+│    │   ├── controller/          # ParkingController (GET /parkings, POST /parkings)
+│    │   ├── service/             # ParkingService (Lógica de búsqueda con PostGIS)
+│    │   ├── repository/          # ParkingRepository, ParkingSpecification
+│    │   ├── model/               # Parking.java (@Entity con PostGIS Geometry)
+│    │   └── dto/                 # ParkingDTO, ParkingCreationRequest
+│    │
+│    └── reservation/             # DOMINIO: Reservas y Tiempo Real
+│        ├── controller/          # ReservationController (CRUD)
+│        ├── service/             # ReservationService (Lógica de booking, llamadas a WebSocket)
+│        ├── repository/          # ReservationRepository
+│        └── model/               # Reservation.java
 └── README.md
 ```
 
