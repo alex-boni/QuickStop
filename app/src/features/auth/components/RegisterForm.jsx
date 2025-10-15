@@ -10,7 +10,7 @@ const RegisterForm = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'driver',
+    role: 'DRIVER',
     termsAccepted: false,
   });
 
@@ -107,7 +107,7 @@ const RegisterForm = () => {
             ${errors[field] ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'}`;
   };
 
-  const isDriver = formData.role === 'driver';
+  const isDriver = formData.role === 'DRIVER';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -206,7 +206,7 @@ const RegisterForm = () => {
           {/* ... Botones Driver/Owner (sin cambios) ... */}
           <button
             type="button"
-            onClick={() => handleRoleChange('driver')}
+            onClick={() => handleRoleChange('DRIVER')}
             className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ease-in-out ${isDriver ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}
             role="radio"
             aria-checked={isDriver}
@@ -214,7 +214,7 @@ const RegisterForm = () => {
           
           <button
             type="button"
-            onClick={() => handleRoleChange('owner')}
+            onClick={() => handleRoleChange('OWNER')}
             className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ease-in-out ${!isDriver ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}
             role="radio"
             aria-checked={!isDriver}
