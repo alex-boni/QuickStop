@@ -54,12 +54,5 @@ public class AuthService {
 
         // Mapea la entidad guardada al DTO de respuesta.
         return authMapper.toAuthResponseDTO(savedUser);
-        //vamos a simular que el usuario se ha guardado correctamente y devolver un DTO de respuesta simulado
-        // AuthResponseDTO response = new AuthResponseDTO();
-        // response.setToken("simulated-jwt-token");
-        // response.setUserId(1L);
-        // response.setEmail(request.getEmail());
-        // response.setRole(request.getRole());
-        // return response;
     }
 }
