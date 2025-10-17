@@ -18,5 +18,13 @@ public ResponseEntity<MessageResponse> getMyJson() {
         // Devuelve el código HTTP 200 OK con el objeto en el cuerpo
         return ResponseEntity.ok(response);
     }
-    
+
+    //login 
+    @GetMapping("/login")
+    public ResponseEntity<MessageResponse> loginJson() {
+        // Objeto que Spring Boot serializará a JSON
+        var response = new MessageResponse("La petición GET de login fue exitosa y este es el JSON devuelto."); 
+        // Devuelve el código HTTP 200 OK con el objeto en el cuerpo
+        return ResponseEntity.ok(response);
+    }
 }

@@ -1,9 +1,10 @@
-import LoginForm from "../components/LoginForm";
+import AuthLayout from "../Layouts/AuthLayout";
+import LoginForm from "../features/auth/components/LoginForm";
+
 export default function Login() {
   return (
-    <div>
-      <h1>Login</h1>
+    <AuthLayout title="Iniciar Sesión">
       <LoginForm />
-    </div>
+    </AuthLayout>
   );
 }

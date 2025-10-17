@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpStatus;
+import es.quickstop.api.auth.dto.LoginRequestDTO;
 
 
 @RestController
@@ -39,5 +40,11 @@ public class AuthController {
             throw e; // Será manejada por un manejador global de excepciones
         }
     }
-    
-}   
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDTO> loginUser(@Valid @RequestBody LoginRequestDTO request){
+        AuthResponseDTO response = authService.login(request);
+        System.out.println("Usuario logueado: " + response.getEmail());
+        return ResponseEntity.ok(response);
+    }
+}

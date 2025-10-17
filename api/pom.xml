@@ -84,20 +84,30 @@
 			<version>2.5.0</version>
 		</dependency>
 
+		<!-- Hibernate Spatial (añadido): proporciona PostgisDialect -->
 		<dependency>
-			<groupId>org.hibernate.orm</groupId>
-			<artifactId>hibernate-spatial</artifactId>
-		</dependency>
-<dependency>
-  <groupId>org.flywaydb</groupId>
-  <artifactId>flyway-database-postgresql</artifactId>
-  <version>11.7.2</version>
-  <scope>runtime</scope>
-</dependency>
-<dependency>
-    <groupId>org.mapstruct</groupId>
-    <artifactId>mapstruct</artifactId>
-    <version>1.5.5.Final</version> </dependency>
+          <groupId>org.hibernate.orm</groupId>
+          <artifactId>hibernate-spatial</artifactId>
+          <version>6.6.29.Final</version>
+        </dependency>
+        
+        <!-- Flyway core -->
+        <dependency>
+          <groupId>org.flywaydb</groupId>
+          <artifactId>flyway-core</artifactId>
+        </dependency>
+        
+        <!-- Flyway PostgreSQL database support (runtime) -->
+        <dependency>
+          <groupId>org.flywaydb</groupId>
+          <artifactId>flyway-database-postgresql</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.5.5.Final</version> </dependency>
 
 <dependency>
     <groupId>org.mapstruct</groupId>

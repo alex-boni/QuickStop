@@ -55,4 +55,23 @@ public class AuthService {
         // Mapea la entidad guardada al DTO de respuesta.
         return authMapper.toAuthResponseDTO(savedUser);
     }
+
+    public AuthResponseDTO login(es.quickstop.api.auth.dto.LoginRequestDTO request) {
+        // Buscar el usuario por email
+        Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
+        if (userOpt.isEmpty()) {
+            throw new IllegalArgumentException("Credenciales inválidas.");
+        }
+
+        User user = userOpt.get();
+
+        // Verificar la contraseña
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Credenciales inválidas.");
+        }
+
+        // Si las credenciales son válidas, mapear y devolver el DTO de respuesta
+        return authMapper.toAuthResponseDTO(user);
+    }
 }
+
