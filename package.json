@@ -14,7 +14,7 @@
     "dev:db": "docker-compose up -d",
     "dev:app": "npm --workspace=app run dev",
     "dev:windows:api": "dotenv -e .env -- cmd /c \"cd api && mvnw spring-boot:run\"",
-    "dev:api": "dotenv -e .env -- sh -c 'cd api && ./mvnw spring-boot:run'",
+    "dev:api": "dotenv -e .env -- sh -c 'cd api && ./mvnw spring-boot:run -DskipTests'",
     "dev": "npm run dev:db && concurrently -n WEB,API -c auto \"npm run dev:app\" \"npm run dev:api\"",
     "dev:windows": "npm run dev:db && concurrently -n WEB,API -c auto \"npm run dev:app\" \"npm run dev:windows:api\""
   },
