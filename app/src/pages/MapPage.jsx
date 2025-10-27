@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Map, { GeolocateControl } from "react-map-gl/mapbox";
+import Map, {  GeolocateControl, NavigationControl } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 // import "./MapPage.css";
 
@@ -43,22 +43,19 @@ function MapPage() {
           positionOptions={{ enableHighAccuracy: true }}
           trackUserLocation={true}
           showUserHeading={true}
-          position="top-left"
+          position="top-right"
           aria-label="Localizar mi ubicación actual"
+          style={{marginRight: "45px", marginTop: "110px"}}
         />
 
-        {/* 💡 FUTURO: Aquí irán los Marcadores (<Marker>) y Popups */}
       </Map>
 
-      {/* 3. BARRA DE BÚSQUEDA (Móvil): Flotante en la parte superior del móvil */}
       <MobileSearchBar onSearch={(query) => console.log("Buscando:", query)} />
-<DesktopSearchBar onSearch={(query) => console.log('Buscando en Desktop:', query)} />
+      <DesktopSearchBar
+        onSearch={(query) => console.log("Buscando en Desktop:", query)}
+      />
       <FloatingMenuButton onToggle={toggleMenu} />
-
-      {/* 5. BARRA LATERAL (Escritorio): El menú colapsable */}
       <SideMenu isOpen={isMenuOpen} onClose={toggleMenu} />
-
-      {/* 6. Tarjeta de Detalles del Parking (Pendiente de implementar) */}
     </div>
   );
 }

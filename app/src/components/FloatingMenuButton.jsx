@@ -5,7 +5,7 @@ const FloatingMenuButton = ({ onToggle }) => {
     <div className="flex fixed top-6 right-6 z-40">
       <button
         onClick={onToggle}
-        className="p-6 md:p-4 md:mt-3 bg-white rounded-full shadow-xl 
+        className="p-6 md:p-4 md:mt-3 md:mr-2 bg-white rounded-full shadow-xl 
                    text-indigo-600 hover:bg-gray-100 transition-colors 
                    focus:outline-none focus:ring-4 focus:ring-indigo-300"
         aria-label="Mostrar menú lateral y perfil de usuario"
