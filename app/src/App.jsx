@@ -2,6 +2,8 @@ import { Routes, Route, Outlet, Link } from "react-router-dom";
 import MapPage from "./pages/MapPage";
 import RegisterPage from "./pages/RegisterPage";
 import Login from "./pages/Login";
+import AppLayout from "./Layouts/AppLayout";
+import MapPageBonito from "./pages/MapPageBonito";
 
 function Layout() {
   return (
@@ -20,11 +22,13 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<MapPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/mapa" element={<MapPageBonito />} />
+
         {/* Add more routes as needed */}
       </Route>
+      <Route path="/" element={<MapPage />} />
     </Routes>
   );
 }

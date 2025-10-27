@@ -1,4 +1,3 @@
-// app/src/layouts/AuthLayout.jsx
 import React from "react";
 
 const AuthLayout = ({ children, title }) => {
