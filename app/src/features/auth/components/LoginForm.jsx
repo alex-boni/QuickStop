@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../AuthService';
+import { useAuth } from '../../../context/AuthContext';
 
 const LoginForm = () => {
 	const navigate = useNavigate();
+	const { login } = useAuth();
 	const [isLoading, setIsLoading] = useState(false);
 	const [formData, setFormData] = useState({
 		email: '',
@@ -42,8 +44,17 @@ const LoginForm = () => {
 		}
 		setIsLoading(true);
 		try {
-			await loginUser(formData);
-			navigate('/profile');
+			const response = await loginUser(formData);
+			// Guardar token y datos del usuario en el contexto
+			if (response?.token) {
+				const userData = {
+					name: response.name,
+					email: response.email,
+					role: response.role
+				};
+				login(response.token, userData);
+			}
+			navigate('/');
 		} catch (error) {
 			if (error.message === 'InvalidCredentials') {
 				setErrors({ global: 'Correo o contraseña incorrectos.' });

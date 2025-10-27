@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class AuthResponseDTO {
     private String token; // El token JWT (para Login y Registro si es auto-login)
     private Long userId;
+    private String name;
     private String email;
     private String role;
     
