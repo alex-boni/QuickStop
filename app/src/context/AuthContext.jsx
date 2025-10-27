@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { logoutUser } from '../features/auth/AuthService';
 
 const AuthContext = createContext(null);
 
@@ -26,8 +27,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
+    logoutUser();
     setIsAuthenticated(false);
     setUser(null);
   };
