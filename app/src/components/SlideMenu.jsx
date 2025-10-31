@@ -36,6 +36,26 @@ const SideMenu = ({ isOpen, onClose }) => {
             </div>
           </a>
           <a
+            href="/login"
+            className="flex text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14c-4.418 0-8 3.582-8 8h16c0-4.418-3.582-8-8-8zM15 11l2 2m0-2l-2 2" // Representa un "check" o "entrada" junto al usuario
+              />
+            </svg>
+            <span className="font-medium">Iniciar Sesión</span>
+          </a>
+          <a
             href="/reservations"
             className="flex text-gray-700 hover:text-indigo-600 text-center  mt-6  items-center gap-2"
           >
@@ -55,6 +75,27 @@ const SideMenu = ({ isOpen, onClose }) => {
             </svg>
             <span className="font-medium">Mis Reservas</span>
           </a>
+          <a
+            href="/login"
+            className="flex text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
+            </svg>
+            <span className="font-medium">Cerrar Sesión</span>
+          </a>
+
           <a
             href="/settings"
             className="flex text-gray-700 hover:text-indigo-600 text-center items-center gap-2"

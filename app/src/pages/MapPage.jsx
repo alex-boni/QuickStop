@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import Map, {  GeolocateControl, NavigationControl } from "react-map-gl/mapbox";
+import Map, {  GeolocateControl, ScaleControl, NavigationControl } from "react-map-gl/mapbox";
+import GeocoderControl from "../components/GeocoderControl";
 import "mapbox-gl/dist/mapbox-gl.css";
 // import "./MapPage.css";
 
@@ -16,6 +17,22 @@ function MapPage() {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
+  const [viewState, setViewState] = useState({
+    latitude: 40.4168,
+    longitude: -3.7038,
+    zoom: 12,
+  });
+  
+  const handleViewStateChange = (newViewState) => {
+    if(!newViewState || !newViewState.latitude || !newViewState.longitude ) return;
+    setViewState({
+      latitude: newViewState.latitude,
+      longitude: newViewState.longitude,
+      zoom: 14,
+      trandsitionDuration: 1500,
+    });
+  }
+  
   // Verificación de token (WCAG 3.3.5: Ayuda en caso de error)
   if (!MAPBOX_TOKEN) {
     return (
@@ -25,19 +42,20 @@ function MapPage() {
       </div>
     );
   }
-
+// const noop = () => {};
+  
   return (
     <div className="relative w-full h-full ">
       <Map
         mapboxAccessToken={MAPBOX_TOKEN}
         style={{ width: "100%", height: "100%" }}
-        initialViewState={{
-          latitude: 40.4168,
-          longitude: -3.7038,
-          zoom: 12,
-        }}
+        {...viewState}
+        onMove={evt => setViewState(evt.viewState)}
         mapStyle="mapbox://styles/mapbox/streets-v9"
       >
+        {/* Control de Búsqueda Geocoding */}
+        {/* <GeocoderControl mapboxAccessToken={MAPBOX_TOKEN} position="top-left" marker="false" onLoading={noop} onResults={noop} onResult={noop} onError={noop} /> */}
+
         {/* Control de Geolocalización (Mi Ubicación) */}
         <GeolocateControl
           positionOptions={{ enableHighAccuracy: true }}
@@ -45,14 +63,16 @@ function MapPage() {
           showUserHeading={true}
           position="top-right"
           aria-label="Localizar mi ubicación actual"
-          style={{marginRight: "45px", marginTop: "110px"}}
+          style={{marginRight: "35px", marginTop: "110px"}}
         />
+        <ScaleControl/>
+        <NavigationControl position="top-right" style={{marginRight: "35px", marginTop: "20px"}}/>
 
       </Map>
 
-      <MobileSearchBar onSearch={(query) => console.log("Buscando:", query)} />
+      <MobileSearchBar onSearch={handleViewStateChange} />
       <DesktopSearchBar
-        onSearch={(query) => console.log("Buscando en Desktop:", query)}
+        onSearch={handleViewStateChange}
       />
       <FloatingMenuButton onToggle={toggleMenu} />
       <SideMenu isOpen={isMenuOpen} onClose={toggleMenu} />

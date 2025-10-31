@@ -2,7 +2,7 @@ import React from "react";
 
 const FloatingMenuButton = ({ onToggle }) => {
   return (
-    <div className="flex fixed top-6 right-6 z-40">
+    <div className="flex fixed top-6 right-4 z-40">
       <button
         onClick={onToggle}
         className="p-6 md:p-4 md:mt-3 md:mr-2 bg-white rounded-full shadow-xl 
