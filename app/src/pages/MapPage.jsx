@@ -22,8 +22,8 @@ import SideMenu from "../components/SlideMenu";
 import DesktopSearchBar from "../components/DesktopSearchBar";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
-// app/src/pages/MapPage.jsx (Definir los datos arriba)
 
+// datos simulados de parkings
 const MOCK_PARKINGS_DATA = {
   type: "FeatureCollection",
   features: [
