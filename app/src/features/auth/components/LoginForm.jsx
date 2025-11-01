@@ -27,10 +27,10 @@ const LoginForm = () => {
 			newErrors.email = 'Introduce un correo electrónico válido.';
 			isValid = false;
 		}
-		if (!formData.password || formData.password.length < 8) {
-			newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
-			isValid = false;
-		}
+		//if (!formData.password || formData.password.length < 8) {
+		//	newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
+		//	isValid = false;
+		//}
 		setErrors(newErrors);
 		return isValid;
 	};
@@ -45,7 +45,7 @@ const LoginForm = () => {
 		setIsLoading(true);
 		try {
 			const response = await loginUser(formData);
-			// Guardar token y datos del usuario en el contexto
+			//guardar token y datos del usuario en el contexto
 			if (response?.token) {
 				const userData = {
 					name: response.name,
@@ -59,6 +59,7 @@ const LoginForm = () => {
 			if (error.message === 'InvalidCredentials') {
 				setErrors({ global: 'Las credenciales no son correctas. Por favor, verifica tu correo y contraseña.' });
 			} else {
+				console.error(error.message);
 				setErrors({ global: 'Error del servidor. Por favor, inténtalo de nuevo más tarde.' });
 			}
 		} finally {
