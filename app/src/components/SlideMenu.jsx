@@ -1,6 +1,22 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const SideMenu = ({ isOpen, onClose }) => {
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    onClose();
+    navigate('/login');
+  };
+
+  const handleNavigation = (path) => {
+    onClose();
+    navigate(path);
+  };
+
   return (
     <>
       {isOpen && (
@@ -17,111 +33,137 @@ const SideMenu = ({ isOpen, onClose }) => {
                     ${isOpen ? "translate-x-0" : "translate-x-full"}`}
       >
         <nav className="space-y-6 mt-12 text-xl">
-          <a
-            href="/profile"
-            className="block text-gray-700 hover:text-indigo-600 border-b-1 pb-4 mb-4"
-          >
-            <div className="flex-col items-center justify-center text-center space-x-3">
-              <div className="flex-row items-center content-center justify-center ">
-                <img
-                  src="../../public/vite.svg"
-                  alt="PerfilImage"
-                  className="mx-auto"
-                />
-                <span className="font-medium">Alexsadasdfs</span>
-              </div>
-              <span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-0.5 text-sm font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
-                Ver Perfil
-              </span>
-            </div>
-          </a>
-          <a
-            href="/login"
-            className="flex text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14c-4.418 0-8 3.582-8 8h16c0-4.418-3.582-8-8-8zM15 11l2 2m0-2l-2 2" // Representa un "check" o "entrada" junto al usuario
-              />
-            </svg>
-            <span className="font-medium">Iniciar Sesión</span>
-          </a>
-          <a
-            href="/reservations"
-            className="flex text-gray-700 hover:text-indigo-600 text-center  mt-6  items-center gap-2"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            <span className="font-medium">Mis Reservas</span>
-          </a>
-          <a
-            href="/login"
-            className="flex text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-              />
-            </svg>
-            <span className="font-medium">Cerrar Sesión</span>
-          </a>
-
-          <a
-            href="/settings"
-            className="flex text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.829 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.829 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.829-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.829-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-            <span className="font-medium">Configuración</span>
-          </a>
+          {isAuthenticated ? (
+            <>
+              <button
+                onClick={() => handleNavigation('/account')}
+                className="block w-full text-left text-gray-700 hover:text-indigo-600 border-b-1 pb-4 mb-4"
+              >
+                <div className="flex-col items-center justify-center text-center space-x-3">
+                  <div className="flex-row items-center content-center justify-center ">
+                    <img
+                      src="../../public/vite.svg"
+                      alt="PerfilImage"
+                      className="mx-auto"
+                    />
+                    <span className="font-medium">{user?.username || 'Usuario'}</span>
+                  </div>
+                  <span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-0.5 text-sm font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
+                    Ver Perfil
+                  </span>
+                </div>
+              </button>
+              <button
+                onClick={() => handleNavigation('/reservations')}
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center mt-6 items-center gap-2"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <span className="font-medium">Mis Reservas</span>
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+                <span className="font-medium">Cerrar Sesión</span>
+              </button>
+              <button
+                onClick={() => handleNavigation('/settings')}
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.829 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.829 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.829-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.829-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <span className="font-medium">Configuración</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => handleNavigation('/login')}
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14c-4.418 0-8 3.582-8 8h16c0-4.418-3.582-8-8-8zM15 11l2 2m0-2l-2 2"
+                  />
+                </svg>
+                <span className="font-medium">Iniciar Sesión</span>
+              </button>
+              <button
+                onClick={() => handleNavigation('/register')}
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                  />
+                </svg>
+                <span className="font-medium">Registrarse</span>
+              </button>
+            </>
+          )}
         </nav>
 
         <button
