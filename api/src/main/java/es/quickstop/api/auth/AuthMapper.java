@@ -45,6 +45,7 @@ public interface AuthMapper {
      */
     @Mapping(target = "token", source = "password") // Se asume que el token se añade al DTO en el servicio
     @Mapping(target = "userId", source = "id")
+    @Mapping(target = "name", source = "name")
     @Mapping(target = "email", source = "email")
     AuthResponseDTO toAuthResponseDTO(User user);
 }

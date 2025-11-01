@@ -44,4 +44,11 @@ export const loginUser = async (credentials) => {
     }
 };
 
+// Servicio de Logout de Usuario
+export const logoutUser = () => {
+    // Limpiar tokens y datos del usuario
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
+};
+
 //Aqui se pueden definir mas servicios como logoutUser, etc. Para luego exportarlos y usarlos en los componentes correspondientes.

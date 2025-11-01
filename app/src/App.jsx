@@ -4,6 +4,8 @@ import RegisterPage from "./pages/RegisterPage";
 import Login from "./pages/Login";
 import AppLayout from "./Layouts/AppLayout";
 import MapPageBonito from "./pages/MapPageBonito";
+import ViewAccountDetails from "./pages/ViewAccountDetails";
+import { AuthProvider } from "./context/AuthContext";
 
 function Layout() {
   return (
@@ -20,15 +22,17 @@ function Layout() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/mapa" element={<MapPageBonito />} />
-
-        {/* Add more routes as needed */}
-      </Route>
-      <Route path="/" element={<MapPage />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/mapa" element={<MapPageBonito />} />
+          <Route path="/account" element={<ViewAccountDetails />} />
+          {/* Add more routes as needed */}
+        </Route>
+        <Route path="/" element={<MapPage />} />
+      </Routes>
+    </AuthProvider>
   );
 }
