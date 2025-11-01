@@ -57,9 +57,9 @@ const LoginForm = () => {
 			navigate('/');
 		} catch (error) {
 			if (error.message === 'InvalidCredentials') {
-				setErrors({ global: 'Correo o contraseña incorrectos.' });
+				setErrors({ global: 'Las credenciales no son correctas. Por favor, verifica tu correo y contraseña.' });
 			} else {
-				setErrors({ global: 'Ocurrió un error. Inténtalo de nuevo más tarde.' });
+				setErrors({ global: 'Error del servidor. Por favor, inténtalo de nuevo más tarde.' });
 			}
 		} finally {
 			setIsLoading(false);

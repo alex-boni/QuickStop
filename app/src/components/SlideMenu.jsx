@@ -46,7 +46,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                       alt="PerfilImage"
                       className="mx-auto"
                     />
-                    <span className="font-medium">{user?.username || 'Usuario'}</span>
+                    <span className="font-medium">{user?.name || user?.username || 'Usuario'}</span>
                   </div>
                   <span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-0.5 text-sm font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
                     Ver Perfil
