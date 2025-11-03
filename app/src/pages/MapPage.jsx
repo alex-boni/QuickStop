@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Map, {
   GeolocateControl,
   ScaleControl,
@@ -20,10 +20,10 @@ import FloatingMenuButton from "../components/FloatingMenuButton";
 import MobileSearchBar from "../components/MobileSearchBar";
 import SideMenu from "../components/SlideMenu";
 import DesktopSearchBar from "../components/DesktopSearchBar";
-import { getParkings } from "../features/parking/ParkingService"; 
+import { getParkings, EMPTY_GEOJSON} from "../features/parking/ParkingService"; 
 
 const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
-const PARKINGS_DATA = await getParkings();
+// const PARKINGS_DATA = await getParkings();
 
 function MapPage() {
   // Estado para controlar la barra lateral (SideMenu) en escritorio
@@ -36,6 +36,42 @@ function MapPage() {
     longitude: -3.7038,
     zoom: 12,
   });
+
+  // Estado para manejar la búsqueda de parkings según la ubicación
+  const [searchLocation, setSearchLocation] = useState(null);
+  const [isLoadingParkings, setIsLoadingParkings] = useState(true);
+  const [parkingsGeoJson, setParkingsGeoJson] = useState(EMPTY_GEOJSON);
+  const SEARCH_DISTANCE_KM = 5; // Distancia de búsqueda en kilómetros
+  const handleSearchMove = (result) =>{
+    if(!result || !result.latitude || !result.longitude){
+      return;
+    }
+    setViewState({
+      latitude: result.latitude,
+      longitude: result.longitude,
+      zoom: 14,
+      transitionDuration: 1500,
+    })
+    setSearchLocation({
+      latitude: result.latitude,
+      longitude: result.longitude,
+      distance: SEARCH_DISTANCE_KM,
+    })
+  }
+  useEffect(() =>{
+    const loadParkings = async ()=>{
+      setIsLoadingParkings(true);
+      const coords = searchLocation || {
+        latitude: viewState.latitude,
+        longitude: viewState.longitude,
+        distance: SEARCH_DISTANCE_KM,
+      }
+      const data = await getParkings(coords);
+      setParkingsGeoJson(data);
+      setIsLoadingParkings(false);
+    }
+    loadParkings();
+  }, [searchLocation]);
 
   const handleViewStateChange = (newViewState) => {
     if (!newViewState || !newViewState.latitude || !newViewState.longitude)
@@ -92,6 +128,22 @@ function MapPage() {
 
   return (
     <div className="relative w-full h-full ">
+      {isLoadingParkings && (
+                <div 
+                    className="absolute inset-0 z-[100] flex items-center justify-center bg-gray-100 bg-opacity-75"
+                    role="status" // WCAG: Indica que es un área de estado (cargando)
+                    aria-live="polite" // WCAG: Anuncia al lector de pantalla que el estado ha cambiado
+                >
+                    <p className="text-indigo-600 font-bold text-xl flex items-center gap-2 p-4 bg-white rounded-lg shadow-lg">
+                        {/* Spinner simple de Tailwind (ejemplo) */}
+                        <svg className="animate-spin h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Cargando parkings disponibles...
+                    </p> 
+                </div>
+            )}
       <Map
         mapboxAccessToken={MAPBOX_TOKEN}
         style={{ width: "100%", height: "100%" }}
@@ -105,7 +157,7 @@ function MapPage() {
         <Source
           id="parkings"
           type="geojson"
-          data={PARKINGS_DATA}
+          data={parkingsGeoJson}
           cluster={true}
           clusterMaxZoom={14}
           clusterRadius={50}
@@ -133,8 +185,8 @@ function MapPage() {
         />
       </Map>
 
-      <MobileSearchBar onSearch={handleViewStateChange} />
-      <DesktopSearchBar onSearch={handleViewStateChange} />
+      <MobileSearchBar onSearch={handleSearchMove} />
+      <DesktopSearchBar onSearch={handleSearchMove} />
       <FloatingMenuButton onToggle={toggleMenu} />
       <SideMenu isOpen={isMenuOpen} onClose={toggleMenu} />
     </div>
