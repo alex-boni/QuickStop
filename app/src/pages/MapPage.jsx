@@ -20,51 +20,10 @@ import FloatingMenuButton from "../components/FloatingMenuButton";
 import MobileSearchBar from "../components/MobileSearchBar";
 import SideMenu from "../components/SlideMenu";
 import DesktopSearchBar from "../components/DesktopSearchBar";
+import { getParkings } from "../features/parking/ParkingService"; 
 
 const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
-
-// datos simulados de parkings
-const MOCK_PARKINGS_DATA = {
-  type: "FeatureCollection",
-  features: [
-    {
-      type: "Feature",
-      geometry: { type: "Point", coordinates: [-3.701, 40.416] },
-      properties: { id: 1, available: 5 },
-    },
-    {
-      type: "Feature",
-      geometry: { type: "Point", coordinates: [-3.702, 40.415] },
-      properties: { id: 2, available: 12 },
-    },
-    {
-      type: "Feature",
-      geometry: { type: "Point", coordinates: [-3.7025, 40.4162] },
-      properties: { id: 3, available: 8 },
-    },
-    {
-      type: "Feature",
-      geometry: { type: "Point", coordinates: [-3.707, 40.418] },
-      properties: { id: 4, available: 2 },
-    },
-    {
-      type: "Feature",
-      geometry: { type: "Point", coordinates: [-3.69, 40.41] },
-      properties: { id: 5, available: 15 },
-    },
-    {
-      type: "Feature",
-      geometry: { type: "Point", coordinates: [-3.6905, 40.4105] },
-      properties: { id: 6, available: 6 },
-    },
-    // Más puntos cercanos para que se agrupen en Madrid Central
-    {
-      type: "Feature",
-      geometry: { type: "Point", coordinates: [-3.703, 40.416] },
-      properties: { id: 7, available: 20 },
-    },
-  ],
-};
+const PARKINGS_DATA = await getParkings();
 
 function MapPage() {
   // Estado para controlar la barra lateral (SideMenu) en escritorio
@@ -146,7 +105,7 @@ function MapPage() {
         <Source
           id="parkings"
           type="geojson"
-          data={MOCK_PARKINGS_DATA}
+          data={PARKINGS_DATA}
           cluster={true}
           clusterMaxZoom={14}
           clusterRadius={50}

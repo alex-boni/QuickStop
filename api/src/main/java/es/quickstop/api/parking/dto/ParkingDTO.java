@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ParkingDTO {
     private Long id;
-    private double latitude;
     private double longitude;
+    private double latitude;
     private int spots;
     private String owner;
     private double price;

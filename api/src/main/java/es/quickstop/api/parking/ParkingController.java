@@ -11,17 +11,24 @@ import java.util.ArrayList;
 
 
 @RestController
-@RequestMapping("/api/parkings")
+@RequestMapping("/parking")
 public class ParkingController {
     
     @GetMapping("/find-all")
     public ResponseEntity<List<ParkingDTO>> getAllParkings() {
         List<ParkingDTO> parkings = new ArrayList<>();
-        parkings.add(new ParkingDTO(1L, 40.4168, -3.7038, 50, "Owner1", 2.5, true));
-        parkings.add(new ParkingDTO(2L, 41.3851, 2.1734, 30, "Owner2", 3.0, false));
-        parkings.add(new ParkingDTO(3L, 39.4699, -0.3763, 20, "Owner3", 1.5, true));
-        parkings.add(new ParkingDTO(4L, 37.3891, -5.9845, 40, "Owner4", 2.0, true));
-        parkings.add(new ParkingDTO(5L, 43.2630, -2.9350, 25, "Owner5", 2.8, false));
+        parkings.add(new ParkingDTO(1L,  -3.7038,40.4168, 50, "Owner1", 2.5, true));
+        parkings.add(new ParkingDTO(2L,  2.1734, 41.3851,30, "Owner2", 3.0, true));
+        parkings.add(new ParkingDTO(3L,  -0.3763,39.4699, 20, "Owner3", 1.5, true));
+        parkings.add(new ParkingDTO(4L,  -5.9845,37.3891, 40, "Owner4", 2.0, true));
+        parkings.add(new ParkingDTO(5L,  -2.9350,43.2630, 25, "Owner5", 2.8, true));
+        parkings.add(new ParkingDTO(6L,  -3.7010, 40.4160, 25, "Owner6", 2.8, true));
+        parkings.add(new ParkingDTO(7L,  -3.7020, 40.4150, 25, "Owner7", 2.8, true));
+        parkings.add(new ParkingDTO(8L,  -3.7025, 40.4162, 25, "Owner8", 2.8, true));
+        parkings.add(new ParkingDTO(9L,  -3.7070, 40.4180, 25, "Owner9", 2.8, true));
+        parkings.add(new ParkingDTO(10L, -3.69, 40.41, 25, "Owner10", 2.8, true));
+        parkings.add(new ParkingDTO(11L, -3.6905, 40.4105, 25, "Owner11", 2.8, true));
+        parkings.add(new ParkingDTO(12L, -3.703, 40.416, 25, "Owner12", 2.8, true));
         return new ResponseEntity<>(parkings, HttpStatus.OK);
     }
     
