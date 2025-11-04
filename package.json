@@ -16,7 +16,13 @@
     "dev:windows:api": "dotenv -e .env -- cmd /c \"cd api && mvnw spring-boot:run -DskipTests\"",
     "dev:api": "dotenv -e .env -- sh -c 'cd api && ./mvnw spring-boot:run -DskipTests'",
     "dev": "npm run dev:db && concurrently -n WEB,API -c auto \"npm run dev:app\" \"npm run dev:api\"",
-    "dev:windows": "npm run dev:db && concurrently -n WEB,API -c auto \"npm run dev:app\" \"npm run dev:windows:api\""
+    "dev:windows": "npm run dev:db && concurrently -n WEB,API -c auto \"npm run dev:app\" \"npm run dev:windows:api\"",
+
+    "build:app": "npm run build --workspace=app",
+    "build:api": "cmd /c \"cd api && mvnw clean install -DskipTests\"", 
+    "build": "npm run build:app && npm run build:api",
+    "start:app": "npm run preview --workspace=app",
+    "start:api": "dotenv -e .env -- java -jar api/target/api-0.0.1-SNAPSHOT.jar"
   },
   "repository": {
     "type": "git",

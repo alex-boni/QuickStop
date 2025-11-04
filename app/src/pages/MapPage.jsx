@@ -130,9 +130,9 @@ function MapPage() {
     <div className="relative w-full h-full ">
       {isLoadingParkings && (
                 <div 
-                    className="absolute inset-0 z-[100] flex items-center justify-center bg-gray-100 bg-opacity-75"
-                    role="status" // WCAG: Indica que es un área de estado (cargando)
-                    aria-live="polite" // WCAG: Anuncia al lector de pantalla que el estado ha cambiado
+                className="absolute inset-0 z-[10] flex items-center justify-center bg-gray-100 bg-opacity-75"
+                role="status" // WCAG: Indica que es un área de estado (cargando)
+                aria-live="polite" // WCAG: Anuncia al lector de pantalla que el estado ha cambiado
                 >
                     <p className="text-indigo-600 font-bold text-xl flex items-center gap-2 p-4 bg-white rounded-lg shadow-lg">
                         {/* Spinner simple de Tailwind (ejemplo) */}

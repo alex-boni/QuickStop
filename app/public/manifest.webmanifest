@@ -1,0 +1,30 @@
+{
+    "name": "QuickStop - Aparta tu lugar de estacionamiento",
+    "short_name": "QuickStop",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4f46e5",
+    "icons": [
+        {
+            "src": "icons/appstore.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/playstore.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/ic_app_512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/ic_app_196.png",
+            "sizes": "196x196",
+            "type": "image/png"
+        }
+    ]
+}

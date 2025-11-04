@@ -12,3 +12,13 @@ createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </StrictMode>,
 )
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // VitePWA genera el archivo sw.js
+    navigator.serviceWorker.register('/sw.js').then(registration => {
+      console.log('SW registrado con éxito:', registration);
+    }).catch(error => {
+      console.error('Fallo en el registro del SW:', error);
+    });
+  });
+}
