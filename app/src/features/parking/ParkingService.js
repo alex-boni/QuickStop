@@ -1,8 +1,9 @@
 import apiClient from "../../services/apiClient";
 //Definicion de Endpoints
 const PARKING_ENDPOINTS = {
-    GET_PARKINGS: '/parking/find-all'
-    //Aqui se pueden añadir mas endpoints relacionados con parkings
+    GET_PARKINGS: '/parking/find-all',
+    CREATE_PARKING: '/parking/create'
+
 }
 
 export const getParkings = async () => {
@@ -32,3 +33,15 @@ export const getParkings = async () => {
     }
 };
 
+
+
+//EXPLICAR
+export const createParking = async (parkingData) => {
+    try {
+        const response = await apiClient.post(PARKING_ENDPOINTS.CREATE_PARKING, parkingData);
+        return response.data;
+    } catch (error) {
+        console.error("Error creating parking:", error);
+        throw error;
+    }
+};

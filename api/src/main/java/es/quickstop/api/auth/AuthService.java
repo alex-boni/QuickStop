@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthMapper authMapper = AuthMapper.INSTANCE;
+    private final AuthMapper authMapper;
     
 @Transactional // Asegura que la operación sea atómica (éxito total o fallo total)
     public AuthResponseDTO register(RegisterRequestDTO request) {
