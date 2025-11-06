@@ -1,9 +1,8 @@
 import apiClient from "../../services/apiClient";
-//Definicion de Endpoints
-const PARKING_ENDPOINTS = {
-    GET_PARKINGS: '/parking/find-all',
-    CREATE_PARKING: '/parking/create'
 
+const PARKING_ENDPOINTS = {
+    GET_PARKINGS: 'parking/find-all',
+    CREATE_PARKING: 'parking/create'
 }
 
 export const getParkings = async () => {

@@ -2,7 +2,7 @@ import { Routes, Route, Outlet, Link } from "react-router-dom";
 import MapPage from "./pages/MapPage";
 import RegisterPage from "./pages/RegisterPage";
 import Login from "./pages/Login";
-import AppLayout from "./Layouts/AppLayout";
+import AddParking from "./pages/AddParking";
 import MapPageBonito from "./pages/MapPageBonito";
 import ViewAccountDetails from "./pages/ViewAccountDetails";
 import { AuthProvider } from "./context/AuthContext";
@@ -29,6 +29,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/mapa" element={<MapPageBonito />} />
           <Route path="/account" element={<ViewAccountDetails />} />
+          <Route path="/addparking" element={<AddParking />} />
           {/* Add more routes as needed */}
         </Route>
         <Route path="/" element={<MapPage />} />
