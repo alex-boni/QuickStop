@@ -110,7 +110,7 @@ const RegisterForm = () => {
   const isDriver = formData.role === 'DRIVER';
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-2">
       
       {/* ---------------------------------------------------- */}
       {/* 1. Campos de Formulario (con Feedback de Error y ARIA) */}
