@@ -14,9 +14,7 @@ const PARKING_ENDPOINTS = {
 
 export const getParkings = async (coords) => {
     try {
-        // console.log("Fetching parkings with coords:", coords);
         if(!coords || !coords.latitude || !coords.longitude){
-            console.warn("Invalid coordinates provided for fetching parkings.");
             return EMPTY_GEOJSON;
         }
         const response = await apiClient.get(PARKING_ENDPOINTS.GET_PARKINGS,{
@@ -38,9 +36,9 @@ export const getParkings = async (coords) => {
                     id: parking.id,
                     name: parking.name,
                     ownerId: parking.ownerId,
-                    spots: parking.spots,
-                    price: parking.price,
-                    available: parking.available,
+                    spots: parking.availableSpots,
+                    price: parking.pricePerHour,
+                    available: parking.isActive,
                 }
             }))
         };

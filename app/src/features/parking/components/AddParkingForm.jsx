@@ -131,16 +131,10 @@ const AddParkingForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        console.log('=== INICIO SUBMIT ===');
-        console.log('FormData actual:', formData);
-        console.log('Marker position:', markerPosition);
-        
         if (!validateForm()) {
-            console.error('Validación falló');
             return;
         }
 
-        console.log('Validación OK');
         setIsLoading(true);
         setErrors({});
         setSuccess(false);
@@ -158,9 +152,7 @@ const AddParkingForm = () => {
                 isActive: formData.isActive
             };
 
-            console.log('📤 Enviando datos:', parkingData);
-            const response = await createParking(parkingData);
-            console.log('✅ Respuesta del servidor:', response);
+            await createParking(parkingData);
             
             setSuccess(true);
             
@@ -170,10 +162,6 @@ const AddParkingForm = () => {
             }, 2000);
             
         } catch (error) {
-            console.error('❌ Error completo:', error);
-            console.error('Error response:', error.response);
-            console.error('Error message:', error.message);
-            console.error('Error code:', error.code);
             
             if (error.code === 'ECONNABORTED') {
                 setErrors({
