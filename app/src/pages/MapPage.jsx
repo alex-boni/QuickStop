@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Map, {
   GeolocateControl,
   ScaleControl,
@@ -26,6 +27,8 @@ const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
 const PARKINGS_DATA = await getParkings();
 
 function MapPage() {
+  const navigate = useNavigate();
+  
   // Estado para controlar la barra lateral (SideMenu) en escritorio
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -55,28 +58,35 @@ function MapPage() {
       return;
     }
     const feature = event.features[0];
-    // Solo proceder si el clic fue en la capa 'clusters'
-    if (feature.layer.id !== clusterLayer.id) {
-      return;
-    }
+    
+    // Si es un cluster, expandirlo
+    if (feature.layer.id === clusterLayer.id) {
+      const clusterId = feature.properties.cluster_id;
+      const mapboxSource = mapRef.current.getSource("parkings");
 
-    const clusterId = feature.properties.cluster_id;
-    const mapboxSource = mapRef.current.getSource("parkings");
+      // Mapbox calcula el zoom necesario para expandir el cluster
+      mapboxSource.getClusterExpansionZoom(clusterId, (err, zoom) => {
+        if (err) {
+          return;
+        }
 
-    // Mapbox calcula el zoom necesario para expandir el cluster
-    mapboxSource.getClusterExpansionZoom(clusterId, (err, zoom) => {
-      if (err) {
-        return;
-      }
-
-      // Anima el movimiento del mapa al centro del cluster con el zoom calculado
-      setViewState({
-        latitude: feature.geometry.coordinates[1], // [lng, lat]
-        longitude: feature.geometry.coordinates[0],
-        zoom,
-        transitionDuration: 500,
+        // Anima el movimiento del mapa al centro del cluster con el zoom calculado
+        setViewState({
+          latitude: feature.geometry.coordinates[1], // [lng, lat]
+          longitude: feature.geometry.coordinates[0],
+          zoom,
+          transitionDuration: 500,
+        });
       });
-    });
+    }
+    
+    // Si es un punto individual, navegar a sus detalles
+    if (feature.layer.id === unclusteredPointLayer.id) {
+      const parkingId = feature.properties.id;
+      if (parkingId) {
+        navigate(`/parking/${parkingId}`);
+      }
+    }
   };
 
   // Verificación de token (WCAG 3.3.5: Ayuda en caso de error)
@@ -98,7 +108,7 @@ function MapPage() {
         {...viewState}
         onMove={(evt) => setViewState(evt.viewState)}
         mapStyle="mapbox://styles/mapbox/streets-v9"
-        interactiveLayerIds={[clusterLayer.id]}
+        interactiveLayerIds={[clusterLayer.id, unclusteredPointLayer.id]}
         onClick={onClick}
         ref={mapRef}
       >

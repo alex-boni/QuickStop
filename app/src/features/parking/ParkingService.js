@@ -2,6 +2,7 @@ import apiClient from "../../services/apiClient";
 
 const PARKING_ENDPOINTS = {
     GET_PARKINGS: 'parking/find-all',
+    GET_PARKING_BY_ID: 'parking',
     CREATE_PARKING: 'parking/create'
 }
 
@@ -34,7 +35,16 @@ export const getParkings = async () => {
 
 
 
-//EXPLICAR
+export const getParkingById = async (id) => {
+    try {
+        const response = await apiClient.get(`${PARKING_ENDPOINTS.GET_PARKING_BY_ID}/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching parking by ID:", error);
+        throw error;
+    }
+};
+
 export const createParking = async (parkingData) => {
     try {
         const response = await apiClient.post(PARKING_ENDPOINTS.CREATE_PARKING, parkingData);

@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.HttpStatus;
 import es.quickstop.api.parking.dto.ParkingDTO;
 import java.util.List;
@@ -33,6 +34,11 @@ public class ParkingController {
         return new ResponseEntity<>(createdParking, HttpStatus.CREATED);
     }
 
-
+    @GetMapping("/{id}")
+    public ResponseEntity<ParkingDTO> getParkingById(@PathVariable Long id) {
+        return parkingService.getParkingById(id)
+                .map(parking -> new ResponseEntity<>(parking, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
 
 }

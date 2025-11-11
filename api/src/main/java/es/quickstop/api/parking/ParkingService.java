@@ -7,6 +7,7 @@ import es.quickstop.api.parking.model.Parking;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,5 +28,10 @@ public class ParkingService {
         Parking parking = parkingMapper.toEntity(parkingDTO);
         Parking savedParking = parkingRepository.save(parking);
         return parkingMapper.toDTO(savedParking);
+    }
+    
+    public Optional<ParkingDTO> getParkingById(Long id) {
+        return parkingRepository.findById(id)
+                .map(parkingMapper::toDTO);
     }
 }
