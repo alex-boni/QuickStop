@@ -19,7 +19,8 @@ export const getParkings = async () => {
                 },
                 properties: {
                     id: parking.id,
-                    name: parking.owner,
+                    name: parking.name,
+                    ownerId: parking.ownerId,
                     spots: parking.spots,
                     price: parking.price,
                     available: parking.available,
@@ -45,12 +46,32 @@ export const getParkingById = async (id) => {
     }
 };
 
+export const updateParking = async (id, parkingData) => {
+    try {
+        const response = await apiClient.put(`${PARKING_ENDPOINTS.GET_PARKING_BY_ID}/${id}`, parkingData);
+        return response.data;
+    } catch (error) {
+        console.error("Error updating parking:", error);
+        throw error;
+    }
+};
+
 export const createParking = async (parkingData) => {
     try {
         const response = await apiClient.post(PARKING_ENDPOINTS.CREATE_PARKING, parkingData);
         return response.data;
     } catch (error) {
         console.error("Error creating parking:", error);
+        throw error;
+    }
+};
+
+export const deleteParking = async (id) => {
+    try {
+        const response = await apiClient.delete(`${PARKING_ENDPOINTS.GET_PARKING_BY_ID}/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting parking:", error);
         throw error;
     }
 };

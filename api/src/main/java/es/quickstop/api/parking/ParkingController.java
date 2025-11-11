@@ -7,13 +7,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+
 import es.quickstop.api.parking.dto.ParkingDTO;
 import java.util.List;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import org.springframework.web.bind.annotation.RequestBody;
 
 import lombok.RequiredArgsConstructor;
-
 
 @RestController
 @RequestMapping("/parking")
@@ -39,6 +42,22 @@ public class ParkingController {
         return parkingService.getParkingById(id)
                 .map(parking -> new ResponseEntity<>(parking, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ParkingDTO> updateParking(
+            @PathVariable Long id, @RequestBody ParkingDTO parkingDTO) {
+        return parkingService.updateParking(id, parkingDTO)
+                .map(parking -> new ResponseEntity<>(parking, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteParking(@PathVariable Long id) {
+        if (parkingService.deleteParking(id)) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 }

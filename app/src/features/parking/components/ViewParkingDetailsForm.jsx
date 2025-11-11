@@ -123,7 +123,7 @@ export default function ViewParkingDetailsForm() {
             <div className="flex gap-4">
                 <button
                     type="button"
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigate('/')}
                     className="flex-1 bg-gray-500 text-white py-3 px-4 rounded-lg hover:bg-gray-600 transition-colors"
                 >
                     Volver

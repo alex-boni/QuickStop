@@ -6,6 +6,7 @@ import AddParking from "./pages/AddParking";
 import MapPageBonito from "./pages/MapPageBonito";
 import ViewAccountDetails from "./pages/ViewAccountDetails";
 import ViewParkingDetails from "./pages/ViewParkingDetails";
+import EditParking from "./pages/EditParking";
 import { AuthProvider } from "./context/AuthContext";
 
 function Layout() {
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/account" element={<ViewAccountDetails />} />
           <Route path="/addparking" element={<AddParking />} />
           <Route path="/parking/:id" element={<ViewParkingDetails />} />
+          <Route path="/parking/edit/:id" element={<EditParking />} />
           {/* Add more routes as needed */}
         </Route>
         <Route path="/" element={<MapPage />} />

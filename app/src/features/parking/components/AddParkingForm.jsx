@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { createParking } from "../ParkingService";
+import { useAuth } from "../../../context/AuthContext";
 import Map, { Marker } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -8,6 +9,7 @@ const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
 
 const AddParkingForm = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
@@ -17,7 +19,7 @@ const AddParkingForm = () => {
         availableSpots: '',
         pricePerHour: '',
         description: '',
-        ownerId: 1, // TODO: obtener del usuario autenticado
+        ownerId: user?.id || null,
         isActive: true
     });
 

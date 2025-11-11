@@ -48,6 +48,7 @@ const LoginForm = () => {
 			//guardar token y datos del usuario en el contexto
 			if (response?.token) {
 				const userData = {
+					id: response.userId,
 					name: response.name,
 					email: response.email,
 					role: response.role
