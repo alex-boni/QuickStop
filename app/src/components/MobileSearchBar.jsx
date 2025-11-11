@@ -43,6 +43,7 @@ const MobileSearchBar = ({ onSearch }) => {
           setSuggestions(results);
         }).catch((error) => {
           console.error("Error al obtener sugerencias de geocoding:", error);
+          setSuggestions([{"id": "error", "place_name": "Error al cargar sugerencias"}]);
         });
     }, [debouncedQuery]); 
   

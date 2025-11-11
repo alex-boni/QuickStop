@@ -118,7 +118,7 @@ function MapPage() {
   // Verificación de token (WCAG 3.3.5: Ayuda en caso de error)
   if (!MAPBOX_TOKEN) {
     return (
-      <div className="flex justify-center items-center h-screen text-red-600 font-semibold p-8">
+      <div className="flex justify-center items-center h-screen text-red-600 font-semibold p-8" role="alert" aria-label="Error de Configuración: Token de Mapbox no configurado">
         Error de Configuración: Token de Mapbox no configurado. Verifica tu
         archivo .env.
       </div>
@@ -128,11 +128,16 @@ function MapPage() {
 
   return (
     <div className="relative w-full h-full ">
+      <title>QuikStop: Mapa </title>
+      <h1 className="justify-center place-self-center text-indigo-600" aria-label="QuikStop: Mapa de Parkings" hidden>QuikStop: Mapa de Parkings</h1>
+      <h2 className="justify-center place-self-center text-indigo-600" aria-label="Mapa interactivo de parkings disponibles en QuikStop" hidden>Mapa interactivo de parkings disponibles</h2>
+
       {isLoadingParkings && (
                 <div 
                 className="absolute inset-0 z-[10] flex items-center justify-center bg-gray-100 bg-opacity-75"
                 role="status" // WCAG: Indica que es un área de estado (cargando)
                 aria-live="polite" // WCAG: Anuncia al lector de pantalla que el estado ha cambiado
+                aria-label="Cargando parkings disponibles. Por favor espera. Si la carga tarda mucho, por favor refresca la página o revisa tu conexión a internet."
                 >
                     <p className="text-indigo-600 font-bold text-xl flex items-center gap-2 p-4 bg-white rounded-lg shadow-lg">
                         {/* Spinner simple de Tailwind (ejemplo) */}
@@ -140,7 +145,7 @@ function MapPage() {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        Cargando parkings disponibles...
+                        Cargando parkings disponibles... Si la carga tarda mucho, por favor refresca la página o revisa tu conexión a internet.
                     </p> 
                 </div>
             )}
