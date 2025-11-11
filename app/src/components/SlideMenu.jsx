@@ -43,7 +43,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                   <div className="flex-row items-center content-center justify-center ">
                     <img
                       src="../../public/vite.svg"
-                      alt="PerfilImage"
+                      alt={user?.name ?`Foto de perfil de ${user.name}` : "Foto de perfil de usuario"}
                       className="mx-auto"
                     />
                     <span className="font-medium">
@@ -65,6 +65,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -91,6 +92,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -111,6 +113,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -131,6 +134,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -160,6 +164,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -186,6 +191,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -206,6 +212,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
