@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ParkingActionModal from "../features/parking/components/ParkingActionModal";
 import ParkingDetailsModal from "../features/parking/components/ParkingDetailsModal";
+import ParkingQuickViewPopup from "../features/parking/components/ParkingQuickViewPopup";
 import { deleteParking } from "../features/parking/ParkingService";
 import Map, {
   GeolocateControl,
@@ -10,6 +11,7 @@ import Map, {
   NavigationControl,
   Source,
   Layer,
+  Popup,
 } from "react-map-gl/mapbox";
 import {
   clusterLayer,
@@ -46,10 +48,18 @@ export default function MapPage() {
     ownerId: null
   });
 
-  // Estado para el modal de detalles (no owner)
+  // Estado para el modal de detalles completo (owner)
   const [detailsModalState, setDetailsModalState] = useState({
     isOpen: false,
     parkingId: null
+  });
+
+  // Estado para el popup quick view (no owner) - anclado al mapa
+  const [quickViewModalState, setQuickViewModalState] = useState({
+    isOpen: false,
+    parkingId: null,
+    longitude: null,
+    latitude: null
   });
 
   const openModal = (parkingId, parkingName, ownerId) => {
@@ -71,7 +81,7 @@ export default function MapPage() {
   };
 
   const handleViewDetails = () => {
-    // Cerrar el modal de acciones y abrir el modal de detalles
+    // Cerrar el modal de acciones y abrir el modal de detalles completo (para owner)
     const parkingId = modalState.parkingId;
     closeModal();
     setDetailsModalState({
@@ -120,7 +130,7 @@ export default function MapPage() {
       latitude: result.latitude,
       longitude: result.longitude,
       zoom: 14,
-      transitionDuration: 100000,
+      transitionDuration: 1500,
     })
     setSearchLocation({
       latitude: result.latitude,
@@ -196,7 +206,7 @@ export default function MapPage() {
           mapRef.current.easeTo({
             center: [longitude, latitude],
             zoom: 16,
-            duration: 3000, // 3 segundos
+            duration: 1500, // 1.5 segundos
             essential: true
           });
         }
@@ -206,10 +216,12 @@ export default function MapPage() {
           // Es el owner, mostrar modal de acciones
           openModal(parkingId, parkingName, ownerId);
         } else {
-          // No es el owner, mostrar modal de detalles
-          setDetailsModalState({
+          // No es el owner, mostrar quick view anclado al mapa
+          setQuickViewModalState({
             isOpen: true,
-            parkingId
+            parkingId,
+            longitude,
+            latitude
           });
         }
       }
@@ -289,6 +301,16 @@ export default function MapPage() {
           position="top-right"
           style={{ marginRight: "35px", marginTop: "20px" }}
         />
+
+        {/* Popup anclado al parking */}
+        {quickViewModalState.isOpen && (
+          <ParkingQuickViewPopup
+            longitude={quickViewModalState.longitude}
+            latitude={quickViewModalState.latitude}
+            parkingId={quickViewModalState.parkingId}
+            onClose={() => setQuickViewModalState({ isOpen: false, parkingId: null, longitude: null, latitude: null })}
+          />
+        )}
       </Map>
 
       <MobileSearchBar onSearch={handleSearchMove} />
