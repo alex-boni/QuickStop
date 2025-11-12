@@ -78,7 +78,7 @@ export default function EditParkingForm() {
             
             await updateParking(id, updatedData);
             alert('Parking actualizado correctamente');
-            navigate(`/parking/${id}`, { replace: true });
+            navigate('/', { replace: true });
         } catch (err) {
             setError('Error al actualizar el parking');
             console.error(err);

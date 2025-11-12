@@ -30,7 +30,7 @@ import { getParkings, EMPTY_GEOJSON} from "../features/parking/ParkingService";
 const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
 // const PARKINGS_DATA = await getParkings();
 
-export default function MapPage() { //meter argmunetos latitud y longitud
+export default function MapPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   
@@ -120,7 +120,7 @@ export default function MapPage() { //meter argmunetos latitud y longitud
       latitude: result.latitude,
       longitude: result.longitude,
       zoom: 14,
-      transitionDuration: 1500,
+      transitionDuration: 100000,
     })
     setSearchLocation({
       latitude: result.latitude,
@@ -188,8 +188,19 @@ export default function MapPage() { //meter argmunetos latitud y longitud
       const parkingId = feature.properties.id;
       const parkingName = feature.properties.name || 'Parking';
       const ownerId = feature.properties.ownerId;
+      const [longitude, latitude] = feature.geometry.coordinates;
       
       if (parkingId) {
+        // Centrar el mapa en el parking clickeado con transición suave usando easeTo
+        if (mapRef.current) {
+          mapRef.current.easeTo({
+            center: [longitude, latitude],
+            zoom: 16,
+            duration: 3000, // 3 segundos
+            essential: true
+          });
+        }
+
         // Verificar si el usuario es el owner
         if (user && user.id === ownerId) {
           // Es el owner, mostrar modal de acciones
