@@ -20,7 +20,7 @@
 
     "build:app": "npm run build --workspace=app",
     "build:windows:api": "cmd /c \"cd api && mvnw clean install -DskipTests\"", 
-    "build:api": "cd api && ./mvnw clean install -DskipTests\"", 
+    "build:api": "cd api && ./mvnw clean install -DskipTests", 
     "build": "npm run build:app && npm run build:api",
     "build:windows": "npm run build:app && npm run build:windows:api",
     "start:app": "npm run preview --workspace=app",
