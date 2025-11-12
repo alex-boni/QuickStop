@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import ParkingActionModal from "../features/parking/components/ParkingActionModal";
+import { deleteParking } from "../features/parking/ParkingService";
 import Map, {
   GeolocateControl,
   ScaleControl,
@@ -25,10 +29,64 @@ import { getParkings, EMPTY_GEOJSON} from "../features/parking/ParkingService";
 const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
 // const PARKINGS_DATA = await getParkings();
 
-function MapPage() {
+export default function MapPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
   // Estado para controlar la barra lateral (SideMenu) en escritorio
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  // Estado para el modal
+  const [modalState, setModalState] = useState({
+    isOpen: false,
+    parkingId: null,
+    parkingName: '',
+    ownerId: null
+  });
+
+  const openModal = (parkingId, parkingName, ownerId) => {
+    setModalState({
+      isOpen: true,
+      parkingId,
+      parkingName,
+      ownerId
+    });
+  };
+
+  const closeModal = () => {
+    setModalState({
+      isOpen: false,
+      parkingId: null,
+      parkingName: '',
+      ownerId: null
+    });
+  };
+
+  const handleViewDetails = () => {
+    navigate(`/parking/${modalState.parkingId}`);
+    closeModal();
+  };
+
+  const handleEdit = () => {
+    navigate(`/parking/edit/${modalState.parkingId}`);
+    closeModal();
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm(`¿Estás seguro de que quieres eliminar "${modalState.parkingName}"? Esta acción no se puede deshacer.`)) {
+      try {
+        await deleteParking(modalState.parkingId);
+        alert('Parking eliminado correctamente');
+        closeModal();
+        // Recargar la página para actualizar el mapa
+        window.location.reload();
+      } catch (error) {
+        console.error('Error al eliminar parking:', error);
+        alert('Error al eliminar el parking. Inténtalo de nuevo.');
+      }
+    }
+  };
 
   // Estado para controlar la vista del mapa
   const [viewState, setViewState] = useState({
@@ -91,28 +149,45 @@ function MapPage() {
       return;
     }
     const feature = event.features[0];
-    // Solo proceder si el clic fue en la capa 'clusters'
-    if (feature.layer.id !== clusterLayer.id) {
-      return;
-    }
+    
+    // Si es un cluster, expandirlo
+    if (feature.layer.id === clusterLayer.id) {
+      const clusterId = feature.properties.cluster_id;
+      const mapboxSource = mapRef.current.getSource("parkings");
 
-    const clusterId = feature.properties.cluster_id;
-    const mapboxSource = mapRef.current.getSource("parkings");
+      // Mapbox calcula el zoom necesario para expandir el cluster
+      mapboxSource.getClusterExpansionZoom(clusterId, (err, zoom) => {
+        if (err) {
+          return;
+        }
 
-    // Mapbox calcula el zoom necesario para expandir el cluster
-    mapboxSource.getClusterExpansionZoom(clusterId, (err, zoom) => {
-      if (err) {
-        return;
-      }
-
-      // Anima el movimiento del mapa al centro del cluster con el zoom calculado
-      setViewState({
-        latitude: feature.geometry.coordinates[1], // [lng, lat]
-        longitude: feature.geometry.coordinates[0],
-        zoom,
-        transitionDuration: 500,
+        // Anima el movimiento del mapa al centro del cluster con el zoom calculado
+        setViewState({
+          latitude: feature.geometry.coordinates[1], // [lng, lat]
+          longitude: feature.geometry.coordinates[0],
+          zoom,
+          transitionDuration: 500,
+        });
       });
-    });
+    }
+    
+    // Si es un punto individual
+    if (feature.layer.id === unclusteredPointLayer.id) {
+      const parkingId = feature.properties.id;
+      const parkingName = feature.properties.name || 'Parking';
+      const ownerId = feature.properties.ownerId;
+      
+      if (parkingId) {
+        // Verificar si el usuario es el owner
+        if (user && user.id === ownerId) {
+          // Es el owner, mostrar modal
+          openModal(parkingId, parkingName, ownerId);
+        } else {
+          // No es el owner, ir directo a detalles
+          navigate(`/parking/${parkingId}`);
+        }
+      }
+    }
   };
 
   // Verificación de token (WCAG 3.3.5: Ayuda en caso de error)
@@ -155,7 +230,7 @@ function MapPage() {
         {...viewState}
         onMove={(evt) => setViewState(evt.viewState)}
         mapStyle="mapbox://styles/mapbox/streets-v9"
-        interactiveLayerIds={[clusterLayer.id]}
+        interactiveLayerIds={[clusterLayer.id, unclusteredPointLayer.id]}
         onClick={onClick}
         ref={mapRef}
       >
@@ -194,8 +269,16 @@ function MapPage() {
       <DesktopSearchBar onSearch={handleSearchMove} />
       <FloatingMenuButton onToggle={toggleMenu} />
       <SideMenu isOpen={isMenuOpen} onClose={toggleMenu} />
+      
+      <ParkingActionModal
+        isOpen={modalState.isOpen}
+        onClose={closeModal}
+        onView={handleViewDetails}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        parkingName={modalState.parkingName}
+      />
     </div>
   );
 }
 
-export default MapPage;

@@ -17,10 +17,8 @@
     "dev:api": "dotenv -e .env -- sh -c 'cd api && ./mvnw spring-boot:run -DskipTests'",
     "dev": "npm run dev:db && concurrently -n WEB,API -c auto \"npm run dev:app\" \"npm run dev:api\"",
     "dev:windows": "npm run dev:db && concurrently -n WEB,API -c auto \"npm run dev:app\" \"npm run dev:windows:api\"",
-
     "build:app": "npm run build --workspace=app",
-    "build:windows:api": "cmd /c \"cd api && mvnw clean install -DskipTests\"", 
-    "build:api": "cd api && ./mvnw clean install -DskipTests", 
+    "build:api": "cmd /c \"cd api && mvnw clean install -DskipTests\"", 
     "build": "npm run build:app && npm run build:api",
     "build:windows": "npm run build:app && npm run build:windows:api",
     "start:app": "npm run preview --workspace=app",

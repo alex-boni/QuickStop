@@ -21,12 +21,15 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             // 1. Deshabilitar CSRF (Crucial para APIs REST)
-            .csrf(csrf -> csrf.disable()) 
+            .csrf(csrf -> csrf.disable())
             
-            // 2. Configurar la gestión de sesiones como STATELESS (Necesario para JWT)
+            // 2. Habilitar CORS
+            .cors(cors -> cors.disable())
+            
+            // 3. Configurar la gestión de sesiones como STATELESS (Necesario para JWT)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
-            // 3. Definición de Reglas de Autorización
+            // 4. Definición de Reglas de Autorización
             .authorizeHttpRequests(auth -> auth
                 // Permitir el acceso sin autenticación a /auth/register y /auth/login
                 .requestMatchers("/auth/register", "/auth/login", "/parking/**").permitAll()
