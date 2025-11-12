@@ -29,7 +29,7 @@ import { getParkings, EMPTY_GEOJSON} from "../features/parking/ParkingService";
 const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
 // const PARKINGS_DATA = await getParkings();
 
-export default function MapPage() {
+export default function MapPage() { //meter argmunetos latitud y longitud
   const navigate = useNavigate();
   const { user } = useAuth();
   
