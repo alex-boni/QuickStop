@@ -36,7 +36,7 @@ const SideMenu = ({ isOpen, onClose }) => {
           {isAuthenticated ? (
             <>
               <button
-                onClick={() => handleNavigation("/account")}
+                onClick={() => handleNavigation("/profile")}
                 className="block w-full text-left text-gray-700 hover:text-indigo-600 border-b-1 pb-4 mb-4"
               >
                 <div className="flex-col items-center justify-center text-center space-x-3">
@@ -51,7 +51,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                     </span>
                   </div>
                   <span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-0.5 text-sm font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
-                    Ver Perfil
+                    Mi Cuenta
                   </span>
                 </div>
               </button>
@@ -105,6 +105,27 @@ const SideMenu = ({ isOpen, onClose }) => {
               </button>
 
 
+
+              <button
+                onClick={() => handleNavigation('/my-parkings')}
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center mt-6 items-center gap-2"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                  />
+                </svg>
+                <span className="font-medium">Mis Parkings</span>
+              </button>
 
               <button
                 onClick={() => handleNavigation('/addparking')}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ParkingActionModal from "../features/parking/components/ParkingActionModal";
 import ParkingDetailsModal from "../features/parking/components/ParkingDetailsModal";
@@ -34,6 +34,7 @@ const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
 
 export default function MapPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   
   // Estado para controlar la barra lateral (SideMenu) en escritorio
@@ -117,10 +118,39 @@ export default function MapPage() {
     zoom: 12,
   });
 
+  // Efecto para centrar el mapa cuando venimos desde "Ver en mapa"
+  useEffect(() => {
+    if (location.state?.centerOn) {
+      const { longitude, latitude } = location.state.centerOn;
+      
+      // Esperar a que el mapa esté listo
+      const timer1 = setTimeout(() => {
+        if (mapRef.current) {
+          mapRef.current.easeTo({
+            center: [longitude, latitude],
+            zoom: 16,
+            duration: 1500
+          });
+        }
+      }, 500);
+      
+      // Limpiar el state después de usarlo
+      const timer2 = setTimeout(() => {
+        window.history.replaceState({}, document.title);
+      }, 2100);
+      
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
+    }
+  }, [location.state]);
+
   // Estado para manejar la búsqueda de parkings según la ubicación
   const [searchLocation, setSearchLocation] = useState(null);
   const [isLoadingParkings, setIsLoadingParkings] = useState(true);
   const [parkingsGeoJson, setParkingsGeoJson] = useState(EMPTY_GEOJSON);
+  const [showOnlyMyParkings, setShowOnlyMyParkings] = useState(false);
   const SEARCH_DISTANCE_KM = 5; // Distancia de búsqueda en kilómetros
   const handleSearchMove = (result) =>{
     if(!result || !result.latitude || !result.longitude){
@@ -147,11 +177,22 @@ export default function MapPage() {
         distance: SEARCH_DISTANCE_KM,
       }
       const data = await getParkings(coords);
-      setParkingsGeoJson(data);
+      
+      // Filtrar solo mis parkings si está activado
+      if (showOnlyMyParkings && user) {
+        const filteredData = {
+          ...data,
+          features: data.features.filter(f => f.properties.ownerId === user.id)
+        };
+        setParkingsGeoJson(filteredData);
+      } else {
+        setParkingsGeoJson(data);
+      }
+      
       setIsLoadingParkings(false);
     }
     loadParkings();
-  }, [searchLocation]);
+  }, [searchLocation, showOnlyMyParkings]);
 
   const handleViewStateChange = (newViewState) => {
     if (!newViewState || !newViewState.latitude || !newViewState.longitude)
@@ -315,6 +356,32 @@ export default function MapPage() {
 
       <MobileSearchBar onSearch={handleSearchMove} />
       <DesktopSearchBar onSearch={handleSearchMove} />
+      
+      {/* Botón flotante para filtrar mis parkings - solo para OWNERS */}
+      {user && user.role === 'OWNER' && (
+        <button
+          onClick={() => setShowOnlyMyParkings(!showOnlyMyParkings)}
+          className={`fixed bottom-24 right-4 md:bottom-8 md:right-8 p-4 rounded-full shadow-lg transition-all duration-300 z-10 ${
+            showOnlyMyParkings 
+              ? 'bg-indigo-600 hover:bg-indigo-700' 
+              : 'bg-white hover:bg-gray-100'
+          }`}
+          title={showOnlyMyParkings ? 'Mostrar todos los parkings' : 'Mostrar solo mis parkings'}
+        >
+          {showOnlyMyParkings ? (
+            // Icono cuando está activo (filtro aplicado)
+            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
+            </svg>
+          ) : (
+            // Icono cuando está inactivo
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+          )}
+        </button>
+      )}
+      
       <FloatingMenuButton onToggle={toggleMenu} />
       <SideMenu isOpen={isMenuOpen} onClose={toggleMenu} />
       

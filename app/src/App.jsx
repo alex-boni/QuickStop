@@ -7,6 +7,8 @@ import MapPageBonito from "./pages/MapPageBonito";
 import ViewAccountDetails from "./pages/ViewAccountDetails";
 import ViewParkingDetails from "./pages/ViewParkingDetails";
 import EditParking from "./pages/EditParking";
+import ProfilePage from "./pages/ProfilePage";
+import MyParkingsPage from "./pages/MyParkingsPage";
 import { AuthProvider } from "./context/AuthContext";
 import { useState } from "react";
 import TopNav from "./components/TopNav";
@@ -39,6 +41,8 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/mapa" element={<MapPageBonito />} />
           <Route path="/account" element={<ViewAccountDetails />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/my-parkings" element={<MyParkingsPage />} />
           <Route path="/addparking" element={<AddParking />} />
           <Route path="/parking/:id" element={<ViewParkingDetails />} />
           <Route path="/parking/edit/:id" element={<EditParking />} />
