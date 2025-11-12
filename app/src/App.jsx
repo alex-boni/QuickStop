@@ -6,15 +6,23 @@ import AppLayout from "./Layouts/AppLayout";
 import MapPageBonito from "./pages/MapPageBonito";
 import ViewAccountDetails from "./pages/ViewAccountDetails";
 import { AuthProvider } from "./context/AuthContext";
+import { useState } from "react";
+import TopNav from "./components/TopNav";
+import FloatingMenuButton from "./components/FloatingMenuButton";
+import SideMenu from "./components/SlideMenu";
 
 function Layout() {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   return (
     <>
-      <nav style={{ padding: 12 }}>
-        <Link to="/" style={{ marginRight: 12 }}>Home</Link>
-        <Link to="/register" style={{ marginRight: 12 }}>Register</Link>
-        <Link to="/login">Login</Link>
-      </nav>
+    <div className="hidden md:block">
+      <TopNav />
+    </div>
+    <div className="md:hidden z-50">
+          <FloatingMenuButton onToggle={toggleMenu} />
+      <SideMenu isOpen={isMenuOpen} onClose={toggleMenu} />
+    </div>
       <Outlet />
     </>
   );

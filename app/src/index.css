@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------- */
-/* 2. Estilos Estructurales Críticos para PWA/WCAG */
-/* Estos aseguran que la app ocupe 100% de la vista, crucial para el mapa */
+/* Estilos Estructurales Críticos para PWA/WCAG */
+/* Estos aseguran que la app ocupe 100% de la vista*/
 /* ---------------------------------------------------- */
 body {
   padding: 0;
@@ -16,21 +16,22 @@ body {
   display: flex; 
   flex-direction: column;
   width: 100%;
+  background-color: var(--color-gray-100)
 }
 
 /* ---------------------------------------------------- */
-/* 3. Estilos Base con @apply (@layer base) */
-/* Aplicamos un look profesional y accesible por defecto */
+/* Estilos Base con @apply (@layer base) Accesible por defecto */
 /* ---------------------------------------------------- */
 @layer base {
   /* Enlaces: Estilo coherente para enlaces fuera de botones */
   a {
-    @apply text-indigo-600 hover:text-indigo-800 font-medium transition-colors cursor-pointer;
+    @apply font-semibold rounded-lg transition-colors mx-1 
+           focus:outline-none focus:ring-4 focus:ring-indigo-300 focus:ring-offset-2;
   }
+
 
   /* Títulos H1: Define el estilo principal para el título de la página */
   h1 {
-    /* Aquí puedes poner un estilo de fuente grande y en negrita para la marca */
     @apply text-3xl font-extrabold tracking-tight text-gray-900;
   }
 
@@ -42,17 +43,15 @@ body {
   /* Inputs/Textareas: Define el estilo de borde, padding y foco para todos los campos */
   input:where([type="text"], [type="email"], [type="password"]),
   textarea {
-    /* Un look base limpio y profesional para todos los formularios */
     @apply w-full p-3 border border-gray-300 rounded-lg 
            focus:ring-indigo-500 focus:border-indigo-500 
            transition-all duration-150 ease-in-out;
   }
 
-  /* Botones Primarios (ej. sin clases de color) */
-  /* Aunque la mayoría de los botones tendrán clases de color específicas,
-     esto asegura que el foco (WCAG 2.4.7) sea siempre visible. */
+  /* Botones Primarios con el foco (WCAG 2.4.7) sea siempre visible. */
   button {
     @apply font-semibold rounded-lg transition-colors 
            focus:outline-none focus:ring-4 focus:ring-indigo-300 focus:ring-offset-2;
   }
+
 }

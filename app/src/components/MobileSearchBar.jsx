@@ -6,11 +6,20 @@ const SuggestionItem = ({ place, onClick }) => (
   <li 
     className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer flex items-center gap-3"
     onClick={() => onClick(place)}
+    onKeyDown={(e)=>{
+      if (e.key === 'Enter' || e.key === ' ') { 
+        console.log("Sugerencia seleccionada (teclado):", place);
+        e.preventDefault(); // Evita el comportamiento por defecto del navegador
+        onClick(place); // Ejecuta la acción de selección
+      }
+    }}
     tabIndex={0} // WCAG: Asegura que el elemento de lista sea enfocable
-    aria-label={`Seleccionar ${place.place_name_es || place.place_name}`}
+    aria-label={`Seleccionar ${place.place_name_es || place.place_name}`} // WCAG: Etiqueta accesible para lectores de pantalla para cada sugerencia para mejorar la accesibilidad para usuarios con discapacidades visuales para describir la acción de seleccionar la sugerencia  
   >
     {/* Ícono de Pin (o Dirección) */}
-    <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+    <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" ></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+    </svg>
     <span className="truncate">{place.place_name_es || place.place_name}</span>
   </li>
 );
@@ -34,6 +43,7 @@ const MobileSearchBar = ({ onSearch }) => {
           setSuggestions(results);
         }).catch((error) => {
           console.error("Error al obtener sugerencias de geocoding:", error);
+          setSuggestions([{"id": "error", "place_name": "Error al cargar sugerencias"}]);
         });
     }, [debouncedQuery]); 
   
@@ -49,6 +59,9 @@ const MobileSearchBar = ({ onSearch }) => {
       });
   
     };
+    	const getInputClass = () => {
+		return `w-full p-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'}`;
+	};
   return (
     <div className="md:hidden fixed bottom-0 inset-x-0 p-3 bg-white shadow-lg z-40 rounded-xl pb-8 mx-0">
               {/* Lista de Sugerencias (Lista Desplegable) */}
@@ -64,12 +77,17 @@ const MobileSearchBar = ({ onSearch }) => {
           </ul>
         )}
       <div className="flex items-center space-x-3">
+        {/* Ícono de Reloj para historial de búsqueda. No implementado aún */}
+        <button           
+        className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700"
+          aria-label="Historial de búsquedas">
         <svg
-          className="w-12 h-12"
+          className="w-8 h-8"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
@@ -79,28 +97,33 @@ const MobileSearchBar = ({ onSearch }) => {
           />
         </svg>
 
+        </button>
+
         {/* Barra de Búsqueda */}
+        <label htmlFor="search-input-mobile" className="sr-only">Buscar parkings por dirección</label>
         <input
+          id="search-input-mobile"
           type="text"
           placeholder="Buscar parking cerca de dirección o punto de interés en Madrid..."
-          className="w-full p-2 border border-gray-300 rounded-full focus:ring-indigo-500 focus:border-indigo-500"
+          className={getInputClass()}
           aria-label="Barra de búsqueda de parkings"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
         
 
-        {/* Ícono de Ubicación Actual */}
+        {/* Ícono de Ubicación Actual. No implementado aún */}
         <button
-          className="p-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700"
+          className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700"
           aria-label="Mi ubicación actual"
         >
           <svg
-            className="w-5 h-5"
+            className="w-8 h-8"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"

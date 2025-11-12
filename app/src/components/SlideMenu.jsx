@@ -9,7 +9,7 @@ const SideMenu = ({ isOpen, onClose }) => {
   const handleLogout = () => {
     logout();
     onClose();
-    navigate('/login');
+    navigate("/login");
   };
 
   const handleNavigation = (path) => {
@@ -36,17 +36,19 @@ const SideMenu = ({ isOpen, onClose }) => {
           {isAuthenticated ? (
             <>
               <button
-                onClick={() => handleNavigation('/account')}
+                onClick={() => handleNavigation("/account")}
                 className="block w-full text-left text-gray-700 hover:text-indigo-600 border-b-1 pb-4 mb-4"
               >
                 <div className="flex-col items-center justify-center text-center space-x-3">
                   <div className="flex-row items-center content-center justify-center ">
                     <img
                       src="../../public/vite.svg"
-                      alt="PerfilImage"
+                      alt={user?.name ?`Foto de perfil de ${user.name}` : "Foto de perfil de usuario"}
                       className="mx-auto"
                     />
-                    <span className="font-medium">{user?.name || user?.username || 'Usuario'}</span>
+                    <span className="font-medium">
+                      {user?.name || user?.username || "Usuario"}
+                    </span>
                   </div>
                   <span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-0.5 text-sm font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
                     Ver Perfil
@@ -54,7 +56,34 @@ const SideMenu = ({ isOpen, onClose }) => {
                 </div>
               </button>
               <button
-                onClick={() => handleNavigation('/reservations')}
+                onClick={() => handleNavigation("/")}
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <span className="font-medium">Mapa</span>
+              </button>
+              <button
+                onClick={() => handleNavigation("/reservations")}
                 className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center mt-6 items-center gap-2"
               >
                 <svg
@@ -63,6 +92,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -83,6 +113,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -94,7 +125,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                 <span className="font-medium">Cerrar Sesión</span>
               </button>
               <button
-                onClick={() => handleNavigation('/settings')}
+                onClick={() => handleNavigation("/settings")}
                 className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
               >
                 <svg
@@ -103,6 +134,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -123,7 +155,7 @@ const SideMenu = ({ isOpen, onClose }) => {
           ) : (
             <>
               <button
-                onClick={() => handleNavigation('/login')}
+                onClick={() => handleNavigation("/")}
                 className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
               >
                 <svg
@@ -132,18 +164,25 @@ const SideMenu = ({ isOpen, onClose }) => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14c-4.418 0-8 3.582-8 8h16c0-4.418-3.582-8-8-8zM15 11l2 2m0-2l-2 2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                   />
                 </svg>
-                <span className="font-medium">Iniciar Sesión</span>
+                <span className="font-medium">Mapa</span>
               </button>
               <button
-                onClick={() => handleNavigation('/register')}
+                onClick={() => handleNavigation("/login")}
                 className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
               >
                 <svg
@@ -152,6 +191,28 @@ const SideMenu = ({ isOpen, onClose }) => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                  />
+                </svg>
+                <span className="font-medium">Iniciar Sesión</span>
+              </button>
+              <button
+                onClick={() => handleNavigation("/register")}
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"

@@ -16,9 +16,27 @@ const LoginForm = () => {
 	const handleChange = (e) => {
 		const { id, value } = e.target;
 		setFormData(prev => ({ ...prev, [id]: value }));
-		if (errors[id]) setErrors(prev => ({ ...prev, [id]: null }));
+		validateFormInput(id, value);
 	};
-
+	const validateFormInput = (field, value) => {
+		const newErrors = { ...errors };
+		if (field === 'email') {
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(value)) {
+			newErrors.email = 'Introduce un correo electrónico válido.';
+		} else {
+			delete newErrors.email;
+		}
+		}
+		if (field === 'password') {
+			if (!value || value.length < 8) {
+				newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
+			} else {
+				delete newErrors.password;
+			}
+		}
+		setErrors(newErrors);
+	}
 	const validateForm = () => {
 		const newErrors = {};
 		let isValid = true;
@@ -27,10 +45,10 @@ const LoginForm = () => {
 			newErrors.email = 'Introduce un correo electrónico válido.';
 			isValid = false;
 		}
-		//if (!formData.password || formData.password.length < 8) {
-		//	newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
-		//	isValid = false;
-		//}
+		if (!formData.password || formData.password.length < 8) {
+			newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
+			isValid = false;
+		}
 		setErrors(newErrors);
 		return isValid;
 	};
