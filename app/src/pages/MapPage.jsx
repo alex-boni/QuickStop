@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ParkingActionModal from "../features/parking/components/ParkingActionModal";
+import ParkingDetailsModal from "../features/parking/components/ParkingDetailsModal";
 import { deleteParking } from "../features/parking/ParkingService";
 import Map, {
   GeolocateControl,
@@ -37,12 +38,18 @@ export default function MapPage() { //meter argmunetos latitud y longitud
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  // Estado para el modal
+  // Estado para el modal de acciones (owner)
   const [modalState, setModalState] = useState({
     isOpen: false,
     parkingId: null,
     parkingName: '',
     ownerId: null
+  });
+
+  // Estado para el modal de detalles (no owner)
+  const [detailsModalState, setDetailsModalState] = useState({
+    isOpen: false,
+    parkingId: null
   });
 
   const openModal = (parkingId, parkingName, ownerId) => {
@@ -64,8 +71,13 @@ export default function MapPage() { //meter argmunetos latitud y longitud
   };
 
   const handleViewDetails = () => {
-    navigate(`/parking/${modalState.parkingId}`);
+    // Cerrar el modal de acciones y abrir el modal de detalles
+    const parkingId = modalState.parkingId;
     closeModal();
+    setDetailsModalState({
+      isOpen: true,
+      parkingId
+    });
   };
 
   const handleEdit = () => {
@@ -180,11 +192,14 @@ export default function MapPage() { //meter argmunetos latitud y longitud
       if (parkingId) {
         // Verificar si el usuario es el owner
         if (user && user.id === ownerId) {
-          // Es el owner, mostrar modal
+          // Es el owner, mostrar modal de acciones
           openModal(parkingId, parkingName, ownerId);
         } else {
-          // No es el owner, ir directo a detalles
-          navigate(`/parking/${parkingId}`);
+          // No es el owner, mostrar modal de detalles
+          setDetailsModalState({
+            isOpen: true,
+            parkingId
+          });
         }
       }
     }
@@ -277,6 +292,12 @@ export default function MapPage() { //meter argmunetos latitud y longitud
         onEdit={handleEdit}
         onDelete={handleDelete}
         parkingName={modalState.parkingName}
+      />
+
+      <ParkingDetailsModal
+        isOpen={detailsModalState.isOpen}
+        onClose={() => setDetailsModalState({ isOpen: false, parkingId: null })}
+        parkingId={detailsModalState.parkingId}
       />
     </div>
   );
