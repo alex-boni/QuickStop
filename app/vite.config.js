@@ -13,7 +13,8 @@ export default defineConfig({
       // output: el archivo Service Worker generado se llamará sw.js
       workbox: {
         // Caching de Assets estáticos (JavaScript, CSS, imágenes)
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'], 
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MB
         // Define la estrategia de caching para assets externos (ej. tiles de Mapbox)
         runtimeCaching: [{
             urlPattern: ({url}) => url.origin === 'https://api.mapbox.com',
