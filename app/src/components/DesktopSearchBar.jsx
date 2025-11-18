@@ -4,7 +4,8 @@ import { fetchGeocodingResults } from "../services/mapService";
 
 const SuggestionItem = ({ place, onClick }) => (
   <li
-    className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer flex items-center gap-3"
+    className="px-4 my-2 py-1  hover:bg-gray-100 cursor-pointer flex items-center gap-3 text-gray-700 hover:text-indigo-600 
+             focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg"
     onClick={() => onClick(place)}
     onKeyDown={(e) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -127,7 +128,7 @@ const DesktopSearchBar = ({ onSearch }) => {
 
           {/* Botón de Acción/Ubicación (al hacer clic, solo se busca el texto actual) */}
           <button
-            className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors ml-3 focus:ring-indigo-300 disabled:opacity-50"
+            className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors ml-3 focus:ring-indigo-500 disabled:opacity-50 focus:outline-none focus:bg-indigo-600 focus:ring-2"
             aria-label="Ejecutar búsqueda de parkings"
             onClick={() => onSearch({ query: query })}
           >
@@ -137,7 +138,7 @@ const DesktopSearchBar = ({ onSearch }) => {
 
         {/* Lista de Sugerencias (Lista Desplegable) */}
         {suggestions.length > 0 && (
-          <ul className="absolute top-full left-0 w-full mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden max-h-80 overflow-y-auto z-30">
+          <ul className="absolute top-full left-0 w-full mt-2 p-1 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden max-h-80 overflow-y-auto z-30">
             {suggestions.map((place) => (
               <SuggestionItem
                 key={place.id}

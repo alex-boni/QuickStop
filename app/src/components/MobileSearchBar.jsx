@@ -4,7 +4,8 @@ import { useDebounce } from "../hooks/useDebounce";
 import { fetchGeocodingResults } from "../services/mapService";
 const SuggestionItem = ({ place, onClick }) => (
   <li 
-    className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer flex items-center gap-3"
+    className="px-4 my-2 py-1  hover:bg-gray-100 cursor-pointer flex items-center gap-3 text-gray-700 hover:text-indigo-600 
+             focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg"
     onClick={() => onClick(place)}
     onKeyDown={(e)=>{
       if (e.key === 'Enter' || e.key === ' ') { 
@@ -66,7 +67,7 @@ const MobileSearchBar = ({ onSearch }) => {
     <div className="md:hidden fixed bottom-0 inset-x-0 p-3 bg-white shadow-lg z-40 rounded-xl pb-8 mx-0">
               {/* Lista de Sugerencias (Lista Desplegable) */}
         {( suggestions.length > 0) && (
-          <ul className="absolute bottom-full left-0 w-full mb-2 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden max-h-80 overflow-y-auto z-50">
+          <ul className="absolute bottom-full left-0 w-full mb-2 p-1 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden max-h-80 overflow-y-auto z-50">
             {suggestions.map((place) => (
               <SuggestionItem 
                 key={place.id} 
@@ -79,7 +80,8 @@ const MobileSearchBar = ({ onSearch }) => {
       <div className="flex items-center space-x-3">
         {/* Ícono de Reloj para historial de búsqueda. No implementado aún */}
         <button           
-        className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700"
+        className="p-2 bg-indigo-600 text-white rounded-full  hover:bg-indigo-700 transition-colors 
+             focus:outline-none focus:bg-indigo-700 focus:ring-2 focus:ring-indigo-700"
           aria-label="Historial de búsquedas">
         <svg
           className="w-8 h-8"
@@ -114,7 +116,8 @@ const MobileSearchBar = ({ onSearch }) => {
 
         {/* Ícono de Ubicación Actual. No implementado aún */}
         <button
-          className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700"
+          className="p-2 bg-indigo-600 text-white rounded-full  hover:bg-indigo-700 transition-colors 
+             focus:outline-none focus:bg-indigo-700 focus:ring-2 focus:ring-indigo-700"
           aria-label="Mi ubicación actual"
         >
           <svg

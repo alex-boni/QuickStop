@@ -133,7 +133,8 @@ const LoginForm = () => {
 
 			<button
 				type="submit"
-				className="w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-4 focus:ring-indigo-300 focus:ring-offset-2"
+				className="w-full py-3 px-4  bg-indigo-600 text-white hover:bg-indigo-700 transition-colors 
+             focus:outline-none focus:bg-indigo-600 focus:ring-2 focus:ring-indigo-500 "
 				disabled={isLoading}
 				aria-label={isLoading ? 'Iniciando sesión...' : 'Iniciar sesión en QuickStop'}
 			>
@@ -151,7 +152,7 @@ const LoginForm = () => {
 			</button>
 
 			<p className="text-center text-sm text-gray-600 mt-4">
-				¿No tienes cuenta? <a href="/register" className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors">Regístrate aquí</a>
+				¿No tienes cuenta? <a href="/register" className="p-1 text-indigo-600  hover:bg-indigo-100  focus:text-indigo-700 focus:bg-indigo-200 focus:ring-2 focus:ring-indigo-500 font-medium transition-colors">Regístrate aquí</a>
 			</p>
 		</form>
 	);

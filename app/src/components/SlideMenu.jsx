@@ -1,10 +1,36 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const SideMenu = ({ isOpen, onClose }) => {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
+  const closeButtonRef = useRef(null); // Referencia al botón de cerrar (X)
+  const previousFocusRef = useRef(null); // Para guardar dónde estaba el foco antes de abrir
+
+  useEffect(() => {
+    if (isOpen) {
+      previousFocusRef.current = document.activeElement; // Guardar el elemento enfocado previamente
+      closeButtonRef.current?.focus(); // Enfocar el botón de cerrar al abrir
+    } else {
+      previousFocusRef.current?.focus(); // Restaurar el foco al elemento previo al cerrar
+    }
+  }, [isOpen]);
+
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOpen, onClose]);
 
   const handleLogout = () => {
     logout();
@@ -32,7 +58,16 @@ const SideMenu = ({ isOpen, onClose }) => {
                     transition-transform duration-300 ease-in-out transform
                     ${isOpen ? "translate-x-0" : "translate-x-full"}`}
       >
+                <button
+          onClick={onClose}
+                    ref={closeButtonRef}
+          className="absolute top-6 right-6 p-2 font-bold text-3xl text-gray-600 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg"
+          aria-label="Cerrar menú lateral"
+        >
+          &times;
+        </button>
         <nav className="space-y-6 mt-12 text-xl">
+          <h1 className="justify-center place-self-center text-indigo-600" aria-label="Menú lateral" hidden></h1>
           {isAuthenticated ? (
             <>
               <button
@@ -57,7 +92,8 @@ const SideMenu = ({ isOpen, onClose }) => {
               </button>
               <button
                 onClick={() => handleNavigation("/")}
-                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 
+             focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg p-2"
               >
                 <svg
                   className="w-6 h-6"
@@ -84,7 +120,8 @@ const SideMenu = ({ isOpen, onClose }) => {
               </button>
               <button
                 onClick={() => handleNavigation("/reservations")}
-                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center mt-6 items-center gap-2"
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 
+             focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg p-2"
               >
                 <svg
                   className="w-6 h-6"
@@ -108,7 +145,8 @@ const SideMenu = ({ isOpen, onClose }) => {
 
               <button
                 onClick={() => handleNavigation('/my-parkings')}
-                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center mt-6 items-center gap-2"
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 
+             focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg p-2"
               >
                 <svg
                   className="w-6 h-6"
@@ -129,7 +167,8 @@ const SideMenu = ({ isOpen, onClose }) => {
 
               <button
                 onClick={() => handleNavigation('/addparking')}
-                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center mt-6 items-center gap-2"
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 
+             focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg p-2"
               >
                 <svg
                   className="w-6 h-6"
@@ -159,7 +198,8 @@ const SideMenu = ({ isOpen, onClose }) => {
 
               <button
                 onClick={handleLogout}
-                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 
+             focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg p-2"
               >
                 <svg
                   className="w-6 h-6"
@@ -180,7 +220,8 @@ const SideMenu = ({ isOpen, onClose }) => {
               </button>
               <button
                 onClick={() => handleNavigation("/settings")}
-                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 
+             focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg p-2"
               >
                 <svg
                   className="w-6 h-6"
@@ -210,7 +251,8 @@ const SideMenu = ({ isOpen, onClose }) => {
             <>
               <button
                 onClick={() => handleNavigation("/")}
-                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 
+             focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg p-2"
               >
                 <svg
                   className="w-6 h-6"
@@ -237,7 +279,8 @@ const SideMenu = ({ isOpen, onClose }) => {
               </button>
               <button
                 onClick={() => handleNavigation("/login")}
-                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 
+             focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg p-2"
               >
                 <svg
                   className="w-6 h-6"
@@ -258,7 +301,8 @@ const SideMenu = ({ isOpen, onClose }) => {
               </button>
               <button
                 onClick={() => handleNavigation("/register")}
-                className="flex w-full text-left text-gray-700 hover:text-indigo-600 text-center items-center gap-2"
+                className="flex w-full text-left text-gray-700 hover:text-indigo-600 
+             focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg p-2"
               >
                 <svg
                   className="w-6 h-6"
@@ -281,13 +325,7 @@ const SideMenu = ({ isOpen, onClose }) => {
           )}
         </nav>
 
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 p-2 font-bold text-3xl text-gray-600 hover:text-gray-900"
-          aria-label="Cerrar menú lateral"
-        >
-          &times;
-        </button>
+
       </div>
     </>
   );

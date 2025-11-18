@@ -92,17 +92,17 @@
         </dependency>
         
         <!-- Flyway core -->
-        <dependency>
+        <!-- <dependency>
           <groupId>org.flywaydb</groupId>
           <artifactId>flyway-core</artifactId>
-        </dependency>
+        </dependency> -->
         
         <!-- Flyway PostgreSQL database support (runtime) -->
-        <dependency>
+        <!-- <dependency>
           <groupId>org.flywaydb</groupId>
           <artifactId>flyway-database-postgresql</artifactId>
           <scope>runtime</scope>
-        </dependency>
+        </dependency> -->
 
         <dependency>
             <groupId>org.mapstruct</groupId>
