@@ -20,7 +20,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
       </div>
 
       {/* Pequeño texto legal fuera de la tarjeta */}
-      <footer className="flex mt-6 text-sm text-gray-500">
+      <footer className="flex mt-6 text-sm text-gray-700">
         ¿Problemas? Contacta a soporte.
       </footer>
     </div>
