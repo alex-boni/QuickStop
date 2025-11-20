@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import es.quickstop.api.auth.dto.RegisterRequestDTO;
 import es.quickstop.api.auth.dto.LoginRequestDTO;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
