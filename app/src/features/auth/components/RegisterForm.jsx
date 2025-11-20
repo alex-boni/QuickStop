@@ -5,6 +5,7 @@ import { registerUser } from '../AuthService';
 const RegisterForm = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,130 +15,170 @@ const RegisterForm = () => {
     termsAccepted: false,
   });
 
-  // Nuevo estado para almacenar mensajes de error por campo
   const [errors, setErrors] = useState({});
 
+  // ----------------------------
+  // INPUT CHANGE + VALIDACIÓN LIVE
+  // ----------------------------
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
+
+    setFormData(prev => ({
+      ...prev,
       [id]: type === 'checkbox' ? checked : value,
-    });
-    // Limpiar el error cuando el usuario empieza a escribir en el campo
-    if (errors[id]) {
-        setErrors(prev => ({ ...prev, [id]: null }));
-    }
+    }));
+
+    validateField(id, type === 'checkbox' ? checked : value);
   };
 
-  const handleRoleChange = (newRole) => {
-    setFormData({ ...formData, role: newRole });
-  };
-  
-  // Función de validación del lado del cliente
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
+  const validateField = (field, value) => {
+    const newErrors = { ...errors };
 
-    // 1. Validación de Nombre (mín. 4 caracteres)
-    if (formData.name.length < 4) {
-      newErrors.name = "El nombre debe tener al menos 4 caracteres.";
-      isValid = false;
-    }
-    
-    // 2. Validación de Email (Formato básico y no vacío. La verificación de 'no registrado' es de la API)
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-        newErrors.email = "Introduce un correo electrónico válido.";
-        isValid = false;
-    }
-    
-    // 3. Validación de Contraseña (mín. 8 caracteres)
-    if (formData.password.length < 8) {
-        newErrors.password = "La contraseña debe tener al menos 8 caracteres.";
-        isValid = false;
+    // Nombre
+    if (field === 'name') {
+      if (!value || value.length < 4) newErrors.name = 'El nombre debe tener al menos 4 caracteres.';
+      else delete newErrors.name;
     }
 
-    // 4. Validación de Confirmación de Contraseña
-    if (formData.confirmPassword !== formData.password) {
-        newErrors.confirmPassword = "Las contraseñas no coinciden.";
-        isValid = false;
+    // Email
+    if (field === 'email') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) newErrors.email = 'Introduce un correo electrónico válido.';
+      else delete newErrors.email;
     }
 
-    // 5. Validación de Términos
-    if (!formData.termsAccepted) {
-        newErrors.termsAccepted = "Debes aceptar los Términos y Condiciones.";
-        isValid = false;
+    // Password
+    if (field === 'password') {
+      if (!value || value.length < 8) newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
+      else delete newErrors.password;
+
+      // Si cambia password, también validar confirmación
+      if (formData.confirmPassword && value !== formData.confirmPassword) {
+        newErrors.confirmPassword = 'Las contraseñas no coinciden.';
+      } else {
+        delete newErrors.confirmPassword;
+      }
+    }
+
+    // Confirm password
+    if (field === 'confirmPassword') {
+      if (value !== formData.password) newErrors.confirmPassword = 'Las contraseñas no coinciden.';
+      else delete newErrors.confirmPassword;
+    }
+
+    // Términos
+    if (field === 'termsAccepted') {
+      if (!value) newErrors.termsAccepted = 'Debes aceptar los Términos y Condiciones.';
+      else delete newErrors.termsAccepted;
     }
 
     setErrors(newErrors);
-    return isValid;
   };
 
+  // ----------------------------
+  // VALIDACIÓN COMPLETA
+  // ----------------------------
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (formData.name.length < 4)
+      newErrors.name = 'El nombre debe tener al menos 4 caracteres.';
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email))
+      newErrors.email = 'Introduce un correo electrónico válido.';
+
+    if (formData.password.length < 8)
+      newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
+
+    if (formData.password !== formData.confirmPassword)
+      newErrors.confirmPassword = 'Las contraseñas no coinciden.';
+
+    if (!formData.termsAccepted)
+      newErrors.termsAccepted = 'Debes aceptar los Términos y Condiciones.';
+
+    setErrors(newErrors);
+
+    return { isValid: Object.keys(newErrors).length === 0, newErrors };
+  };
+
+  // ----------------------------
+  // SUBMIT
+  // ----------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) {
-      // Enfocar al primer campo con error (WCAG)
-      const firstErrorField = Object.keys(errors).find(key => errors[key]);
-      if (firstErrorField) { document.getElementById(firstErrorField)?.focus(); }
+
+    const { isValid, newErrors } = validateForm();
+
+    if (!isValid) {
+      const firstField = Object.keys(newErrors)[0];
+      document.getElementById(firstField)?.focus();
       return;
     }
+
+    setIsLoading(true);
+
     try {
       await registerUser(formData);
-      navigate('/login'); // Redirige a login tras registro exitoso
+      navigate('/login');
     } catch (error) {
       if (error.message === 'EmailAlreadyExists') {
-        setErrors({ 
-            email: 'Este correo electrónico ya está registrado. Por favor, inicia sesión.',
-        });
+        setErrors({ email: 'Este correo ya está registrado.' });
         document.getElementById('email')?.focus();
       } else {
-        // Otros errores no manejados (ej. 500 interno)
-        setErrors({ 
-            global: 'Ocurrió un error inesperado. Inténtalo de nuevo más tarde.'
+        setErrors({
+          global: 'Ocurrió un error inesperado. Inténtalo más tarde.',
         });
-      } 
-    }finally {
-        setIsLoading(false);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Clase común para inputs (usando errores para el estilo)
-  const getInputClass = (field) => {
-    return `w-full p-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 
-            ${errors[field] ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'}`;
-  };
+  const getInputClass = (field) => `
+    w-full p-3 border rounded-lg transition-colors focus:outline-none
+    ${errors[field]
+      ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+      : 'border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'}
+  `;
 
   const isDriver = formData.role === 'DRIVER';
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2">
-      
-      {/* ---------------------------------------------------- */}
-      {/* 1. Campos de Formulario (con Feedback de Error y ARIA) */}
-      {/* ---------------------------------------------------- */}
+    <form onSubmit={handleSubmit} className="space-y-6">
 
-      {/* Campo Nombre */}
+      {errors.global && (
+        <p className="text-sm text-red-600" aria-live="assertive">{errors.global}</p>
+      )}
+
+      {/* Nombre */}
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+          Nombre completo
+        </label>
         <input
           id="name"
           type="text"
-          value={formData.name} // Mantiene el valor ingresado
+          value={formData.name}
           onChange={handleChange}
           required
           autoComplete="name"
           className={getInputClass('name')}
-          placeholder="Ej: Laura Sánchez (mín. 4 caracteres)"
-          aria-invalid={!!errors.name} // WCAG: Indica si el campo tiene un error
-          aria-describedby={errors.name ? 'name-error' : undefined} // WCAG: Vincula el campo al mensaje de error
-          disabled={isLoading} // Deshabilita el campo si está cargando
+          placeholder="Ej: Laura Sánchez"
+          aria-invalid={!!errors.name}
+          aria-describedby={errors.name ? 'name-error' : undefined}
+          disabled={isLoading}
         />
-        {errors.name && <p id="name-error" className="mt-1 text-sm text-red-600" aria-live="assertive">{errors.name}</p>}
+        {errors.name && (
+          <p id="name-error" className="mt-1 text-sm text-red-600">{errors.name}</p>
+        )}
       </div>
 
-      {/* Campo Email */}
+      {/* Email */}
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          Correo Electrónico
+        </label>
         <input
           id="email"
           type="email"
@@ -151,12 +192,16 @@ const RegisterForm = () => {
           aria-describedby={errors.email ? 'email-error' : undefined}
           disabled={isLoading}
         />
-        {errors.email && <p id="email-error" className="mt-1 text-sm text-red-600" aria-live="assertive">{errors.email}</p>}
+        {errors.email && (
+          <p id="email-error" className="mt-1 text-sm text-red-600">{errors.email}</p>
+        )}
       </div>
 
-      {/* Campo Contraseña */}
+      {/* Password */}
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          Contraseña
+        </label>
         <input
           id="password"
           type="password"
@@ -170,12 +215,16 @@ const RegisterForm = () => {
           aria-describedby={errors.password ? 'password-error' : undefined}
           disabled={isLoading}
         />
-        {errors.password && <p id="password-error" className="mt-1 text-sm text-red-600" aria-live="assertive">{errors.password}</p>}
+        {errors.password && (
+          <p id="password-error" className="mt-1 text-sm text-red-600">{errors.password}</p>
+        )}
       </div>
-      
-      {/* Campo Confirmar Contraseña */}
+
+      {/* Confirmación */}
       <div>
-        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">Confirmar Contraseña</label>
+        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+          Confirmar Contraseña
+        </label>
         <input
           id="confirmPassword"
           type="password"
@@ -189,88 +238,101 @@ const RegisterForm = () => {
           aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
           disabled={isLoading}
         />
-        {errors.confirmPassword && <p id="confirmPassword-error" className="mt-1 text-sm text-red-600" aria-live="assertive">{errors.confirmPassword}</p>}
+        {errors.confirmPassword && (
+          <p id="confirmPassword-error" className="mt-1 text-sm text-red-600">
+            {errors.confirmPassword}
+          </p>
+        )}
       </div>
-      
-      {/* ---------------------------------------------------- */}
-      {/* 2. Selector de Rol y Términos (sin cambios en estilo) */}
-      {/* ---------------------------------------------------- */}
 
+      {/* Rol */}
       <div className="pt-2">
-        <span className="block text-sm font-medium text-gray-700 mb-2">Quiero usar QuickStop como:</span>
-        <div 
-          className="flex bg-gray-100 rounded-xl p-1 shadow-inner"
-          role="radiogroup"
-          aria-label="Selección de rol de usuario"
-        >
-          {/* ... Botones Driver/Owner (sin cambios) ... */}
-          <button
-            type="button"
-            onClick={() => handleRoleChange('DRIVER')}
-            className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ease-in-out ${isDriver ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}
-            role="radio"
-            aria-checked={isDriver}
-          >Conductor (Driver)</button>
+        <span className="block text-sm font-medium text-gray-700 mb-2">
+          Quiero usar QuickStop como:
+        </span>
+
+        <div className="flex bg-gray-100 rounded-xl p-1 shadow-inner" role="radiogroup">
           
           <button
             type="button"
-            onClick={() => handleRoleChange('OWNER')}
-            className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ease-in-out ${!isDriver ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}
+            onClick={() => setFormData(prev => ({ ...prev, role: 'DRIVER' }))}
+            className={`
+              flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 
+              focus:outline-none focus:ring-2 focus:ring-indigo-500
+              ${isDriver
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-200'}
+            `}
+            role="radio"
+            aria-checked={isDriver}
+          >
+            Conductor (Driver)
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setFormData(prev => ({ ...prev, role: 'OWNER' }))}
+            className={`
+              flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200
+              focus:outline-none focus:ring-2 focus:ring-indigo-500
+              ${!isDriver
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-200'}
+            `}
             role="radio"
             aria-checked={!isDriver}
-          >Dueño (Owner)</button>
+          >
+            Dueño (Owner)
+          </button>
         </div>
       </div>
 
-      {/* Checkbox y Mensaje de Términos */}
+      {/* Términos */}
       <div className="mt-4">
         <div className="flex items-start">
-            <div className="flex items-center h-5">
-              <input
-                id="termsAccepted"
-                name="termsAccepted"
-                type="checkbox"
-                checked={formData.termsAccepted}
-                onChange={handleChange}
-                className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                aria-required="true"
-                aria-invalid={!!errors.termsAccepted} // WCAG: Indica si el checkbox tiene un error
-                disabled={isLoading} // Deshabilita el checkbox si está cargando
-              />
-            </div>
-            <div className="ml-3 text-sm">
-              <label htmlFor="termsAccepted" className="font-medium text-gray-700">
-                Acepto los <a href="/terms" className="text-indigo-600 hover:text-indigo-800 underline transition-colors" target="_blank" rel="noopener noreferrer">Términos y Condiciones</a>
-              </label>
-            </div>
+          <input
+            id="termsAccepted"
+            name="termsAccepted"
+            type="checkbox"
+            checked={formData.termsAccepted}
+            onChange={handleChange}
+            className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
+            aria-invalid={!!errors.termsAccepted}
+            disabled={isLoading}
+          />
+          <label htmlFor="termsAccepted" className="ml-3 text-sm font-medium text-gray-700">
+            Acepto los <a href="/terms" className="text-indigo-600 hover:text-indigo-800 underline">Términos y Condiciones</a>
+          </label>
         </div>
-        {errors.termsAccepted && <p id="termsAccepted-error" className="mt-1 text-sm text-red-600" aria-live="assertive">{errors.termsAccepted}</p>}
+
+        {errors.termsAccepted && (
+          <p id="termsAccepted-error" className="mt-1 text-sm text-red-600">
+            {errors.termsAccepted}
+          </p>
+        )}
       </div>
-      
-      {/* Botón de Registro */}
+
+      {/* Submit */}
       <button
         type="submit"
-        className="w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-4 focus:ring-indigo-300 focus:ring-offset-2"
-        disabled={isLoading || !formData.termsAccepted}
-        aria-label={isLoading ? "Registrando usuario..." : "Crear una cuenta nueva en QuickStop ParkIT"}
+        className="
+          w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg
+          hover:bg-indigo-700 transition-colors
+          focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+        "
+        disabled={isLoading}
       >
-                {isLoading ? (
-            <>
-                {/* Ícono de carga simple */}
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Registrando...
-            </>
-        ) : (
-            'Crear Cuenta'
-        )}
+        {isLoading ? 'Registrando...' : 'Crear Cuenta'}
       </button>
 
-      {/* Enlace a Login */}
       <p className="text-center text-sm text-gray-600 mt-4">
-        ¿Ya tienes cuenta? <a href="/login" className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors">Iniciar Sesión</a>
+        ¿Ya tienes cuenta?{' '}
+        <a
+          href="/login"
+          className="p-1 text-indigo-600 hover:bg-indigo-100 focus:bg-indigo-200 focus:ring-2 focus:ring-indigo-500 rounded"
+        >
+          Inicia sesión aquí
+        </a>
       </p>
     </form>
   );
