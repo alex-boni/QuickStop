@@ -1,5 +1,9 @@
 package es.quickstop.api.parking;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.stereotype.Service;
 
 import es.quickstop.api.parking.dto.ParkingDTO;
@@ -22,6 +26,17 @@ public class ParkingService {
                 .stream()
                 .map(parkingMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    public List<ParkingDTO> searchParkings(double latitude, double longitude, double distance) {
+         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+        Point punto = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+        double distanceInMeters = distance * 1000; // Convertir km a metros
+        return parkingRepository.findNearWithinDistance(punto, distanceInMeters)
+                .stream()
+                .map(parkingMapper::toDTO)
+                .collect(Collectors.toList());
+       
     }
 
     public ParkingDTO createParking(ParkingDTO parkingDTO) {

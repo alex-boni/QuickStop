@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.locationtech.jts.geom.Point;
+
 @Entity
 @Table(name = "parkings")
 @Data
@@ -25,11 +27,8 @@ public class Parking {
     @Column(nullable = false, length = 255)
     private String address;
     
-    @Column(nullable = false)
-    private Double latitude;
-    
-    @Column(nullable = false)
-    private Double longitude;
+    @Column(columnDefinition = "geometry(Point, 4326)", nullable = false)
+    private Point location;
     
     @Column(name = "available_spots", nullable = false)
     private Integer availableSpots;
