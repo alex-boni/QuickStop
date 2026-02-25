@@ -7,8 +7,11 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.locationtech.jts.geom.Point;
+
+import es.quickstop.api.reservation.model.Reservation;
 
 @Entity
 @Table(name = "parkings")
@@ -61,4 +64,8 @@ public class Parking {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    @OneToMany
+    @JoinColumn(name = "parking_id")
+    private List<Reservation> reservations;
 }
