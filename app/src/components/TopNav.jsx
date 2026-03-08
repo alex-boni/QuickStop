@@ -31,7 +31,7 @@ const TopNav = () => {
 
         {isAuthenticated && (
           <Link
-            to="/account"
+            to="/profile"
             className=" font-semibold transition-colors text-gray-700 hover:text-indigo-600 
              focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg p-2"
           >

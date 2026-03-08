@@ -4,18 +4,31 @@ import { logoutUser } from '../features/auth/AuthService';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    !!localStorage.getItem('authToken')
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return !!localStorage.getItem('authToken');
+    }
+    return false;
+  });
+  
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
-    const userData = localStorage.getItem('userData');
+    const userDataString = localStorage.getItem('userData');
     
-    if (token && userData) {
-      setIsAuthenticated(true);
-      setUser(JSON.parse(userData));
+    if (token && userDataString) {
+      try {
+        const parsedUser = JSON.parse(userDataString);
+        setIsAuthenticated(true);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error('Error parseando los datos del usuario:', error);
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userData');
+        setIsAuthenticated(false);
+        setUser(null);
+      }
     }
   }, []);
 
@@ -28,12 +41,30 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     logoutUser();
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');  
     setIsAuthenticated(false);
     setUser(null);
   };
 
+  const updateUser = (updatedData) => {
+    if (!user) {
+      console.warn("Se intentó actualizar el usuario pero no hay sesión activa.");
+      return; 
+    }
+
+    if (updatedData && typeof updatedData.preventDefault === 'function') {
+      console.error("Estás pasando el evento del formulario en lugar de los datos.");
+      return;
+    }
+
+    const updatedUser = { ...user, ...updatedData };
+    localStorage.setItem('userData', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

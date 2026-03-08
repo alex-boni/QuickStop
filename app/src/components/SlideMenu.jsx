@@ -58,9 +58,9 @@ const SideMenu = ({ isOpen, onClose }) => {
                     transition-transform duration-300 ease-in-out transform
                     ${isOpen ? "translate-x-0" : "translate-x-full"}`}
       >
-                <button
+        <button
           onClick={onClose}
-                    ref={closeButtonRef}
+          ref={closeButtonRef}
           className="absolute top-6 right-6 p-2 font-bold text-3xl text-gray-600 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg"
           aria-label="Cerrar menú lateral"
         >
@@ -78,7 +78,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                   <div className="flex-row items-center content-center justify-center ">
                     <img
                       src="../../public/vite.svg"
-                      alt={user?.name ?`Foto de perfil de ${user.name}` : "Foto de perfil de usuario"}
+                      alt={user?.name ? `Foto de perfil de ${user.name}` : "Foto de perfil de usuario"}
                       className="mx-auto"
                     />
                     <span className="font-medium">
@@ -118,30 +118,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                 </svg>
                 <span className="font-medium">Mapa</span>
               </button>
-              <button
-                onClick={() => handleNavigation("/reservations")}
-                className="flex w-full text-left text-gray-700 hover:text-indigo-600 
-             focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg p-2"
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                <span className="font-medium">Mis Reservas</span>
-              </button>
-
-
+          
 
               <button
                 onClick={() => handleNavigation('/my-parkings')}
