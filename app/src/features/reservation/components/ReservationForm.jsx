@@ -1,0 +1,223 @@
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { getParkingById } from "../../parking/ParkingService";
+import { createReservation } from "../../reservation/ReservationService"; 
+import { useAuth } from "../../../context/AuthContext";
+import Map, { Marker } from "react-map-gl/mapbox";
+import "mapbox-gl/dist/mapbox-gl.css";
+
+const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
+
+const ReservationForm = () => {
+    const navigate = useNavigate();
+    const { parkingId } = useParams();
+    const { user } = useAuth();
+    
+    const [parking, setParking] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [issubmitting, setIsSubmitting] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    // --- Lógica de Restricciones de Tiempo ---
+    const getInitialTimes = () => {
+        const start = new Date();
+        const end = new Date(start.getTime() + (60 * 60 * 1000)); 
+
+        return {
+            startDate: start.toISOString().split('T')[0],
+            startTime: start.toTimeString().slice(0, 5),
+            endDate: end.toISOString().split('T')[0],
+            endTime: end.toTimeString().slice(0, 5)
+        };
+    };
+
+    const [formData, setFormData] = useState(getInitialTimes());
+
+    useEffect(() => {
+        const fetchParkingData = async () => {
+            try {
+                const data = await getParkingById(parkingId);
+                setParking(data);
+            } catch (error) {
+                setErrors({ submit: "No se pudo cargar la información del parking" });
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchParkingData();
+    }, [parkingId]);
+
+    const handleChange = (e) => {
+        const { id, value } = e.target;
+        setFormData(prev => ({ ...prev, [id]: value }));
+        if (errors[id]) setErrors(prev => ({ ...prev, [id]: null }));
+    };
+
+    const calculateTotal = () => {
+        if (!parking || !formData.endTime) return 0;
+        const start = new Date(`${formData.startDate}T${formData.startTime}`);
+        const end = new Date(`${formData.endDate}T${formData.endTime}`);
+        const diffInHours = (end - start) / (1000 * 60 * 60);
+        return diffInHours > 0 ? (diffInHours * parking.pricePerHour).toFixed(2) : 0;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const now = new Date();
+        const start = new Date(`${formData.startDate}T${formData.startTime}`);
+        const end = new Date(`${formData.endDate}T${formData.endTime}`);
+
+        let newErrors = {};
+
+        // Restricción: Entrada no puede ser anterior a "ahora"
+        if (start < new Date(now.getTime() - 1000 * 60)) { // margen de 1 min
+            newErrors.startTime = "La entrada no puede ser en el pasado";
+        }
+
+        // Restricción: Salida posterior a entrada
+        if (end <= start) {
+            newErrors.startTime = "La salida debe ser posterior a la entrada";
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            const reservationData = {
+                parkingId,
+                userId: user.id,
+                startTime: start.toISOString(),
+                endTime: end.toISOString(),
+                totalPrice: calculateTotal()
+            };
+            await createReservation(reservationData);
+            alert("¡Reserva realizada con éxito!");
+            navigate('/my-reservations');
+        } catch (error) {
+            setErrors({ submit: "Error al procesar la reserva. Inténtalo de nuevo." });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    if (isLoading) return <div className="p-8 text-center text-indigo-600 font-bold">Cargando detalles del parking...</div>;
+
+    return (
+        <div className="max-w-2xl mx-auto p-4 ">
+            <header className="shadow-md p-4 mb-4 rounded-xl bg-white">
+                <h1 className="text-2xl font-bold text-gray-900">Confirmar Reserva</h1>
+                <p className="text-gray-500">Revisa los detalles antes de finalizar</p>
+            </header>
+
+            <form onSubmit={handleSubmit} className="space-y-4 ">
+                <div className="bg-white rounded-xl shadow-sm  p-4 flex flex-col md:flex-row gap-4">
+                    <div className="flex-1">
+                        <h2 className="text-xl font-bold text-indigo-700">{parking.name}</h2>
+                        <p className="text-sm text-gray-600 mb-2">{parking.address}</p>
+                        <div className="flex gap-4">
+                            <span className={`px-2 py-1 rounded text-xs font-bold ${parking.availableSpots > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                {parking.availableSpots} plazas libres
+                            </span>
+                            <span className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold">
+                                {parking.pricePerHour}€ / hora
+                            </span>
+                        </div>
+                    </div>
+                    <div className="w-full md:w-48 h-32 rounded-lg overflow-hidden ">
+                        <Map
+                            initialViewState={{
+                                longitude: parking.longitude,
+                                latitude: parking.latitude,
+                                zoom: 14
+                            }}
+                            mapboxAccessToken={MAPBOX_TOKEN}
+                            mapStyle="mapbox://styles/mapbox/streets-v12"
+                            interactive={false}
+                        >
+                            <Marker longitude={parking.longitude} latitude={parking.latitude} color="red" />
+                        </Map>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    {/* Inicio */}
+                    <div className="space-y-3">
+                        <h3 className="font-bold text-indigo-700 flex items-center gap-2">Entrada</h3>
+                        <input
+                            type="date"
+                            id="startDate"
+                            value={formData.startDate}
+                            min={new Date().toISOString().split('T')[0]}
+                            onChange={handleChange}
+                            className={`w-50 md:w-full mr-4  p-3 border rounded-lg outline-none transition-all ${errors.startTime ? 'border-red-500' : 'border-gray-300'}`}
+                        />
+                        <input
+                            type="time"
+                            id="startTime"
+                            value={formData.startTime}
+                            onChange={handleChange}
+                            className={`w-25 md:w-full p-3 border rounded-lg outline-none transition-all ${errors.startTime ? 'border-red-500' : 'border-gray-300'}`}
+                        />
+                        {errors.startTime && <p className="text-red-500 text-xs">{errors.startTime}</p>}
+                    </div>
+
+                    {/* Fin */}
+                    <div className="space-y-3">
+                        <h3 className="font-bold text-indigo-700 flex items-center gap-2">Salida</h3>
+                        <input
+                            type="date"
+                            id="endDate"
+                            value={formData.endDate}
+                            onChange={handleChange}
+                            min={formData.startDate}
+                            className={`w-50 md:w-full  mr-4 p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all ${errors.endTime ? 'border-red-500' : 'border-gray-300'}`}
+                        />
+                        <input
+                            type="time"
+                            id="endTime"
+                            required
+                            value={formData.endTime}
+                            onChange={handleChange}
+                            className={`w-25 md:w-full  p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all ${errors.endTime ? 'border-red-500' : 'border-gray-300'}`}
+                        />
+                    </div>
+                </div>
+
+                {errors.endTime && <p className="text-red-600 text-sm font-medium">{errors.endTime}</p>}
+
+                <div className="bg-indigo-700 text-white p-4 rounded-xl flex justify-between items-center shadow-lg">
+                    <div>
+                        <p className="text-indigo-200 text-xs uppercase font-bold tracking-wider">Total Estimado</p>
+                        <h2 className="text-3xl text-white">{calculateTotal()}€</h2>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-sm opacity-90">Pago</p>
+                        <p className="text-xs opacity-70">Gestionado por los usuarios</p>
+                    </div>
+                </div>
+
+                <div className="flex gap-4">
+                    <button
+                        type="submit"
+                        disabled={issubmitting || !formData.endTime || (parking && parking.availableSpots <= 0 && formData.startDate === new Date().toISOString().split('T')[0])}
+                        className="flex-1 bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 shadow-md transition-all disabled:bg-gray-400 disabled:shadow-none"
+                    >
+                        {issubmitting ? 'Procesando...' : (parking?.availableSpots > 0 ? 'Confirmar Reserva' : 'Reservar otro día')}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => navigate(-1)}
+                        className="px-6 py-4 border-2 border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition-all"
+                    >
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+};
+
+export default ReservationForm;

@@ -9,6 +9,7 @@ import ViewParkingDetails from "./pages/ViewParkingDetails";
 import EditParking from "./pages/EditParking";
 import ProfilePage from "./pages/ProfilePage";
 import MyParkingsPage from "./pages/MyParkingsPage";
+import CreateReservation from "./pages/CreateReservation";
 import { AuthProvider } from "./context/AuthContext";
 import { useState } from "react";
 import TopNav from "./components/TopNav";
@@ -46,6 +47,7 @@ export default function App() {
           <Route path="/addparking" element={<AddParking />} />
           <Route path="/parking/:id" element={<ViewParkingDetails />} />
           <Route path="/parking/edit/:id" element={<EditParking />} />
+            <Route path="/reservation/:parkingId" element={<CreateReservation />} />
           {/* Add more routes as needed */}
         </Route>
         <Route path="/" element={<MapPage />} />

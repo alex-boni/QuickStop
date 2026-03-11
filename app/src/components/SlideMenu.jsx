@@ -118,6 +118,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                 </svg>
                 <span className="font-medium">Mapa</span>
               </button>
+              {user && user.role === "DRIVER" && (
               <button
                 onClick={() => handleNavigation("/reservations")}
                 className="flex w-full text-left text-gray-700 hover:text-indigo-600 
@@ -139,10 +140,10 @@ const SideMenu = ({ isOpen, onClose }) => {
                   />
                 </svg>
                 <span className="font-medium">Mis Reservas</span>
-              </button>
+              </button>)}
 
 
-
+{user && user.role === "OWNER" && (
               <button
                 onClick={() => handleNavigation('/my-parkings')}
                 className="flex w-full text-left text-gray-700 hover:text-indigo-600 
@@ -164,6 +165,8 @@ const SideMenu = ({ isOpen, onClose }) => {
                 </svg>
                 <span className="font-medium">Mis Parkings</span>
               </button>
+)}
+{user && user.role === "OWNER" && (
 
               <button
                 onClick={() => handleNavigation('/addparking')}
@@ -193,8 +196,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                 <span className="font-medium">Añadir parking</span>
               </button>
 
-
-
+)}
 
               <button
                 onClick={handleLogout}

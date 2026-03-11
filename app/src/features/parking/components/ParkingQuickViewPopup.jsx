@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Popup } from 'react-map-gl/mapbox';
 import { getParkingById } from '../ParkingService';
 
@@ -6,6 +7,10 @@ const ParkingQuickViewPopup = ({ longitude, latitude, parkingId, onClose }) => {
   const [parking, setParking] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
 
   useEffect(() => {
     if (parkingId) {
@@ -103,13 +108,11 @@ const ParkingQuickViewPopup = ({ longitude, latitude, parkingId, onClose }) => {
 
             {/*boton de reservar */}
             <button
-              onClick={() => {
-                // TODO: Implementar reserva
-                alert('Funcionalidad de reserva próximamente');
-              }}
-              className="w-full bg-indigo-600 text-white py-2 px-3 rounded-lg hover:bg-indigo-700 transition-colors font-semibold text-sm"
+              onClick={() => handleNavigation(`/reservation/${parking.id}`)}
+              className={`w-full  text-white py-2 px-3 rounded-lg hover:bg-indigo-700 transition-colors font-semibold text-sm
+              ${parking.availableSpots > 0 ? 'bg-indigo-600 ' : 'bg-gray-600'}`}
             >
-              Reservar Plaza
+              {parking.availableSpots > 0 ? 'Reservar Plaza' : 'Reservar otro día'}
             </button>
           </div>
         )}
