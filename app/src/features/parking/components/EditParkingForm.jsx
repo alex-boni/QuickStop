@@ -127,21 +127,6 @@ export default function EditParkingForm() {
             </div>
 
             <div>
-                <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                    Dirección *
-                </label>
-                <input
-                    type="text"
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                />
-            </div>
-
-            <div>
                 <label htmlFor="availableSpots" className="block text-sm font-medium text-gray-700 mb-1">
                     Plazas disponibles *
                 </label>
@@ -206,14 +191,30 @@ export default function EditParkingForm() {
             <div className="flex gap-4">
                 <button
                     type="button"
-                    onClick={() => navigate(`/parking/${id}`)}
+                    onClick={() => navigate('/', {
+                        state: {
+                            centerOn: {
+                                longitude: parking.longitude,
+                                latitude: parking.latitude
+                            }
+                        }
+                    })}
                     className="flex-1 bg-gray-500 text-white py-3 px-4 rounded-lg hover:bg-gray-600 transition-colors"
                     disabled={saving}
                 >
                     Cancelar
                 </button>
                 <button
-                    type="submit"
+                    type="submit" 
+                    //TODO revisar la redireccion porque se queda cargando la sentencia SQL
+                    onClick={() => navigate('/', {
+                        state: {
+                            centerOn: {
+                                longitude: parking.longitude,
+                                latitude: parking.latitude
+                            }
+                        }
+                    })}
                     className="flex-1 bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-400"
                     disabled={saving}
                 >

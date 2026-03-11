@@ -109,26 +109,6 @@ const ParkingDetailsModal = ({ isOpen, onClose, parkingId }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Latitud
-                </label>
-                <div className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50">
-                  {parking.latitude}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Longitud
-                </label>
-                <div className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50">
-                  {parking.longitude}
-                </div>
-              </div>
-            </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Estado

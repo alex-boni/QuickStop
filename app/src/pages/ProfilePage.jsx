@@ -1,10 +1,11 @@
-    import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function ProfilePage() {
     const navigate = useNavigate();
-    const { user } = useAuth();
+const { user, updateUser } = useAuth();
+    const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [errors, setErrors] = useState({});
@@ -44,7 +45,7 @@ export default function ProfilePage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (!validateForm()) {
             return;
         }
@@ -53,24 +54,30 @@ export default function ProfilePage() {
         setErrors({});
 
         try {
-            // TODO: Implementar llamada a API para actualizar perfil
-            // await updateUserProfile(user.id, formData);
-            
             console.log('Actualizando perfil:', formData);
-            
-            // Simular llamada API
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
+            await new Promise(resolve => setTimeout(resolve, 1000)); //TODO Revisar
+            updateUser(formData);
+
             setSuccess(true);
+            setIsEditing(false);
             setTimeout(() => {
-                navigate('/');
-            }, 2000);
+                setSuccess(false);
+            }, 3000);
         } catch (err) {
             setErrors({ submit: 'Error al actualizar el perfil' });
             console.error(err);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setFormData({
+            name: user?.name || '',
+            email: user?.email || ''
+        });
+        setErrors({});
     };
 
     const getInputClass = (field) => {
@@ -124,7 +131,8 @@ export default function ProfilePage() {
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
-                                className={getInputClass('name')}
+                                disabled={!isEditing}
+                                className={`${getInputClass('name')} ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             />
                             {errors.name && (
                                 <p className="mt-1 text-sm text-red-600">{errors.name}</p>
@@ -142,7 +150,8 @@ export default function ProfilePage() {
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className={getInputClass('email')}
+                                disabled={!isEditing}
+                                className={`${getInputClass('email')} ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             />
                             {errors.email && (
                                 <p className="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -164,21 +173,45 @@ export default function ProfilePage() {
 
                         {/* Botones */}
                         <div className="flex gap-4 pt-4">
-                            <button
-                                type="button"
-                                onClick={() => navigate('/')}
-                                className="flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
-                                disabled={loading}
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                type="submit"
-                                className="flex-1 bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-50"
-                                disabled={loading}
-                            >
-                                {loading ? 'Guardando...' : 'Guardar Cambios'}
-                            </button>
+                            {!isEditing ? (
+                                <>
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate('/')}
+                                        className="flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+                                    >
+                                        Volver
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault(); // <-- Añade esto
+                                            setIsEditing(true);
+                                        }}
+                                        className="flex-1 bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+                                    >
+                                        Editar Perfil
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <button
+                                        type="button"
+                                        onClick={handleCancelEdit}
+                                        className="flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+                                        disabled={loading}
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="flex-1 bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-50"
+                                        disabled={loading}
+                                    >
+                                        {loading ? 'Guardando...' : 'Guardar Cambios'}
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </form>
                 </div>

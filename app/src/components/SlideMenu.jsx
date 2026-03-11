@@ -58,9 +58,9 @@ const SideMenu = ({ isOpen, onClose }) => {
                     transition-transform duration-300 ease-in-out transform
                     ${isOpen ? "translate-x-0" : "translate-x-full"}`}
       >
-                <button
+        <button
           onClick={onClose}
-                    ref={closeButtonRef}
+          ref={closeButtonRef}
           className="absolute top-6 right-6 p-2 font-bold text-3xl text-gray-600 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg"
           aria-label="Cerrar menú lateral"
         >
@@ -78,7 +78,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                   <div className="flex-row items-center content-center justify-center ">
                     <img
                       src="../../public/vite.svg"
-                      alt={user?.name ?`Foto de perfil de ${user.name}` : "Foto de perfil de usuario"}
+                      alt={user?.name ? `Foto de perfil de ${user.name}` : "Foto de perfil de usuario"}
                       className="mx-auto"
                     />
                     <span className="font-medium">
@@ -142,6 +142,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                 <span className="font-medium">Mis Reservas</span>
               </button>)}
 
+          
 
 {user && user.role === "OWNER" && (
               <button
