@@ -49,7 +49,7 @@ export default function App() {
           <Route path="/parking/:id" element={<ViewParkingDetails />} />
           <Route path="/parking/edit/:id" element={<EditParking />} />
             <Route path="/reservation/:parkingId" element={<CreateReservation />} />
-            <Route path="/reservations" element={<MyReservationsPage />} />
+            <Route path="/my-reservations" element={<MyReservationsPage />} />
           {/* Add more routes as needed */}
         </Route>
         <Route path="/" element={<MapPage />} />

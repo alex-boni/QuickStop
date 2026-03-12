@@ -36,7 +36,7 @@ public class SecurityConfig {
             // 4. Definición de Reglas de Autorización
             .authorizeHttpRequests(auth -> auth
                 // Permitir el acceso sin autenticación a /auth/register y /auth/login
-                .requestMatchers("/auth/register", "/auth/login", "/parking/**").permitAll()
+                .requestMatchers("/auth/register", "/auth/login", "/parking/**", "/reservation/**").permitAll()
                 
                 // Permitir también acceso público a la documentación y assets de Vite
                 .requestMatchers(

@@ -24,9 +24,9 @@ export const createReservation = async (reservationData) => {
 /**
  * Obtiene el historial de reservas del usuario autenticado.
  */
-export const getUserReservations = async () => {
+export const getUserReservations = async (userId) => {
     try {
-        const response = await apiClient.get(RESERVATION_ENDPOINTS.GET_RESERVATIONS_BY_USER);
+        const response = await apiClient.get(`${RESERVATION_ENDPOINTS.GET_RESERVATIONS_BY_USER}/${userId}`);
         return response.data;
     } catch (error) {
         console.error("Error al obtener reservas:", error);

@@ -120,7 +120,7 @@ const SideMenu = ({ isOpen, onClose }) => {
               </button>
               {user && user.role === "DRIVER" && (
               <button
-                onClick={() => handleNavigation("/reservations")}
+                onClick={() => handleNavigation("/my-reservations")}
                 className="flex w-full text-left text-gray-700 hover:text-indigo-600 
              focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg p-2"
               >

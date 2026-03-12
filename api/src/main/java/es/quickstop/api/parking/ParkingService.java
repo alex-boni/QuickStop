@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 
 import es.quickstop.api.parking.dto.ParkingDTO;
 import es.quickstop.api.parking.model.Parking;
+import es.quickstop.api.reservation.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 public class ParkingService {
 
     private final ParkingRepository parkingRepository;
+    private final ReservationRepository reservationRepository;
     private final ParkingMapper parkingMapper;
 
     public List<ParkingDTO> getAllParkings() {
@@ -28,15 +31,34 @@ public class ParkingService {
                 .collect(Collectors.toList());
     }
 
-    public List<ParkingDTO> searchParkings(double latitude, double longitude, double distance) {
-         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+public List<ParkingDTO> searchParkings(double latitude, double longitude, double distance) {
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         Point punto = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-        double distanceInMeters = distance * 1000; // Convertir km a metros
+        double distanceInMeters = distance * 1000;
+
+        LocalDateTime now = LocalDateTime.now();
+
         return parkingRepository.findNearWithinDistance(punto, distanceInMeters)
                 .stream()
-                .map(parkingMapper::toDTO)
+                .map(parking -> {
+                    // Calculamos ocupación actual por intersección de tiempos
+                    long occupied = reservationRepository.countOverlappingReservations(
+                            parking.getId(), 
+                            now, 
+                            now.plusSeconds(1)
+                    );
+
+                    ParkingDTO dto = parkingMapper.toDTO(parking);
+                    
+                    // Calculamos disponibilidad real restando ocupación a la capacidad total
+                    int realAvailable = (int) (parking.getAvailableSpots() - occupied);
+                    
+                    // Seteamos el valor dinámico
+                    dto.setAvailableSpots(Math.max(0, realAvailable));
+                    
+                    return dto;
+                })
                 .collect(Collectors.toList());
-       
     }
 
     public ParkingDTO createParking(ParkingDTO parkingDTO) {

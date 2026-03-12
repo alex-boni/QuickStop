@@ -7,9 +7,9 @@ Todo ello cumpliendo con la **normativa europea de accesibilidad (EAA 2025)** y 
 | Capa | Tecnología |
 |------|-------------|
 | Frontend | React + Vite (PWA) |
-| Backend | Spring Boot (REST + WebSockets) |
+| Backend | Spring Boot (REST + Lombok y decoradores + JPA) |
 | Base de datos | PostgreSQL + PostGIS |
-| Comunicación | REST (JSON) + WebSockets (STOMP) |
+| Comunicación | REST (JSON) |
 | Monorepo | npm workspaces |
 
 ## 📂 Estructura del Monorepo
@@ -127,7 +127,9 @@ root/
 │        ├── service/             # ReservationService (Lógica de booking, llamadas a WebSocket)
 │        ├── repository/          # ReservationRepository
 │        └── model/               # Reservation.java
+│        └── dto/                 # ReservationDTO
 └── README.md
+│    
 ```
 
 ## 🎯 Objetivo del Proyecto
