@@ -28,17 +28,17 @@ const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel, type = 'da
           </p>
         </div>
 
-        <div className="flex gap-0 border-t border-gray-100">
+        <div className="flex gap-2 border-t border-gray-100 p-2">
           <button
             onClick={onCancel}
-            className="flex-1 px-4 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+            className="flex-1 px-4 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-200 bg-gray-100 transition-colors"
           >
             Cancelar
           </button>
           <button
             onClick={onConfirm}
             className={`flex-1 px-4 py-3 text-sm font-semibold text-white transition-colors ${
-              isDanger ? 'bg-red-600 hover:bg-red-700' : 'bg-indigo-600 hover:bg-indigo-700'
+              isDanger ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-600 hover:bg-indigo-700'
             }`}
           >
             Confirmar

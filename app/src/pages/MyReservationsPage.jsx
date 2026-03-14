@@ -121,10 +121,6 @@ const handleConfirmCancel = async () => {
         type="danger"
     />
     
-    {/* Cambiar el onClick del botón de cancelar en el map() */}
-    <button onClick={() => triggerCancel(res.id, res.parkingName)}>
-       Cancelar
-    </button>
 
             <div className="max-w-6xl mx-auto">
                 <div className="mb-6">
