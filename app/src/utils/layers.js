@@ -50,17 +50,22 @@ export const clusterCountLayer = {
 };
 
 export const unclusteredPointLayer = {
-    id: 'unclustered-point',
-    type: 'circle',
-    source: PARKING_SOURCE_ID,
-    filter: ['!', ['has', 'point_count']],
-    paint: {
-        'circle-color': '#4f46e5', // Índigo de la marca
-        'circle-radius': 8, 
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#ffffff',
-        'circle-translate': [0, 0],
-    }
+  id: 'unclustered-point',
+  type: 'circle',
+  source: 'parkings',
+  filter: ['!', ['has', 'point_count']],
+  paint: {
+    // Lógica de color dinámica
+    'circle-color': [
+      'case',
+      ['>', ['get', 'spots'], 0], 
+      '#4f46e5', // Índigo (disponible ahora)
+      '#f59e0b'  // Amarillo (sin plazas ahora, pero reservable)
+    ],
+    'circle-radius': 8,
+    'circle-stroke-width': 2,
+    'circle-stroke-color': '#fff'
+  }
 };
 export const unclusteredShadowLayer = {
     id: 'unclustered-shadow',

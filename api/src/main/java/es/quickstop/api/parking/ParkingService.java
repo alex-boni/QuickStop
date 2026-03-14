@@ -31,7 +31,7 @@ public class ParkingService {
                 .collect(Collectors.toList());
     }
 
-public List<ParkingDTO> searchParkings(double latitude, double longitude, double distance) {
+    public List<ParkingDTO> searchParkings(double latitude, double longitude, double distance) {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         Point punto = geometryFactory.createPoint(new Coordinate(longitude, latitude));
         double distanceInMeters = distance * 1000;
@@ -41,21 +41,8 @@ public List<ParkingDTO> searchParkings(double latitude, double longitude, double
         return parkingRepository.findNearWithinDistance(punto, distanceInMeters)
                 .stream()
                 .map(parking -> {
-                    // Calculamos ocupación actual por intersección de tiempos
-                    long occupied = reservationRepository.countOverlappingReservations(
-                            parking.getId(), 
-                            now, 
-                            now.plusSeconds(1)
-                    );
-
                     ParkingDTO dto = parkingMapper.toDTO(parking);
-                    
-                    // Calculamos disponibilidad real restando ocupación a la capacidad total
-                    int realAvailable = (int) (parking.getAvailableSpots() - occupied);
-                    
-                    // Seteamos el valor dinámico
-                    dto.setAvailableSpots(Math.max(0, realAvailable));
-                    
+                    dto.setAvailableSpots(getRealTimeAvailableSpots(parking));
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -69,7 +56,22 @@ public List<ParkingDTO> searchParkings(double latitude, double longitude, double
 
     public Optional<ParkingDTO> getParkingById(Long id) {
         return parkingRepository.findById(id)
-                .map(parkingMapper::toDTO);
+                .map(parking -> {
+                    ParkingDTO dto = parkingMapper.toDTO(parking);
+                    dto.setAvailableSpots(getRealTimeAvailableSpots(parking));
+                    return dto;
+                });
+    }
+
+    private int getRealTimeAvailableSpots(Parking parking) {
+        LocalDateTime now = LocalDateTime.now();
+        long occupied = reservationRepository.countOverlappingReservations(
+                parking.getId(),
+                now,
+                now.plusSeconds(360));
+        // System.out.println( "Parking ID: " + parking.getId() + ", Ocuppied: " +
+        // occupied);
+        return Math.max(0, parking.getAvailableSpots() - (int) occupied);
     }
 
     public Optional<ParkingDTO> updateParking(Long id, ParkingDTO parkingDTO) {
@@ -83,12 +85,11 @@ public List<ParkingDTO> searchParkings(double latitude, double longitude, double
                     existingParking.setDescription(parkingDTO.getDescription());
                     existingParking.setIsActive(parkingDTO.isActive());
                     // OwnerId NO se debe cambiar por seguridad
-                    
+
                     Parking updatedParking = parkingRepository.save(existingParking);
                     return parkingMapper.toDTO(updatedParking);
                 });
     }
-
 
     public boolean deleteParking(Long id) {
         if (parkingRepository.existsById(id)) {

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -28,4 +29,16 @@ public class ReservationController {
     public ResponseEntity<ReservationDTO> cancel(@PathVariable Long id) {
         return ResponseEntity.ok(reservationService.cancelReservation(id));
     }
+
+    @GetMapping("/next-available/{parkingId}")
+    public ResponseEntity<LocalDateTime> getNextAvailable(@PathVariable Long parkingId) {
+        return ResponseEntity.ok(reservationService.findNextAvailableSlot(parkingId));
+    }
+    //frontend: await apiClient.get(RESERVATION_ENDPOINTS.GET_AVAILABLE_SPOTS, { params: reservationData });
+    @GetMapping("/available-spots")
+    public ResponseEntity<Long> getAvailableSpots(ReservationDTO reservationDTO) {
+        System.out.println("Received request for available spots with data: " + reservationDTO);
+        return ResponseEntity.ok(reservationService.getAvailableSpots(reservationDTO));
+    }
+
 }

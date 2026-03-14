@@ -9,11 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -27,15 +28,15 @@ public class ReservationService {
                 .orElseThrow(() -> new RuntimeException("Parking no encontrado"));
 
         long occupiedSpots = reservationRepository.countOverlappingReservations(
-                dto.getParkingId(), 
-                dto.getStartTime(), 
-                dto.getEndTime()
-        );
+                dto.getParkingId(),
+                dto.getStartTime(),
+                dto.getEndTime());
 
         if (occupiedSpots >= parking.getAvailableSpots()) {
             throw new RuntimeException("Capacidad máxima alcanzada para el horario seleccionado");
         }
-
+        System.out.println("Creating reservation for parking ID: " + dto.getParkingId() + ", Start: "
+                + dto.getStartTime() + ", End: " + dto.getEndTime());
         Reservation reservation = Reservation.builder()
                 .user(userRepository.getReferenceById(dto.getUserId()))
                 .parking(parking)
@@ -60,8 +61,47 @@ public class ReservationService {
     public ReservationDTO cancelReservation(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
-        
+
         reservation.setStatus(Reservation.ReservationStatus.CANCELLED);
         return reservationMapper.toDTO(reservationRepository.save(reservation));
     }
+
+    public LocalDateTime findNextAvailableSlot(Long parkingId) {
+        Parking parking = parkingRepository.findById(parkingId)
+                .orElseThrow(() -> new RuntimeException("Parking no encontrado"));
+
+        LocalDateTime candidateStart = LocalDateTime.now();
+        // Redondeamos a la siguiente media hora
+        candidateStart = candidateStart.plusMinutes(30 - (candidateStart.getMinute() % 30)).withSecond(0).withNano(0);
+        int maxDaysToSearch = 7; // Límite de búsqueda para evitar bucles infinitos
+        LocalDateTime limitEnd = candidateStart.plusDays(maxDaysToSearch);
+        while (candidateStart.isBefore(limitEnd)) {
+            LocalDateTime candidateStartEnd = candidateStart.plusHours(1); // Probamos un bloque de 1 hora
+            long occupied = reservationRepository.countOverlappingReservations(
+                    parkingId,
+                    candidateStart,
+                    candidateStartEnd);
+            if (occupied < parking.getAvailableSpots()) {
+                return candidateStart;
+            }
+            // Si está lleno, saltamos 30 minutos y volvemos a comprobar
+            candidateStart = candidateStart.plusMinutes(30);
+        }
+        return null;
+    }
+
+    public Long getAvailableSpots(ReservationDTO reservationDTO) {
+        Parking parking = parkingRepository.findById(reservationDTO.getParkingId())
+                .orElseThrow(() -> new RuntimeException("Parking no encontrado"));
+
+        long occupiedSpots = reservationRepository.countOverlappingReservations(
+                reservationDTO.getParkingId(),
+                reservationDTO.getStartTime(),
+                reservationDTO.getEndTime());
+        System.out.println("Calculating available spots for parking ID: " + reservationDTO.getParkingId() + ", Start: "
+                + reservationDTO.getStartTime() + ", End: " + reservationDTO.getEndTime() + ", Occupied: " + occupiedSpots);
+        return Math.max(0, parking.getAvailableSpots() - occupiedSpots);
+    }
+
+
 }

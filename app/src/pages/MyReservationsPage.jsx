@@ -10,7 +10,7 @@ export default function MyReservationsPage() {
     
     const [reservations, setReservations] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('all'); 
+    const [filter, setFilter] = useState('active'); 
     const [searchTerm, setSearchTerm] = useState('');
     
     // Estado para notificaciones unificadas
@@ -137,9 +137,9 @@ const handleConfirmCancel = async () => {
                     <p className="text-gray-600 mt-2">Controla tus estacionamientos y pagos</p>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-2 mb-6">
                     <div className="flex flex-col md:flex-row gap-4">
-                        <div className="flex-1">
+                        <div className="flex-1  p-2">
                             <input
                                 type="text"
                                 placeholder="Buscar por parking..."
@@ -148,7 +148,7 @@ const handleConfirmCancel = async () => {
                                 className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                             />
                         </div>
-                        <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
+                        <div className="flex gap-2 overflow-x-auto p-2 ">
                             {['all', 'active', 'completed', 'cancelled'].map((f) => (
                                 <button
                                     key={f}

@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Popup } from 'react-map-gl/mapbox';
-import { getParkingById } from '../ParkingService';
+import { getParkingById} from '../ParkingService';
+import { getNextAvailable } from '../../reservation/ReservationService';
 
 const ParkingQuickViewPopup = ({ longitude, latitude, parkingId, onClose }) => {
   const [parking, setParking] = useState(null);
+  const [nextAvailable, setNextAvailable] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const handleNavigation = (path) => {
-    navigate(path);
+    navigate(path, { state: { suggestedDate: nextAvailable } });
   };
 
   useEffect(() => {
@@ -21,7 +23,7 @@ const ParkingQuickViewPopup = ({ longitude, latitude, parkingId, onClose }) => {
           const data = await getParkingById(parkingId);
           setParking(data);
         } catch (err) {
-          setError('Error al cargar el parking');
+          setError("Error al cargar el parking");
           console.error(err);
         } finally {
           setLoading(false);
@@ -30,6 +32,20 @@ const ParkingQuickViewPopup = ({ longitude, latitude, parkingId, onClose }) => {
       fetchParking();
     }
   }, [parkingId]);
+
+  useEffect(() => {
+    if (parking && parking.availableSpots === 0) {
+      const fetchNextSlot = async () => {
+        try {
+          const nextSlot = await getNextAvailable(parkingId);
+          setNextAvailable(new Date(nextSlot));
+        } catch (err) {
+          console.error("No se pudo obtener sugerencia");
+        }
+      };
+      fetchNextSlot();
+    }
+  }, [parking]);
 
   return (
     <Popup
@@ -40,7 +56,7 @@ const ParkingQuickViewPopup = ({ longitude, latitude, parkingId, onClose }) => {
       closeButton={false}
       closeOnClick={true}
       maxWidth="320px"
-      className="parking-popup"
+      className="rounded-2xl overflow-hidden"
     >
       <div className="p-1">
         {loading && (
@@ -58,10 +74,20 @@ const ParkingQuickViewPopup = ({ longitude, latitude, parkingId, onClose }) => {
         {!loading && !error && parking && (
           <div className="space-y-3">
             <div className="border-b pb-2">
-              <h3 className="text-lg font-bold text-gray-900">{parking.name}</h3>
+              <h3 className="text-lg font-bold text-gray-900">
+                {parking.name}
+              </h3>
               <p className="text-xs text-gray-500 mt-1 flex items-center truncate">
-                <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                <svg
+                  className="w-3 h-3 mr-1 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 <span className="truncate">{parking.address}</span>
               </p>
@@ -72,20 +98,26 @@ const ParkingQuickViewPopup = ({ longitude, latitude, parkingId, onClose }) => {
               {/*precioo*/}
               <div className="bg-indigo-50 rounded-lg p-2 text-center">
                 <p className="text-xs text-indigo-600 font-medium">Precio</p>
-                <p className="text-xl font-bold text-indigo-700">{parking.pricePerHour}€</p>
+                <p className="text-xl font-bold text-indigo-700">
+                  {parking.pricePerHour}€
+                </p>
                 <p className="text-xs text-indigo-500">por hora</p>
               </div>
 
               {/*plazasdispo */}
               <div className="bg-green-50 rounded-lg p-2 text-center">
-                <p className="text-xs text-green-600 font-medium">Disponibles</p>
-                <p className="text-xl font-bold text-green-700">{parking.availableSpots}</p>
+                <p className="text-xs text-green-600 font-medium">
+                  Disponibles
+                </p>
+                <p className="text-xl font-bold text-green-700">
+                  {parking.availableSpots}
+                </p>
                 <p className="text-xs text-green-500">plazas</p>
               </div>
             </div>
 
             {/*estado */}
-            <div className="flex items-center justify-center">
+            {/* <div className="flex items-center justify-center">
               {parking.isActive ? (
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                   <span className="w-1.5 h-1.5 mr-1.5 bg-green-400 rounded-full animate-pulse"></span>
@@ -97,12 +129,28 @@ const ParkingQuickViewPopup = ({ longitude, latitude, parkingId, onClose }) => {
                   No disponible
                 </span>
               )}
-            </div>
+            </div> */}
 
             {/* Descripción en caso de tenerloa*/}
             {parking.description && (
               <div className="bg-gray-50 rounded-lg p-2">
-                <p className="text-xs text-gray-600 line-clamp-2">{parking.description}</p>
+                <p className="text-xs text-gray-600 line-clamp-2">
+                  {parking.description}
+                </p>
+              </div>
+            )}
+            {parking.availableSpots === 0 && nextAvailable && (
+              <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-2 mb-2">
+                <p className="text-[10px] text-yellow-700 font-bold uppercase tracking-tight">
+                  Sugerencia de próxima plaza:
+                </p>
+                <p className="text-xs text-yellow-800">
+                  Disponible el {nextAvailable.toLocaleDateString()} a las{" "}
+                  {nextAvailable.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
               </div>
             )}
 
@@ -110,9 +158,11 @@ const ParkingQuickViewPopup = ({ longitude, latitude, parkingId, onClose }) => {
             <button
               onClick={() => handleNavigation(`/reservation/${parking.id}`)}
               className={`w-full  text-white py-2 px-3 rounded-lg hover:bg-indigo-700 transition-colors font-semibold text-sm
-              ${parking.availableSpots > 0 ? 'bg-indigo-600 ' : 'bg-gray-600'}`}
+              ${parking.availableSpots > 0 ? "bg-indigo-600 " : "bg-yellow-600"}`}
             >
-              {parking.availableSpots > 0 ? 'Reservar Plaza' : 'Reservar otro día'}
+              {parking.availableSpots > 0
+                ? "Reservar Plaza"
+                : "Reservar otro día"}
             </button>
           </div>
         )}

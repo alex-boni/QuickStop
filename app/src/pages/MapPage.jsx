@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ParkingActionModal from "../features/parking/components/ParkingActionModal";
@@ -36,6 +36,7 @@ export default function MapPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const geolocateControlRef = useRef();
   
   // Estado para controlar la barra lateral (SideMenu) en escritorio
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -168,6 +169,13 @@ export default function MapPage() {
       distance: SEARCH_DISTANCE_KM,
     })
   }
+
+  const handleGeolocateClick = () => {
+  if (geolocateControlRef.current) {
+    geolocateControlRef.current.trigger();
+  }
+};
+
   useEffect(() =>{
     const loadParkings = async ()=>{
       setIsLoadingParkings(true);
@@ -330,6 +338,7 @@ export default function MapPage() {
 
         {/* Control de Geolocalización (Mi Ubicación) */}
         <GeolocateControl
+        ref={geolocateControlRef}
           positionOptions={{ enableHighAccuracy: true }}
           trackUserLocation={true}
           showUserHeading={true}
@@ -354,7 +363,7 @@ export default function MapPage() {
         )}
       </Map>
 
-      <MobileSearchBar onSearch={handleSearchMove} />
+      <MobileSearchBar onSearch={handleSearchMove} onGeolocate={handleGeolocateClick} />
       <DesktopSearchBar onSearch={handleSearchMove} />
       
       {/* Botón flotante para filtrar mis parkings - solo para OWNERS */}

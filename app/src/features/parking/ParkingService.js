@@ -42,6 +42,7 @@ export const getParkings = async (coords) => {
                 }
             }))
         };
+        console.log("Fetched parkings:", parkings);
         return parkings;
     } catch (error) {
         console.error("Error fetching parkings:", error);
