@@ -98,10 +98,16 @@ public class ReservationService {
                 reservationDTO.getParkingId(),
                 reservationDTO.getStartTime(),
                 reservationDTO.getEndTime());
-        System.out.println("Calculating available spots for parking ID: " + reservationDTO.getParkingId() + ", Start: "
-                + reservationDTO.getStartTime() + ", End: " + reservationDTO.getEndTime() + ", Occupied: " + occupiedSpots);
-        return Math.max(0, parking.getAvailableSpots() - occupiedSpots);
+       return Math.max(0, parking.getAvailableSpots() - occupiedSpots);
     }
 
+        @Transactional
+        public ReservationDTO updateReservationStatus(Long reservationId, String status) {
+                Reservation reservation = reservationRepository.findById(reservationId)
+                        .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+                reservation.setStatus(Reservation.ReservationStatus.valueOf(status));
+                return reservationMapper.toDTO(reservationRepository.save(reservation));
+
+        }
 
 }

@@ -34,11 +34,16 @@ public class ReservationController {
     public ResponseEntity<LocalDateTime> getNextAvailable(@PathVariable Long parkingId) {
         return ResponseEntity.ok(reservationService.findNextAvailableSlot(parkingId));
     }
-    //frontend: await apiClient.get(RESERVATION_ENDPOINTS.GET_AVAILABLE_SPOTS, { params: reservationData });
-    @GetMapping("/available-spots")
-    public ResponseEntity<Long> getAvailableSpots(ReservationDTO reservationDTO) {
-        System.out.println("Received request for available spots with data: " + reservationDTO);
+
+    @PostMapping("/available-spots")
+    public ResponseEntity<Long> getAvailableSpots(@RequestBody ReservationDTO reservationDTO) {
+        // System.out.println("Received request for available spots with data: " + reservationDTO);
         return ResponseEntity.ok(reservationService.getAvailableSpots(reservationDTO));
+    }
+
+    @PutMapping("/update-status/{id}")
+    public ResponseEntity<ReservationDTO> updateStatus(@PathVariable Long id, @RequestParam String status) {
+        return ResponseEntity.ok(reservationService.updateReservationStatus(id, status));
     }
 
 }

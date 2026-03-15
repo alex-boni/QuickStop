@@ -6,7 +6,8 @@ const RESERVATION_ENDPOINTS = {
     CREATE_RESERVATION: '/reservation/create',
     CANCEL_RESERVATION: '/reservation/cancel',
     GET_NEXT_AVAILABLE: '/reservation/next-available',
-    GET_AVAILABLE_SPOTS: '/reservation/available-spots'
+    GET_AVAILABLE_SPOTS: '/reservation/available-spots',
+    UPDATE_RESERVATION_STATUS: '/reservation/update-status'
 };
 
 /**
@@ -85,11 +86,26 @@ export const getNextAvailable = async (parkingId) => {
 export const getAvailableSpots = async (reservationData) => {
     try {
         // console.log("Validating availability with data:", reservationData);
-        const response = await apiClient.get(RESERVATION_ENDPOINTS.GET_AVAILABLE_SPOTS, { params: reservationData });
+        const response = await apiClient.post(RESERVATION_ENDPOINTS.GET_AVAILABLE_SPOTS, reservationData );
         // console.log("Availability response:", response.data);
         return response.data;
     } catch (error) {
         console.error("Error al validar disponibilidad:", error);
+        throw error;
+    }
+};
+
+/** 
+ * Actualiza el estado de una reserva (por ejemplo, de activa a finalizada).
+ * @param {number} reservationId
+ * @param {string} newStatus - El nuevo estado de la reserva (e.g., "ACTIVE", "COMPLETED", "CANCELLED", "NOT_COMPLETED")
+ */
+export const updateReservationStatus = async (reservationId, newStatus) => {
+    try {
+        const response = await apiClient.put(`${RESERVATION_ENDPOINTS.UPDATE_RESERVATION_STATUS}/${reservationId}`, null ,{ params: { status: newStatus } });
+        return response.data;
+    } catch (error) {
+        console.error("Error al actualizar el estado de la reserva:", error);
         throw error;
     }
 };

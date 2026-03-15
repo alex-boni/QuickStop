@@ -31,10 +31,10 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ReservationStatus status; // ACTIVE, COMPLETED, CANCELLED
+    private ReservationStatus status; // ACTIVE, COMPLETED, CANCELLED, NOT_COMPLETED
 
     public enum ReservationStatus {
-        ACTIVE, COMPLETED, CANCELLED
+        ACTIVE, COMPLETED, CANCELLED, NOT_COMPLETED
     }
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
