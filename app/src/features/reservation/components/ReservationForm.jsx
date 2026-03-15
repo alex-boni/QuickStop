@@ -346,7 +346,7 @@ const ReservationForm = () => {
               issubmitting ||
               !formData.endTime ||
               (parking &&
-                parking.availableSpots <= 0 &&
+                dynamicAvailableSpots <= 0 &&
                 formData.startDate === new Date().toISOString().split("T")[0])
             }
             className="flex-1 bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 shadow-md transition-all disabled:bg-gray-400 disabled:shadow-none"
