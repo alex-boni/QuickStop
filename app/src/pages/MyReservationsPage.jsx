@@ -164,7 +164,7 @@ export default function MyReservationsPage() {
         type="danger"
       />
 
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto pt-8 md:py-0">
         <div className="mb-6">
           <button
             onClick={() => navigate("/")}

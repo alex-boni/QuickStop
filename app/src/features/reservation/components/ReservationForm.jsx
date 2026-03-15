@@ -201,7 +201,7 @@ const ReservationForm = () => {
     );
 
   return (
-    <div className="max-w-6xl mx-4 md:mx-auto  py-8">
+    <div className="max-w-6xl mx-4 md:mx-auto pt-16 md:py-8">
       <StatusMessage
         type={status.type}
         message={status.message}

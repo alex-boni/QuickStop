@@ -344,12 +344,12 @@ export default function MapPage() {
           showUserHeading={true}
           position="top-right"
           aria-label="Localizar mi ubicación actual"
-          style={{ marginRight: "35px", marginTop: "110px" }}
+          style={{ marginRight: "35px", marginTop: "150px" }}
         />
         <ScaleControl />
         <NavigationControl
           position="top-right"
-          style={{ marginRight: "35px", marginTop: "20px" }}
+          style={{ marginRight: "35px", marginTop: "30px" }}
         />
 
         {/* Popup anclado al parking */}

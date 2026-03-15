@@ -61,12 +61,12 @@ const SideMenu = ({ isOpen, onClose }) => {
         <button
           onClick={onClose}
           ref={closeButtonRef}
-          className="absolute top-6 right-6 p-2 font-bold text-3xl text-gray-600 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg"
+          className="absolute top-12 right-6 p-2 font-bold text-3xl text-gray-600 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg"
           aria-label="Cerrar menú lateral"
         >
           &times;
         </button>
-        <nav className="space-y-6 mt-12 text-xl">
+        <nav className="space-y-6 mt-16 text-xl">
           <h1 className="justify-center place-self-center text-indigo-600" aria-label="Menú lateral" hidden></h1>
           {isAuthenticated ? (
             <>

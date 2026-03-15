@@ -29,7 +29,7 @@ export default defineConfig({
         }]
       },
       manifest: {
-        name: "QuickStop ParkIT",
+        name: "QuickStop",
         short_name: "QuickStop",
         start_url: "/",
         display: "standalone",
@@ -54,6 +54,16 @@ export default defineConfig({
         {
             "src": "icons/ic_app_196.png",
             "sizes": "196x196",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/ic_app_32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/apple-touch-icon.png",
+            "sizes": "180x180",
             "type": "image/png"
         }
         ]
