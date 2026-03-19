@@ -1,11 +1,52 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createParking } from "../ParkingService";
 import { useAuth } from "../../../context/AuthContext";
+import { useDebounce } from "../../../hooks/useDebounce";
+import { fetchGeocodingResults } from "../../../services/mapService";
 import Map, { Marker } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
+
+const SuggestionItem = ({ place, onClick }) => (
+  <li
+    className="px-4 my-2 py-1 hover:bg-gray-100 cursor-pointer flex items-center gap-3 text-gray-700 hover:text-indigo-600 
+             focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg"
+    onClick={() => onClick(place)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onClick(place);
+      }
+    }}
+    tabIndex={0}
+    aria-label={`Seleccionar ${place.place_name_es || place.place_name}`}
+  >
+    <svg
+      className="w-5 h-5 text-indigo-400"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"
+      ></path>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+      ></path>
+    </svg>
+    <span className="truncate">{place.place_name_es || place.place_name}</span>
+  </li>
+);
 
 const AddParkingForm = () => {
     const navigate = useNavigate();
@@ -31,7 +72,30 @@ const AddParkingForm = () => {
         zoom: 12
     });
     const [markerPosition, setMarkerPosition] = useState(null);
+    const [suggestions, setSuggestions] = useState([]);
     const mapRef = useRef(null);
+
+    const debouncedAddress = useDebounce(formData.address, 300);
+
+    useEffect(() => {
+        if (debouncedAddress.length < 3) {
+            setSuggestions([]);
+            return;
+        }
+
+        if (markerPosition && formData.address === debouncedAddress) {
+            return;
+        }
+
+        fetchGeocodingResults(debouncedAddress)
+            .then((results) => {
+                setSuggestions(results);
+            })
+            .catch((error) => {
+                console.error('Error al obtener sugerencias de geocoding:', error);
+                setSuggestions([]);
+            });
+    }, [debouncedAddress]);
 
     const handleChange = (e) => {
         const { id, value, type, checked } = e.target;
@@ -41,6 +105,9 @@ const AddParkingForm = () => {
         });
         if (errors[id]) {
             setErrors(prev => ({ ...prev, [id]: null }));
+        }
+        if (id === 'address' && value === '') {
+            setSuggestions([]);
         }
     };
 
@@ -79,11 +146,28 @@ const AddParkingForm = () => {
                     latitude: lat.toString(),
                     address: placeName
                 }));
+                setSuggestions([]);
                 setErrors(prev => ({ ...prev, longitude: null, latitude: null, address: null }));
             }
         } catch (error) {
             console.error('Error buscando dirección:', error);
         }
+    };
+
+    const handleSuggestionClick = (place) => {
+        const [lng, lat] = place.center;
+        const placeName = place.place_name_es || place.place_name;
+        
+        setMarkerPosition({ longitude: lng, latitude: lat });
+        setViewState(prev => ({ ...prev, longitude: lng, latitude: lat, zoom: 15 }));
+        setFormData(prev => ({
+            ...prev,
+            longitude: lng.toString(),
+            latitude: lat.toString(),
+            address: placeName
+        }));
+        setSuggestions([]);
+        setErrors(prev => ({ ...prev, longitude: null, latitude: null, address: null }));
     };
 
     const validateForm = () => {
@@ -238,7 +322,7 @@ const AddParkingForm = () => {
             </div>
 
             {/* Dirección con buscador */}
-            <div>
+            <div className="relative">
                 <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
                     Dirección *
                 </label>
@@ -260,6 +344,7 @@ const AddParkingForm = () => {
                         aria-invalid={!!errors.address}
                         aria-describedby={errors.address ? 'address-error' : undefined}
                         disabled={isLoading}
+                        autoComplete="off"
                     />
                     <button
                         type="button"
@@ -267,17 +352,31 @@ const AddParkingForm = () => {
                         className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors whitespace-nowrap"
                         disabled={isLoading}
                     >
-                        🔍 Buscar
+                        Buscar
                     </button>
                 </div>
+                
+                {/* Lista de Sugerencias */}
+                {suggestions.length > 0 && (
+                    <ul className="absolute z-50 w-full mt-1 p-1 bg-white rounded-lg shadow-2xl border border-gray-200 max-h-60 overflow-y-auto">
+                        {suggestions.map((place) => (
+                            <SuggestionItem
+                                key={place.id}
+                                place={place}
+                                onClick={handleSuggestionClick}
+                            />
+                        ))}
+                    </ul>
+                )}
+                
                 {errors.address && <p id="address-error" className="mt-1 text-xs text-red-600" aria-live="assertive">{errors.address}</p>}
-                <p className="mt-1 text-xs text-gray-500">💡 Busca la dirección o haz click en el mapa</p>
+                <p className="mt-1 text-xs text-gray-500">Busca la dirección o haz click en el mapa</p>
             </div>
 
             {/* Mapa interactivo - más pequeño */}
             <div className="border border-gray-300 rounded-lg overflow-hidden">
                 <div className="bg-gray-50 px-3 py-2 border-b border-gray-300 flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-700">📍 Selecciona la ubicación</p>
+                    <p className="text-sm font-medium text-gray-700">Selecciona la ubicación</p>
                     {markerPosition && (
                         <span className="text-xs text-green-600 font-medium">
                             ✓ Ubicación seleccionada
