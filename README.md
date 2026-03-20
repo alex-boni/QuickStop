@@ -217,17 +217,22 @@ Consultas:
 - Push notifications
 
 ## ⚙️ Ejecución (resumen)
-**Frontend**
+- Crear un .env en la raiz del proyecto del codigo con los datos que se encuentran en .env del google drive (dentro la carpeta desarrollo/codigo)
+
+**Linux**
 ```
-cd app
+git clone https://github.com/alex-boni/QuickStop.git
+cd QuickStop
 npm install
-npm run dev
+npm run dev:windows
 ```
 
-**Backend**
+**Windows. Necesita installar docker-desktop**
 ```
-cd api
-./mvnw spring-boot:run
+git clone https://github.com/alex-boni/QuickStop.git
+cd QuickStop
+npm install
+npm run dev
 ```
 
 ## ✅ Por qué este stack
