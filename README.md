@@ -219,20 +219,21 @@ Consultas:
 ## ⚙️ Ejecución (resumen)
 - Crear un .env en la raiz del proyecto del codigo con los datos que se encuentran en .env del google drive (dentro la carpeta desarrollo/codigo)
 
-**Linux**
+**PARA AMBOS SISTEMAS PARA INSTALAR**
 ```
 git clone https://github.com/alex-boni/QuickStop.git
 cd QuickStop
 npm install
-npm run dev:windows
+```
+**EJECUCION Linux**
+```
+npm run dev
 ```
 
-**Windows. Necesita installar docker-desktop**
+
+**EJECUCION Windows. Necesita installar docker-desktop**
 ```
-git clone https://github.com/alex-boni/QuickStop.git
-cd QuickStop
-npm install
-npm run dev
+npm run dev:windows
 ```
 
 ## ✅ Por qué este stack
