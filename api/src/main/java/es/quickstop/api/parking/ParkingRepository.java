@@ -10,6 +10,9 @@ import org.locationtech.jts.geom.Point;
 
 @Repository
 public interface ParkingRepository extends JpaRepository<Parking, Long> {
-    @Query(value = "SELECT * FROM parkings p WHERE ST_DWithin(p.location, :centro, :distanciaMetros) = true", nativeQuery = true)
+    @Query(value = "SELECT * FROM parkings p WHERE ST_DWithin(p.location, :centro, :distanciaMetros) = true AND p.deleted_at IS NULL", nativeQuery = true)
     List<Parking> findNearWithinDistance(Point centro, double distanciaMetros);
+    
+    @Query("SELECT p FROM Parking p WHERE p.deletedAt IS NULL")
+    List<Parking> findAllActive();
 }

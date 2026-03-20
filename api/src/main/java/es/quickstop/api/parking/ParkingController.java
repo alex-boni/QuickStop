@@ -70,4 +70,12 @@ public class ParkingController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @GetMapping("/{id}/delete-info")
+    public ResponseEntity<?> getParkingDeleteInfo(@PathVariable Long id) {
+        int activeReservations = parkingService.countActiveReservations(id);
+        return ResponseEntity.ok(new java.util.HashMap<String, Object>() {{
+            put("activeReservations", activeReservations);
+        }});
+    }
+
 }

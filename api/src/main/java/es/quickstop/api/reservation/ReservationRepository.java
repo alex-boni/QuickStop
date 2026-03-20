@@ -21,4 +21,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("startTime") LocalDateTime startTime, 
             @Param("endTime") LocalDateTime endTime
     );
+
+    List<Reservation> findByParkingIdAndStatus(Long parkingId, Reservation.ReservationStatus status);
 }

@@ -91,3 +91,13 @@ export const deleteParking = async (id) => {
         throw error;
     }
 };
+
+export const getParkingDeleteInfo = async (id) => {
+    try {
+        const response = await apiClient.get(`${PARKING_ENDPOINTS.GET_PARKING_BY_ID}/${id}/delete-info`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching parking delete info:", error);
+        throw error;
+    }
+};

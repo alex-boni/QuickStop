@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import es.quickstop.api.parking.dto.ParkingDTO;
 import es.quickstop.api.parking.model.Parking;
 import es.quickstop.api.reservation.ReservationRepository;
+import es.quickstop.api.reservation.ReservationService;
+import es.quickstop.api.reservation.model.Reservation;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -22,10 +24,11 @@ public class ParkingService {
 
     private final ParkingRepository parkingRepository;
     private final ReservationRepository reservationRepository;
+    private final ReservationService reservationService;
     private final ParkingMapper parkingMapper;
 
     public List<ParkingDTO> getAllParkings() {
-        return parkingRepository.findAll()
+        return parkingRepository.findAllActive()
                 .stream()
                 .map(parkingMapper::toDTO)
                 .collect(Collectors.toList());
@@ -56,6 +59,7 @@ public class ParkingService {
 
     public Optional<ParkingDTO> getParkingById(Long id) {
         return parkingRepository.findById(id)
+                .filter(parking -> parking.getDeletedAt() == null)
                 .map(parking -> {
                     ParkingDTO dto = parkingMapper.toDTO(parking);
                     dto.setAvailableSpots(getRealTimeAvailableSpots(parking));
@@ -92,10 +96,28 @@ public class ParkingService {
     }
 
     public boolean deleteParking(Long id) {
-        if (parkingRepository.existsById(id)) {
-            parkingRepository.deleteById(id);
-            return true;
-        }
-        return false;
+        return parkingRepository.findById(id)
+            .map(parking -> {
+                if (parking.getDeletedAt() != null) {
+                    return false;
+                }
+                
+                List<Reservation> activeReservations = reservationService.getActiveReservationsByParkingId(id);
+                
+                for (Reservation reservation : activeReservations) {
+                    reservationService.cancelReservation(reservation.getId());
+                }
+                
+                parking.setDeletedAt(LocalDateTime.now());
+                parking.setIsActive(false);
+                parkingRepository.save(parking);
+                return true;
+            })
+            .orElse(false);
+    }
+
+    public int countActiveReservations(Long parkingId) {
+        List<Reservation> activeReservations = reservationService.getActiveReservationsByParkingId(parkingId);
+        return activeReservations.size();
     }
 }

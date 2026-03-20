@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getParkings, deleteParking } from '../features/parking/ParkingService';
+import { getParkings, deleteParking, getParkingDeleteInfo } from '../features/parking/ParkingService';
+import ConfirmDialog from '../components/ConfirmDialog';
+import StatusMessage from '../components/StatusMessage';
 
 export default function MyParkingsPage() {
     const navigate = useNavigate();
@@ -10,6 +12,20 @@ export default function MyParkingsPage() {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all'); // 'all', 'active', 'inactive'
     const [searchTerm, setSearchTerm] = useState('');
+    
+    // Estados para el diálogo de confirmación
+    const [confirmDialog, setConfirmDialog] = useState({
+        isOpen: false,
+        parkingId: null,
+        parkingName: '',
+        activeReservations: 0
+    });
+    
+    // Estados para el mensaje de estado
+    const [statusMessage, setStatusMessage] = useState({
+        type: null,
+        message: ''
+    });
 
     useEffect(() => {
         loadMyParkings();
@@ -49,16 +65,52 @@ export default function MyParkingsPage() {
     };
 
     const handleDelete = async (parkingId, parkingName) => {
-        if (window.confirm(`¿Estás seguro de eliminar "${parkingName}"?`)) {
-            try {
-                await deleteParking(parkingId);
-                alert('Parking eliminado correctamente');
-                loadMyParkings();
-            } catch (error) {
-                console.error('Error al eliminar:', error);
-                alert('Error al eliminar el parking');
-            }
+        try {
+            const info = await getParkingDeleteInfo(parkingId);
+            
+            setConfirmDialog({
+                isOpen: true,
+                parkingId,
+                parkingName,
+                activeReservations: info.activeReservations
+            });
+        } catch (error) {
+            console.error('Error obteniendo info del parking:', error);
+            setStatusMessage({
+                type: 'error',
+                message: 'Error al obtener información del parking'
+            });
         }
+    };
+
+    const confirmDelete = async () => {
+        const { parkingId, parkingName, activeReservations } = confirmDialog;
+        
+        try {
+            await deleteParking(parkingId);
+            
+            const message = activeReservations > 0
+                ? `Parking "${parkingName}" eliminado y ${activeReservations} reservas canceladas`
+                : `Parking "${parkingName}" eliminado correctamente`;
+            
+            setStatusMessage({
+                type: 'success',
+                message
+            });
+            loadMyParkings();
+        } catch (error) {
+            console.error('Error al eliminar:', error);
+            setStatusMessage({
+                type: 'error',
+                message: 'Error al eliminar el parking. Por favor, inténtalo de nuevo.'
+            });
+        } finally {
+            setConfirmDialog({ isOpen: false, parkingId: null, parkingName: '', activeReservations: 0 });
+        }
+    };
+
+    const cancelDelete = () => {
+        setConfirmDialog({ isOpen: false, parkingId: null, parkingName: '', activeReservations: 0 });
     };
 
     const handleViewOnMap = (parking) => {
@@ -266,6 +318,27 @@ export default function MyParkingsPage() {
                     </button>
                 )}
             </div>
+
+            {/* Diálogo de confirmación */}
+            <ConfirmDialog
+                isOpen={confirmDialog.isOpen}
+                title="Eliminar Parking"
+                message={
+                    confirmDialog.activeReservations > 0
+                        ? `Este parking tiene ${confirmDialog.activeReservations} reservas activas. Al eliminarlo, se cancelarán TODAS automáticamente. Esta acción no se puede deshacer.`
+                        : `¿Estás seguro de que quieres eliminar "${confirmDialog.parkingName}"? Esta acción no se puede deshacer.`
+                }
+                onConfirm={confirmDelete}
+                onCancel={cancelDelete}
+                type="danger"
+            />
+
+            {/* Mensaje de estado */}
+            <StatusMessage
+                type={statusMessage.type}
+                message={statusMessage.message}
+                onClose={() => setStatusMessage({ type: null, message: '' })}
+            />
         </div>
     );
 }

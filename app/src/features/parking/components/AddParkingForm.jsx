@@ -4,6 +4,7 @@ import { createParking } from "../ParkingService";
 import { useAuth } from "../../../context/AuthContext";
 import { useDebounce } from "../../../hooks/useDebounce";
 import { fetchGeocodingResults } from "../../../services/mapService";
+import StatusMessage from "../../../components/StatusMessage";
 import Map, { Marker } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -65,7 +66,10 @@ const AddParkingForm = () => {
     });
 
     const [errors, setErrors] = useState({});
-    const [success, setSuccess] = useState(false);
+    const [statusMessage, setStatusMessage] = useState({
+        type: null,
+        message: ''
+    });
     const [viewState, setViewState] = useState({
         latitude: 28.4682,
         longitude: -16.2546,
@@ -221,7 +225,7 @@ const AddParkingForm = () => {
 
         setIsLoading(true);
         setErrors({});
-        setSuccess(false);
+        setStatusMessage({ type: null, message: '' });
         
         try {
             const parkingData = {
@@ -238,7 +242,10 @@ const AddParkingForm = () => {
 
             await createParking(parkingData);
             
-            setSuccess(true);
+            setStatusMessage({
+                type: 'success',
+                message: '¡Parking creado exitosamente!'
+            });
             
             // Redirigir después de 2 segundos
             setTimeout(() => {
@@ -283,7 +290,14 @@ const AddParkingForm = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <>
+            <StatusMessage
+                type={statusMessage.type}
+                message={statusMessage.message}
+                onClose={() => setStatusMessage({ type: null, message: '' })}
+            />
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
             {/* Nombre y Descripción */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -468,16 +482,6 @@ const AddParkingForm = () => {
                 </label>
             </div>
 
-            {success && (
-                <div className="p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
-                    <span className="text-2xl">✅</span>
-                    <div>
-                        <p className="text-sm font-medium text-green-800">¡Parking creado exitosamente!</p>
-                        <p className="text-xs text-green-600">Redirigiendo al mapa...</p>
-                    </div>
-                </div>
-            )}
-
             {errors.submit && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
                     <span className="text-2xl">❌</span>
@@ -506,6 +510,7 @@ const AddParkingForm = () => {
                 </button>
             </div>
         </form>
+        </>
     );
 };
 

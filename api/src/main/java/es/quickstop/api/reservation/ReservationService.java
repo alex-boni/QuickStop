@@ -110,4 +110,9 @@ public class ReservationService {
 
         }
 
+        @Transactional(readOnly = true)
+        public List<Reservation> getActiveReservationsByParkingId(Long parkingId) {
+                return reservationRepository.findByParkingIdAndStatus(parkingId, Reservation.ReservationStatus.ACTIVE);
+        }
+
 }

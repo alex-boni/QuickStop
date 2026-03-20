@@ -54,6 +54,9 @@ public class Parking {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
     
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+    
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -65,7 +68,6 @@ public class Parking {
         updatedAt = LocalDateTime.now();
     }
 
-    @OneToMany
-    @JoinColumn(name = "parking_id")
+    @OneToMany(mappedBy = "parking")
     private List<Reservation> reservations;
 }
