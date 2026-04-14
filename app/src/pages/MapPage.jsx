@@ -254,16 +254,7 @@ export default function MapPage() {
     loadParkings();
   }, [searchLocation, showOnlyMyParkings]);
 
-  const handleViewStateChange = (newViewState) => {
-    if (!newViewState || !newViewState.latitude || !newViewState.longitude)
-      return;
-    setViewState({
-      latitude: newViewState.latitude,
-      longitude: newViewState.longitude,
-      zoom: 14,
-      transitionDuration: 1500,
-    });
-  };
+  
 
   // Manejo de los clusters y puntos no agrupados
   const mapRef = React.useRef(null);

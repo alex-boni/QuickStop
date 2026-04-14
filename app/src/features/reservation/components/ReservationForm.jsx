@@ -71,6 +71,7 @@ const ReservationForm = () => {
   }, [parkingId]);
 
   const checkRealTimeAvailability = useCallback(async () => {
+    // Validamos que las fechas sean correctas antes de hacer la consulta
     const start = new Date(`${formData.startDate}T${formData.startTime}`);
     const end = new Date(`${formData.endDate}T${formData.endTime}`);
 
@@ -78,6 +79,8 @@ const ReservationForm = () => {
 
     setCheckingAvailability(true);
     setSuggestion(null);
+
+    // Intentamos obtener la disponibilidad actualizada para las fechas seleccionadas
     try {
       const reservationData = {
         parkingId: parseInt(parkingId),
@@ -87,11 +90,12 @@ const ReservationForm = () => {
         totalPrice: parseFloat(calculateTotal()),
         status: "ACTIVE",
       };
+      // LLamamos al servicio que calcula las plazas disponibles en tiempo real para el rango seleccionado
       const available = await getAvailableSpots(reservationData);
       setDynamicAvailableSpots(available);
 
+      // Si no hay sitio, pedimos una sugerencia de próximo hueco
       if (available <= 0) {
-        // Si no hay sitio, pedimos una sugerencia al servicio que creamos
         const nextSlot = await getNextAvailable(parkingId);
         setSuggestion(new Date(nextSlot));
       }
