@@ -4,7 +4,7 @@ import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
 
 export default function GeocoderControl(props) {
   const [marker, setMarker] = useState(null);
