@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import WelcomeLanding from "../components/WelcomeLanding";
 import ParkingActionModal from "../features/parking/components/ParkingActionModal";
 import ParkingDetailsModal from "../features/parking/components/ParkingDetailsModal";
 import ParkingQuickViewPopup from "../features/parking/components/ParkingQuickViewPopup";
@@ -80,6 +81,8 @@ export default function MapPage() {
     latitude: null
   });
 
+  const [showWelcome, setShowWelcome] = useState(false);
+
   const openModal = (parkingId, parkingName, ownerId) => {
     setModalState({
       isOpen: true,
@@ -96,6 +99,20 @@ export default function MapPage() {
       parkingName: '',
       ownerId: null
     });
+  };
+
+  useEffect(() => {
+    // Solo mostramos si el usuario NO está logueado y es la primera vez en esta sesión
+    const hasSeenWelcome = sessionStorage.getItem("welcomeShown");
+    console.log("Efecto de bienvenida ejecutado. Usuario:", user, "Has visto bienvenida:", hasSeenWelcome);
+    if (!user && !hasSeenWelcome) {
+      setShowWelcome(true);
+    }
+  }, [user]);
+
+  const handleCloseWelcome = () => {
+    sessionStorage.setItem("welcomeShown", "true");
+    setShowWelcome(false);
   };
 
   const handleViewDetails = () => {
@@ -333,6 +350,7 @@ export default function MapPage() {
 
   return (
     <div className="relative w-full h-full ">
+      {showWelcome && <WelcomeLanding onGuest={handleCloseWelcome} />}
       <title>QuikStop: Mapa </title>
       <h1 className="justify-center place-self-center text-indigo-600" aria-label="QuikStop: Mapa de Parkings" hidden>QuikStop: Mapa de Parkings</h1>
       <h2 className="justify-center place-self-center text-indigo-600" aria-label="Mapa interactivo de parkings disponibles en QuikStop" hidden>Mapa interactivo de parkings disponibles</h2>
