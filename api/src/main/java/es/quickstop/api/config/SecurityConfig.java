@@ -1,5 +1,6 @@
 package es.quickstop.api.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,6 +19,8 @@ import java.util.Arrays;
 @EnableWebSecurity // Habilita la seguridad web en la aplicación
 public class SecurityConfig {
 
+    @Value("${FRONTEND_URL:http://localhost:5173}")
+    private String frontendUrl;
     // ... Bean de PasswordEncoder ...
     
     // Configuración del filtro de seguridad
@@ -28,7 +31,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             
             // 2. Habilitar CORS
-            .cors(cors -> cors.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             
             // 3. Configurar la gestión de sesiones como STATELESS (Necesario para JWT)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -58,5 +61,26 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return  new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        
+        // Permitir solo peticiones desde nuestro frontend configurado
+        configuration.setAllowedOrigins(Arrays.asList(frontendUrl));
+        
+        // Permitir los métodos HTTP necesarios
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        
+        // Permitir las cabeceras estándar
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
+        
+        // Permitir envío de credenciales (útil si luego implementas cookies o auth avanzada)
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Aplicar a todas las rutas
+        return source;
     }
 }
