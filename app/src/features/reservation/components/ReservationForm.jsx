@@ -62,7 +62,7 @@ const ReservationForm = () => {
         setParking(data);
         setDynamicAvailableSpots(data.availableSpots);
       } catch (error) {
-        setErrors({ submit: "No se pudo cargar la información del parking" });
+        setErrors({ submit: "No se pudo cargar la información del aparcamiento" });
       } finally {
         setIsLoading(false);
       }
@@ -200,7 +200,7 @@ const ReservationForm = () => {
   if (isLoading)
     return (
       <div className="p-8 text-center text-indigo-600 font-bold">
-        Cargando detalles del parking...
+        Cargando detalles del aparcamiento...
       </div>
     );
 

@@ -244,7 +244,7 @@ const AddParkingForm = () => {
             
             setStatusMessage({
                 type: 'success',
-                message: '¡Parking creado exitosamente!'
+                message: '¡Aparcamiento creado exitosamente!'
             });
             
             // Redirigir después de 2 segundos
@@ -264,7 +264,7 @@ const AddParkingForm = () => {
                 });
             } else if (error.response?.status === 409) {
                 setErrors({
-                    submit: 'Ya existe un parking en esta ubicación'
+                    submit: 'Ya existe un aparcamiento en esta ubicación'
                 });
             } else if (error.response?.status === 500) {
                 setErrors({
@@ -276,7 +276,7 @@ const AddParkingForm = () => {
                 });
             } else {
                 setErrors({
-                    submit: `Error al crear el parking: ${error.message || 'Error desconocido'}`
+                    submit: `Error al crear el aparcamiento: ${error.message || 'Error desconocido'}`
                 });
             }
         } finally {
@@ -302,7 +302,7 @@ const AddParkingForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                        Nombre del Parking *
+                        Nombre del Aparcamiento *
                     </label>
                     <input
                         id="name"
@@ -311,7 +311,7 @@ const AddParkingForm = () => {
                         required
                         onChange={handleChange}
                         className={getInputClass('name')}
-                        placeholder="Ej: Parking Centro"
+                        placeholder="Ej: Aparcamiento Centro"
                         aria-invalid={!!errors.name}
                         aria-describedby={errors.name ? 'name-error' : undefined}
                         disabled={isLoading}
@@ -329,7 +329,7 @@ const AddParkingForm = () => {
                         value={formData.description}
                         onChange={handleChange}
                         className={getInputClass('description')}
-                        placeholder="Ej: Parking céntrico con vigilancia"
+                        placeholder="Ej: Aparcamiento céntrico con vigilancia"
                         disabled={isLoading}
                     />
                 </div>
@@ -467,7 +467,7 @@ const AddParkingForm = () => {
             {/* Toggle Parking activo */}
             <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                 <span className="text-sm font-medium text-gray-700">
-                    Parking activo
+                    Aparcamiento activo
                 </span>
                 <label htmlFor="isActive" className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -486,7 +486,7 @@ const AddParkingForm = () => {
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
                     <span className="text-2xl">❌</span>
                     <div>
-                        <p className="text-sm font-medium text-red-800">Error al crear el parking</p>
+                        <p className="text-sm font-medium text-red-800">Error al crear el aparcamiento</p>
                         <p className="text-xs text-red-600">{errors.submit}</p>
                     </div>
                 </div>
@@ -498,7 +498,7 @@ const AddParkingForm = () => {
                     disabled={isLoading || !markerPosition}
                     className="flex-1 bg-indigo-600 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                    {isLoading ? '⏳ Creando...' : '✓ Añadir Parking'}
+                    {isLoading ? '⏳ Creando...' : '✓ Añadir Aparcamiento'}
                 </button>
                 <button
                     type="button"

@@ -23,7 +23,7 @@ const ParkingQuickViewPopup = ({ longitude, latitude, parkingId, onClose }) => {
           const data = await getParkingById(parkingId);
           setParking(data);
         } catch (err) {
-          setError("Error al cargar el parking");
+          setError("Error al cargar el aparcamiento");
           console.error(err);
         } finally {
           setLoading(false);

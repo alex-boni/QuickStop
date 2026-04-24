@@ -196,7 +196,7 @@ export default function MyReservationsPage() {
             <div className="flex-1  p-2">
               <input
                 type="text"
-                placeholder="Buscar por parking..."
+                placeholder="Buscar por aparcamiento..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"

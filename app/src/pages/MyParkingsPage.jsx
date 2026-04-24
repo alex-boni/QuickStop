@@ -58,7 +58,7 @@ export default function MyParkingsPage() {
             
             setParkings(myParkings);
         } catch (error) {
-            console.error('Error cargando parkings:', error);
+            console.error('Error cargando aparcamientos:', error);
         } finally {
             setLoading(false);
         }
@@ -75,10 +75,10 @@ export default function MyParkingsPage() {
                 activeReservations: info.activeReservations
             });
         } catch (error) {
-            console.error('Error obteniendo info del parking:', error);
+            console.error('Error obteniendo info del aparcamiento:', error);
             setStatusMessage({
                 type: 'error',
-                message: 'Error al obtener información del parking'
+                message: 'Error al obtener información del aparcamiento'
             });
         }
     };
@@ -90,8 +90,8 @@ export default function MyParkingsPage() {
             await deleteParking(parkingId);
             
             const message = activeReservations > 0
-                ? `Parking "${parkingName}" eliminado y ${activeReservations} reservas canceladas`
-                : `Parking "${parkingName}" eliminado correctamente`;
+                ? `Aparcamiento "${parkingName}" eliminado y ${activeReservations} reservas canceladas`
+                : `Aparcamiento "${parkingName}" eliminado correctamente`;
             
             setStatusMessage({
                 type: 'success',
@@ -102,7 +102,7 @@ export default function MyParkingsPage() {
             console.error('Error al eliminar:', error);
             setStatusMessage({
                 type: 'error',
-                message: 'Error al eliminar el parking. Por favor, inténtalo de nuevo.'
+                message: 'Error al eliminar el aparcamiento. Por favor, inténtalo de nuevo.'
             });
         } finally {
             setConfirmDialog({ isOpen: false, parkingId: null, parkingName: '', activeReservations: 0 });
@@ -152,8 +152,8 @@ export default function MyParkingsPage() {
                         </svg>
                         Volver al mapa
                     </button>
-                    <h1 className="text-3xl font-bold text-gray-900">Mis Parkings</h1>
-                    <p className="text-gray-600 mt-2">Gestiona todos tus parkings</p>
+                    <h1 className="text-3xl font-bold text-gray-900">Mis Aparcamientos</h1>
+                    <p className="text-gray-600 mt-2">Gestiona todos tus aparcamientos</p>
                 </div>
 
                 {/* Filtros y búsqueda */}
@@ -210,7 +210,7 @@ export default function MyParkingsPage() {
                 {loading && (
                     <div className="text-center py-12">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                        <p className="mt-4 text-gray-600">Cargando parkings...</p>
+                        <p className="mt-4 text-gray-600">Cargando Aparcamientos...</p>
                     </div>
                 )}
 
@@ -221,19 +221,19 @@ export default function MyParkingsPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                         </svg>
                         <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                            {searchTerm || filter !== 'all' ? 'No se encontraron parkings' : 'No tienes parkings'}
+                            {searchTerm || filter !== 'all' ? 'No se encontraron aparcamientos' : 'No tienes aparcamientos'}
                         </h3>
                         <p className="text-gray-600 mb-4">
                             {searchTerm || filter !== 'all' 
                                 ? 'Intenta con otros filtros' 
-                                : 'Comienza agregando tu primer parking'}
+                                : 'Comienza agregando tu primer aparcamiento'}
                         </p>
                         {!searchTerm && filter === 'all' && (
                             <button
                                 onClick={() => navigate('/addparking')}
                                 className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
                             >
-                                Agregar Parking
+                                Agregar Aparcamiento
                             </button>
                         )}
                     </div>
@@ -310,7 +310,7 @@ export default function MyParkingsPage() {
                     <button
                         onClick={() => navigate('/addparking')}
                         className="fixed bottom-8 right-8 bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition-colors"
-                        title="Agregar parking"
+                        title="Agregar aparcamiento"
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -322,10 +322,10 @@ export default function MyParkingsPage() {
             {/* Diálogo de confirmación */}
             <ConfirmDialog
                 isOpen={confirmDialog.isOpen}
-                title="Eliminar Parking"
+                title="Eliminar Aparcamiento"
                 message={
                     confirmDialog.activeReservations > 0
-                        ? `Este parking tiene ${confirmDialog.activeReservations} reservas activas. Al eliminarlo, se cancelarán TODAS automáticamente. Esta acción no se puede deshacer.`
+                        ? `Este aparcamiento tiene ${confirmDialog.activeReservations} reservas activas. Al eliminarlo, se cancelarán TODAS automáticamente. Esta acción no se puede deshacer.`
                         : `¿Estás seguro de que quieres eliminar "${confirmDialog.parkingName}"? Esta acción no se puede deshacer.`
                 }
                 onConfirm={confirmDelete}

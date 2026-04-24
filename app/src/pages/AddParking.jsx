@@ -19,8 +19,8 @@ export default function AddParking() {
                         </svg>
                         Volver al mapa
                     </button>
-                    <h1 className="text-3xl font-bold text-gray-900">Añadir Parking</h1>
-                    <p className="text-gray-600 mt-2">Completa la información para registrar tu parking</p>
+                    <h1 className="text-3xl font-bold text-gray-900">Añadir Aparcamiento</h1>
+                    <p className="text-gray-600 mt-2">Completa la información para registrar tu aparcamiento</p>
                 </div>
 
                 {/* Formulario */}

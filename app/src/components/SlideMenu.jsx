@@ -164,7 +164,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                     d="M4 6h16M4 10h16M4 14h16M4 18h16"
                   />
                 </svg>
-                <span className="font-medium">Mis Parkings</span>
+                <span className="font-medium">Mis Aparcamientos</span>
               </button>
 )}
 {user && user.role === "OWNER" && (
@@ -194,7 +194,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                   />
                 </svg>
-                <span className="font-medium">Añadir parking</span>
+                <span className="font-medium">Añadir Aparcamiento</span>
               </button>
 
 )}

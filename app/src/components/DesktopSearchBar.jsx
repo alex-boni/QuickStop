@@ -158,8 +158,8 @@ const DesktopSearchBar = ({ onSearch }) => {
           {/* Botón de Acción/Ubicación (al hacer clic, solo se busca el texto actual) */}
           <button
             className="flex p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors ml-3 focus:ring-indigo-500 disabled:opacity-50 focus:outline-none focus:bg-indigo-600 focus:ring-2"
-            title="Buscar parkings en esta ubicación"
-            aria-label="Ejecutar búsqueda de parkings"
+            title="Buscar aparcamientos en esta ubicación"
+            aria-label="Buscar aparcamientos en esta ubicación"
             onClick={handleManualSearch}
           >
           {/* Ícono de Lupa */}

@@ -15,7 +15,7 @@ const ParkingDetailsModal = ({ isOpen, onClose, parkingId }) => {
           const data = await getParkingById(parkingId);
           setParking(data);
         } catch (err) {
-          setError('Error al cargar los detalles del parking');
+          setError('Error al cargar los detalles del aparcamiento');
           console.error(err);
         } finally {
           setLoading(false);
@@ -59,7 +59,7 @@ const ParkingDetailsModal = ({ isOpen, onClose, parkingId }) => {
         {!loading && !error && parking && (
           <div className="space-y-4">
             <h2 className="text-2xl font-bold mb-4 text-gray-800">
-              Detalles del Parking
+              Detalles del Aparcamiento
             </h2>
 
             <div>

@@ -194,13 +194,13 @@ const handleManualSearch = () => {
         </ul>
       )}
       <div className="flex items-center space-x-3">
-        {/* Ícono de Parkings o Reservas */}
+        {/* Ícono de Aparcamientos o Reservas */}
         <button
           onClick={handleQuickAction}
           className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-700"
-          title={user?.role === "OWNER" ? "Mis Parkings" : "Mis Reservas"}
+          title={user?.role === "OWNER" ? "Mis Aparcamientos" : "Mis Reservas"}
           aria-label={
-            user?.role === "OWNER" ? "Ir a mis parkings" : "Ir a mis reservas"
+            user?.role === "OWNER" ? "Ir a mis aparcamientos" : "Ir a mis reservas"
           }
         >
           {user?.role === "OWNER" ? <OwnerIcon /> : <DriverIcon />}
@@ -208,14 +208,14 @@ const handleManualSearch = () => {
 
         {/* Barra de Búsqueda */}
         <label htmlFor="search-input-mobile" className="sr-only">
-          Buscar parkings por dirección
+          Buscar aparcamientos por dirección
         </label>
         <input
           id="search-input-mobile"
           type="text"
           placeholder="¿Dónde quieres aparcar?"
           className={getInputClass()}
-          aria-label="Barra de búsqueda de parkings"
+          aria-label="Introducir dirección para localizar aparcamiento"
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);

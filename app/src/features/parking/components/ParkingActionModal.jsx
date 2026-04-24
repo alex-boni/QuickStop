@@ -17,7 +17,7 @@ const ParkingActionModal = ({ isOpen, onClose, onView, onEdit, onDelete, parking
           {parkingName}
         </h2>
         <p className="text-gray-600 mb-6">
-          ¿Qué deseas hacer con este parking?
+          ¿Qué deseas hacer con este aparcamiento?
         </p>
         
         <div className="space-y-3">
@@ -32,14 +32,14 @@ const ParkingActionModal = ({ isOpen, onClose, onView, onEdit, onDelete, parking
             onClick={onEdit}
             className="w-full py-3 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
           >
-            Editar Parking
+            Editar Aparcamiento
           </button>
 
           <button
             onClick={onDelete}
             className="w-full py-3 px-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
           >
-            Eliminar Parking
+            Eliminar Aparcamiento
           </button>
           
           <button

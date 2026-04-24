@@ -30,7 +30,7 @@ export default function EditParkingForm() {
                 
                 // Verificar que el usuario sea el owner
                 if (data.ownerId !== user?.id) {
-                    setError('No tienes permisos para editar este parking');
+                    setError('No tienes permisos para editar este aparcamiento');
                     return;
                 }
                 
@@ -44,7 +44,7 @@ export default function EditParkingForm() {
                     isActive: data.isActive ?? true
                 });
             } catch (err) {
-                setError('Error al cargar los detalles del parking');
+                setError('Error al cargar los detalles del aparcamiento');
                 console.error(err);
             } finally {
                 setLoading(false);
@@ -86,7 +86,7 @@ export default function EditParkingForm() {
                 navigate('/my-parkings');
             }, 2000);
         } catch (err) {
-            setError('Error al actualizar el parking');
+            setError('Error al actualizar el aparcamiento');
             console.error(err);
         } finally {
             setSaving(false);
@@ -101,7 +101,7 @@ export default function EditParkingForm() {
         return (
             <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600">Cargando parking...</p>
+                <p className="mt-4 text-gray-600">Cargando aparcamiento...</p>
             </div>
         );
     }
@@ -120,7 +120,7 @@ export default function EditParkingForm() {
                         onClick={() => navigate('/my-parkings')}
                         className="bg-indigo-600 text-white py-2.5 px-6 rounded-lg hover:bg-indigo-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     >
-                        Volver a mis parkings
+                        Volver a mis aparcamientos
                     </button>
                 </div>
             </div>
@@ -130,12 +130,12 @@ export default function EditParkingForm() {
     if (!parking) {
         return (
             <div className="text-center py-8">
-                <p className="text-gray-600 mb-4">No se encontró el parking</p>
+                <p className="text-gray-600 mb-4">No se encontró el aparcamiento</p>
                 <button
                     onClick={() => navigate('/my-parkings')}
                     className="bg-indigo-600 text-white py-2.5 px-6 rounded-lg hover:bg-indigo-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                    Volver a mis parkings
+                    Volver a mis aparcamientos
                 </button>
             </div>
         );
@@ -147,7 +147,7 @@ export default function EditParkingForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                        Nombre del Parking *
+                        Nombre del Aparcamiento *
                     </label>
                     <input
                         type="text"
@@ -157,7 +157,7 @@ export default function EditParkingForm() {
                         onChange={handleChange}
                         required
                         className={getInputClass('name')}
-                        placeholder="Ej: Parking Centro"
+                        placeholder="Ej: Aparcamiento Centro"
                         disabled={saving}
                     />
                 </div>
@@ -173,7 +173,7 @@ export default function EditParkingForm() {
                         value={formData.address}
                         onChange={handleChange}
                         className={getInputClass('address')}
-                        placeholder="Dirección del parking"
+                        placeholder="Dirección del aparcamiento"
                         disabled
                     />
                 </div>
@@ -231,15 +231,15 @@ export default function EditParkingForm() {
                     onChange={handleChange}
                     rows="4"
                     className={getInputClass('description')}
-                    placeholder="Describe las características del parking..."
+                    placeholder="Describe las características del aparcamiento..."
                     disabled={saving}
                 />
             </div>
 
-            {/* Toggle Parking activo */}
+            {/* Toggle Aparcamiento activo */}
             <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                 <span className="text-sm font-medium text-gray-700">
-                    Parking activo
+                    Aparcamiento activo
                 </span>
                 <label htmlFor="isActive" className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -259,8 +259,8 @@ export default function EditParkingForm() {
                 <div className="p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
                     <span className="text-2xl">✅</span>
                     <div>
-                        <p className="text-sm font-medium text-green-800">¡Parking actualizado exitosamente!</p>
-                        <p className="text-xs text-green-600">Redirigiendo a mis parkings...</p>
+                        <p className="text-sm font-medium text-green-800">¡Aparcamiento actualizado exitosamente!</p>
+                        <p className="text-xs text-green-600">Redirigiendo a mis aparcamientos...</p>
                     </div>
                 </div>
             )}
@@ -269,7 +269,7 @@ export default function EditParkingForm() {
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
                     <span className="text-2xl">❌</span>
                     <div>
-                        <p className="text-sm font-medium text-red-800">Error al actualizar el parking</p>
+                        <p className="text-sm font-medium text-red-800">Error al actualizar el aparcamiento</p>
                         <p className="text-xs text-red-600">{error}</p>
                     </div>
                 </div>

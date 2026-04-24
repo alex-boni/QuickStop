@@ -16,7 +16,7 @@ export default function ViewParkingDetailsForm() {
                 const data = await getParkingById(id);
                 setParking(data);
             } catch (err) {
-                setError('Error al cargar los detalles del parking');
+                setError('Error al cargar los detalles del aparcamiento');
                 console.error(err);
             } finally {
                 setLoading(false);
@@ -37,7 +37,7 @@ export default function ViewParkingDetailsForm() {
     }
 
     if (!parking) {
-        return <div className="text-center p-4">No se encontró el parking</div>;
+        return <div className="text-center p-4">No se encontró el aparcamiento</div>;
     }
 
     return (

@@ -144,7 +144,7 @@ export default function MapPage() {
       console.error('Error obteniendo info del parking:', error);
       setStatusMessage({
         type: 'error',
-        message: 'Error al obtener información del parking'
+        message: 'Error al obtener información del aparcamiento. Inténtalo de nuevo.'
       });
       closeModal();
     }
@@ -157,8 +157,8 @@ export default function MapPage() {
       await deleteParking(parkingId);
       
       const message = activeReservations > 0
-        ? `Parking "${parkingName}" eliminado y ${activeReservations} reservas canceladas`
-        : `Parking "${parkingName}" eliminado correctamente`;
+        ? `Aparcamiento "${parkingName}" eliminado y ${activeReservations} reservas canceladas`
+        : `Aparcamiento "${parkingName}" eliminado correctamente`;
       
       setStatusMessage({
         type: 'success',
@@ -166,10 +166,10 @@ export default function MapPage() {
       });
       setTimeout(() => window.location.reload(), 1500);
     } catch (error) {
-      console.error('Error al eliminar parking:', error);
+      console.error('Error al eliminar aparcamiento:', error);
       setStatusMessage({
         type: 'error',
-        message: 'Error al eliminar el parking. Inténtalo de nuevo.'
+        message: 'Error al eliminar el aparcamiento. Inténtalo de nuevo.'
       });
     } finally {
       setConfirmDialog({ isOpen: false, parkingId: null, parkingName: '', activeReservations: 0 });
@@ -304,12 +304,12 @@ export default function MapPage() {
     // Si es un punto individual
     if (feature.layer.id === unclusteredPointLayer.id) {
       const parkingId = feature.properties.id;
-      const parkingName = feature.properties.name || 'Parking';
+      const parkingName = feature.properties.name || 'Aparcamiento';
       const ownerId = feature.properties.ownerId;
       const [longitude, latitude] = feature.geometry.coordinates;
       
       if (parkingId) {
-        // Centrar el mapa en el parking clickeado con transición suave usando easeTo
+        // Centrar el mapa en el aparcamiento clickeado con transición suave usando easeTo
         if (mapRef.current) {
           mapRef.current.easeTo({
             center: [longitude, latitude],
@@ -351,15 +351,15 @@ export default function MapPage() {
     <div className="relative w-full h-full ">
       {showWelcome && <WelcomeLanding onGuest={handleCloseWelcome} />}
       <title>QuikStop: Mapa </title>
-      <h1 className="justify-center place-self-center text-indigo-600" aria-label="QuikStop: Mapa de Parkings" hidden>QuikStop: Mapa de Parkings</h1>
-      <h2 className="justify-center place-self-center text-indigo-600" aria-label="Mapa interactivo de parkings disponibles en QuikStop" hidden>Mapa interactivo de parkings disponibles</h2>
+      <h1 className="justify-center place-self-center text-indigo-600" aria-label="QuikStop: Mapa de Aparcamientos" hidden>QuikStop: Mapa de Aparcamientos</h1>
+      <h2 className="justify-center place-self-center text-indigo-600" aria-label="Mapa interactivo de aparcamientos disponibles en QuikStop" hidden>Mapa interactivo de aparcamientos disponibles</h2>
 
       {isLoadingParkings && (
                 <div 
                 className="absolute inset-0 z-[10] flex items-center justify-center bg-gray-100 bg-opacity-75"
                 role="status" // WCAG: Indica que es un área de estado (cargando)
                 aria-live="polite" // WCAG: Anuncia al lector de pantalla que el estado ha cambiado
-                aria-label="Cargando parkings disponibles. Por favor espera. Si la carga tarda mucho, por favor refresca la página o revisa tu conexión a internet."
+                aria-label="Cargando aparcamientos disponibles. Por favor espera. Si la carga tarda mucho, por favor refresca la página o revisa tu conexión a internet."
                 >
                     <p className="text-indigo-600 font-bold text-xl flex items-center gap-2 p-4 bg-white rounded-lg shadow-lg">
                         {/* Spinner simple de Tailwind (ejemplo) */}
@@ -367,7 +367,7 @@ export default function MapPage() {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        Cargando parkings disponibles... Si la carga tarda mucho, por favor refresca la página o revisa tu conexión a internet.
+                        Cargando aparcamientos disponibles... Si la carga tarda mucho, por favor refresca la página o revisa tu conexión a internet.
                     </p> 
                 </div>
             )}
@@ -426,7 +426,7 @@ export default function MapPage() {
       <MobileSearchBar onSearch={handleSearchMove} onGeolocate={handleGeolocateClick} />
       <DesktopSearchBar onSearch={handleSearchMove} />
       
-      {/* Botón flotante para filtrar mis parkings - solo para OWNERS */}
+      {/* Botón flotante para filtrar mis aparcamientos - solo para OWNERS */}
       {user && user.role === 'OWNER' && (
         <button
           onClick={() => setShowOnlyMyParkings(!showOnlyMyParkings)}
@@ -435,7 +435,7 @@ export default function MapPage() {
               ? 'bg-indigo-600 hover:bg-indigo-700' 
               : 'bg-white hover:bg-gray-100'
           }`}
-          title={showOnlyMyParkings ? 'Mostrar todos los parkings' : 'Mostrar solo mis parkings'}
+          title={showOnlyMyParkings ? 'Mostrar todos los aparcamientos' : 'Mostrar solo mis aparcamientos'}
         >
           {showOnlyMyParkings ? (
             // Icono cuando está activo (filtro aplicado)

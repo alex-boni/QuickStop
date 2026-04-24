@@ -3,7 +3,7 @@ import ViewParkingDetailsForm from "../features/parking/components/ViewParkingDe
 
 export default function ViewAccountDetails() {
   return (
-    <AuthLayout title="Detalles del parking">
+    <AuthLayout title="Detalles del Aparcamiento">
       <ViewParkingDetailsForm/>
     </AuthLayout>
   );
