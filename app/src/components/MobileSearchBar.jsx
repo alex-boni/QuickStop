@@ -4,50 +4,65 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useDebounce } from "../hooks/useDebounce";
 import { fetchGeocodingResults } from "../services/mapService";
-const SuggestionItem = ({ place, onClick }) => (
-  <li
-    className="px-4 my-2 py-1  hover:bg-gray-100 cursor-pointer flex items-center gap-3 text-gray-700 hover:text-indigo-600 
-             focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg"
-    onClick={() => onClick(place)}
-    onKeyDown={(e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        console.log("Sugerencia seleccionada (teclado):", place);
-        e.preventDefault(); // Evita el comportamiento por defecto del navegador
-        onClick(place); // Ejecuta la acción de selección
-      }
-    }}
-    tabIndex={0} // WCAG: Asegura que el elemento de lista sea enfocable
-    aria-label={`Seleccionar ${place.place_name_es || place.place_name}`} // WCAG: Etiqueta accesible para lectores de pantalla para cada sugerencia para mejorar la accesibilidad para usuarios con discapacidades visuales para describir la acción de seleccionar la sugerencia
-  >
-    {/* Ícono de Pin (o Dirección) */}
-    <svg
-      className="w-5 h-5 text-indigo-400"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
+const SuggestionItem = ({ place, onClick }) => {
+  // Renderizado de error en el listado
+  if (place.id === "error") {
+    return (
+      <li
+        className="px-4 my-0.5 py-2 text-red-900 bg-red-50 flex items-center gap-3 rounded-lg border border-red-100"
+        tabIndex={-1}
+        aria-live="assertive"
+      >
+        <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span className="text-sm font-medium">{place.place_name}</span>
+      </li>
+    );
+  }
+  // Renderizado de sugerencia vacía en el listado
+  else if (place.id === "empty") {
+    return (
+      <li
+        className="px-4  my-0.5 py-2 text-yellow-900 bg-yellow-50 flex items-center gap-3 rounded-lg border border-yellow-100"
+        tabIndex={-1}
+        aria-live="assertive"
+      >
+        <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span className="text-sm font-medium">{place.place_name}</span>
+      </li>
+    );
+  }
+
+  return (
+    <li
+      className="px-4 my-2 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-3 text-gray-700 hover:text-indigo-600 
+                 focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg"
+      onClick={() => onClick(place)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick(place);
+        }
+      }}
+      tabIndex={0}
+      aria-label={`Seleccionar ${place.place_name_es || place.place_name}`}
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"
-      ></path>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-      ></path>
-    </svg>
-    <span className="truncate">{place.place_name_es || place.place_name}</span>
-  </li>
-);
+      <svg className="w-5 h-5 text-indigo-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      <span className="truncate text-sm">{place.place_name_es || place.place_name}</span>
+    </li>
+  );
+};
 const MobileSearchBar = ({ onSearch, onGeolocate }) => {
   // Estados
   const [query, setQuery] = useState(""); // Texto visible en el input
   const [suggestions, setSuggestions] = useState([]); // Resultados del autocompletado
+  const [isErrorActive, setIsErrorActive] = useState(false); // Estado para controlar el mensaje de error
   const { user } = useAuth(); // Obtenemos el usuario logueado
   const navigate = useNavigate();
 
@@ -85,6 +100,32 @@ const MobileSearchBar = ({ onSearch, onGeolocate }) => {
       latitude: place.center[1],
     });
   };
+
+  // Manejar búsqueda manual (Enter)
+const handleManualSearch = () => {
+    if (!query.trim()) {
+      setIsErrorActive(true);
+      // Ocultar el error automáticamente después de 3 segundos
+        setSuggestions([{"id": "empty", "place_name": "Por favor, introduce una ubicación para buscar aparcamientos."}]);
+        setTimeout(() => {
+        setSuggestions([]);
+        setIsErrorActive(false);
+      }, 3500);
+      return;
+    }
+    const firstValidSuggestion = suggestions.find(s => s.id !== "error" && s.id !== "empty");
+
+    if (firstValidSuggestion) {
+      handleSuggestionClick(firstValidSuggestion);
+    } else {
+      // Si no hay sugerencias cargadas aún pero hay texto, 
+      // enviamos la query de texto plano como fallback
+      setIsErrorActive(false);
+      onSearch({ query: query.trim() });
+      setSuggestions([]);
+    }
+  };
+
   // Icono lista (Driver)
   const DriverIcon = () => (
     <svg
@@ -139,10 +180,10 @@ const MobileSearchBar = ({ onSearch, onGeolocate }) => {
     return `w-full p-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'}`;
   };
   return (
-    <div className="md:hidden fixed bottom-0 inset-x-0 p-3 bg-white shadow-lg z-40 rounded-xl pb-8 mx-0">
+    <div className="md:hidden fixed bottom-0 inset-x-0 p-3 bg-white shadow-lg z-40 rounded-xl pb-8 mx-1">
       {/* Lista de Sugerencias (Lista Desplegable) */}
       {suggestions.length > 0 && (
-        <ul className="absolute bottom-full left-0 w-full mb-2 p-1 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden max-h-80 overflow-y-auto z-50">
+        <ul className="absolute bottom-full left-0 w-full mb-2 px-1 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden max-h-80 overflow-y-auto z-50">
           {suggestions.map((place) => (
             <SuggestionItem
               key={place.id}
@@ -176,7 +217,11 @@ const MobileSearchBar = ({ onSearch, onGeolocate }) => {
           className={getInputClass()}
           aria-label="Barra de búsqueda de parkings"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            if (isErrorActive) setIsErrorActive(false);
+          }}
+          onKeyDown={(e) => e.key === 'Enter' && handleManualSearch()}
         />
 
         {/* Ícono de Ubicación Actual*/}

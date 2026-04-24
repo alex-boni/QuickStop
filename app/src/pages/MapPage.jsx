@@ -104,7 +104,6 @@ export default function MapPage() {
   useEffect(() => {
     // Solo mostramos si el usuario NO está logueado y es la primera vez en esta sesión
     const hasSeenWelcome = sessionStorage.getItem("welcomeShown");
-    console.log("Efecto de bienvenida ejecutado. Usuario:", user, "Has visto bienvenida:", hasSeenWelcome);
     if (!user && !hasSeenWelcome) {
       setShowWelcome(true);
     }
