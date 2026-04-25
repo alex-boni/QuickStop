@@ -105,7 +105,7 @@ export default function MapPage() {
     // Guardamos donde estamos buscando ahora
     lastSearchCoordsRef.current = { latitude, longitude };
 
-    // Disparamos la búsqueda (esto ya lo hace tu useEffect de loadParkings al cambiar searchLocation)
+    // Disparamos la búsqueda con las nuevas coordenadas
     setSearchLocation({
       latitude,
       longitude,
