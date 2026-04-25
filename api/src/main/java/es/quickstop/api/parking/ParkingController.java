@@ -36,7 +36,7 @@ public class ParkingController {
             @RequestParam double latitude,
             @RequestParam double longitude,
             @RequestParam double distance) {
-        System.out.println("Buscar parkings cerca de lat: " + latitude + ", lon: " + longitude + ", distancia: " + distance);
+        // System.out.println("Buscar parkings cerca de lat: " + latitude + ", lon: " + longitude + ", distancia: " + distance);
         List<ParkingDTO> parkings = parkingService.searchParkings(latitude, longitude, distance);
         return new ResponseEntity<>(parkings, HttpStatus.OK);
     }

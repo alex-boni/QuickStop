@@ -5,7 +5,10 @@ import WelcomeLanding from "../components/WelcomeLanding";
 import ParkingActionModal from "../features/parking/components/ParkingActionModal";
 import ParkingDetailsModal from "../features/parking/components/ParkingDetailsModal";
 import ParkingQuickViewPopup from "../features/parking/components/ParkingQuickViewPopup";
-import { deleteParking, getParkingDeleteInfo } from "../features/parking/ParkingService";
+import {
+  deleteParking,
+  getParkingDeleteInfo,
+} from "../features/parking/ParkingService";
 import ConfirmDialog from "../components/ConfirmDialog";
 import StatusMessage from "../components/StatusMessage";
 import Map, {
@@ -30,7 +33,7 @@ import FloatingMenuButton from "../components/FloatingMenuButton";
 import MobileSearchBar from "../components/MobileSearchBar";
 import SideMenu from "../components/SlideMenu";
 import DesktopSearchBar from "../components/DesktopSearchBar";
-import { getParkings, EMPTY_GEOJSON} from "../features/parking/ParkingService"; 
+import { getParkings, EMPTY_GEOJSON } from "../features/parking/ParkingService";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
 // const PARKINGS_DATA = await getParkings();
@@ -40,37 +43,104 @@ export default function MapPage() {
   const location = useLocation();
   const { user } = useAuth();
   const geolocateControlRef = useRef();
-  
+
   // Estado para controlar la barra lateral (SideMenu) en escritorio
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  // Estado para manejar la búsqueda de parkings según la ubicación
+  const [searchLocation, setSearchLocation] = useState(null);
+  const [isLoadingParkings, setIsLoadingParkings] = useState(true);
+  const [parkingsGeoJson, setParkingsGeoJson] = useState(EMPTY_GEOJSON);
+  const [showOnlyMyParkings, setShowOnlyMyParkings] = useState(false);
+  const SEARCH_DISTANCE_KM = 5; // Distancia de búsqueda en kilómetros
+  const mapRef = React.useRef(null);
+
+  // Estado para la vista del mapa (latitud, longitud, zoom)
+  const [viewState, setViewState] = useState(() => {
+    const savedView = sessionStorage.getItem("lastMapView");
+    return savedView
+      ? JSON.parse(savedView)
+      : {
+          latitude: 40.4168,
+          longitude: -3.7038,
+          zoom: 12,
+        };
+  });
+  const currentViewRef = React.useRef(viewState);
+
+  //estado para buscar cerca cuando se mueve el mapa (si el usuario se aleja mucho del punto de búsqueda original)
+  const [showSearchHere, setShowSearchHere] = useState(false);
+  const lastSearchCoordsRef = useRef(null); // Para comparar movimiento
+
+  // Función para calcular distancia simple (en grados) para no sobrecargar
+  const hasMovedSignificantly = (newLat, newLng) => {
+    if (!lastSearchCoordsRef.current) return false;
+    const { latitude, longitude } = lastSearchCoordsRef.current;
+    // Si se mueve más de 0.010 grados (aprox 1 km), mostramos el botón
+    const threshold = 0.01;
+    return (
+      Math.abs(newLat - latitude) > threshold ||
+      Math.abs(newLng - longitude) > threshold
+    );
+  };
+  const handleMapMove = (evt) => {
+    const newViewState = evt.viewState;
+    setViewState(newViewState);
+
+    // Si ya hemos buscado alguna vez, comprobamos si se ha movido mucho
+    if (lastSearchCoordsRef.current) {
+      if (
+        hasMovedSignificantly(newViewState.latitude, newViewState.longitude)
+      ) {
+        setShowSearchHere(true);
+      } else {
+        setShowSearchHere(false);
+      }
+    }
+  };
+  const handleSearchInThisArea = () => {
+    const { latitude, longitude } = viewState;
+
+    // Guardamos donde estamos buscando ahora
+    lastSearchCoordsRef.current = { latitude, longitude };
+
+    // Disparamos la búsqueda (esto ya lo hace tu useEffect de loadParkings al cambiar searchLocation)
+    setSearchLocation({
+      latitude,
+      longitude,
+      distance: SEARCH_DISTANCE_KM,
+    });
+
+    setShowSearchHere(false);
+  };
 
   // Estado para el modal de acciones (owner)
   const [modalState, setModalState] = useState({
     isOpen: false,
     parkingId: null,
-    parkingName: '',
-    ownerId: null
+    parkingName: "",
+    ownerId: null,
   });
 
   // Estado para confirmación de eliminación
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     parkingId: null,
-    parkingName: '',
-    activeReservations: 0
+    parkingName: "",
+    activeReservations: 0,
   });
 
   // Estado para mensajes de estado
   const [statusMessage, setStatusMessage] = useState({
     type: null,
-    message: ''
+    message: "",
   });
 
   // Estado para el modal de detalles completo (owner)
   const [detailsModalState, setDetailsModalState] = useState({
     isOpen: false,
-    parkingId: null
+    parkingId: null,
   });
 
   // Estado para el popup quick view (no owner) - anclado al mapa
@@ -78,7 +148,7 @@ export default function MapPage() {
     isOpen: false,
     parkingId: null,
     longitude: null,
-    latitude: null
+    latitude: null,
   });
 
   const [showWelcome, setShowWelcome] = useState(false);
@@ -88,7 +158,7 @@ export default function MapPage() {
       isOpen: true,
       parkingId,
       parkingName,
-      ownerId
+      ownerId,
     });
   };
 
@@ -96,8 +166,8 @@ export default function MapPage() {
     setModalState({
       isOpen: false,
       parkingId: null,
-      parkingName: '',
-      ownerId: null
+      parkingName: "",
+      ownerId: null,
     });
   };
 
@@ -108,6 +178,10 @@ export default function MapPage() {
       setShowWelcome(true);
     }
   }, [user]);
+
+  useEffect(() => {
+    currentViewRef.current = viewState;
+  }, [viewState]);
 
   const handleCloseWelcome = () => {
     sessionStorage.setItem("welcomeShown", "true");
@@ -120,7 +194,7 @@ export default function MapPage() {
     closeModal();
     setDetailsModalState({
       isOpen: true,
-      parkingId
+      parkingId,
     });
   };
 
@@ -132,19 +206,20 @@ export default function MapPage() {
   const handleDelete = async () => {
     try {
       const info = await getParkingDeleteInfo(modalState.parkingId);
-      
+
       setConfirmDialog({
         isOpen: true,
         parkingId: modalState.parkingId,
         parkingName: modalState.parkingName,
-        activeReservations: info.activeReservations
+        activeReservations: info.activeReservations,
       });
       closeModal();
     } catch (error) {
-      console.error('Error obteniendo info del parking:', error);
+      console.error("Error obteniendo info del parking:", error);
       setStatusMessage({
-        type: 'error',
-        message: 'Error al obtener información del aparcamiento. Inténtalo de nuevo.'
+        type: "error",
+        message:
+          "Error al obtener información del aparcamiento. Inténtalo de nuevo.",
       });
       closeModal();
     }
@@ -152,77 +227,82 @@ export default function MapPage() {
 
   const confirmDelete = async () => {
     const { parkingId, parkingName, activeReservations } = confirmDialog;
-    
+
     try {
       await deleteParking(parkingId);
-      
-      const message = activeReservations > 0
-        ? `Aparcamiento "${parkingName}" eliminado y ${activeReservations} reservas canceladas`
-        : `Aparcamiento "${parkingName}" eliminado correctamente`;
-      
+
+      const message =
+        activeReservations > 0
+          ? `Aparcamiento "${parkingName}" eliminado y ${activeReservations} reservas canceladas`
+          : `Aparcamiento "${parkingName}" eliminado correctamente`;
+
       setStatusMessage({
-        type: 'success',
-        message
+        type: "success",
+        message,
       });
       setTimeout(() => window.location.reload(), 1500);
     } catch (error) {
-      console.error('Error al eliminar aparcamiento:', error);
+      console.error("Error al eliminar aparcamiento:", error);
       setStatusMessage({
-        type: 'error',
-        message: 'Error al eliminar el aparcamiento. Inténtalo de nuevo.'
+        type: "error",
+        message: "Error al eliminar el aparcamiento. Inténtalo de nuevo.",
       });
     } finally {
-      setConfirmDialog({ isOpen: false, parkingId: null, parkingName: '', activeReservations: 0 });
+      setConfirmDialog({
+        isOpen: false,
+        parkingId: null,
+        parkingName: "",
+        activeReservations: 0,
+      });
     }
   };
 
   const cancelDelete = () => {
-    setConfirmDialog({ isOpen: false, parkingId: null, parkingName: '', activeReservations: 0 });
+    setConfirmDialog({
+      isOpen: false,
+      parkingId: null,
+      parkingName: "",
+      activeReservations: 0,
+    });
   };
 
-  // Estado para controlar la vista del mapa
-  const [viewState, setViewState] = useState({
-    latitude: 40.4168,
-    longitude: -3.7038,
-    zoom: 12,
-  });
-
-  // Efecto para centrar el mapa cuando venimos desde "Ver en mapa"
   useEffect(() => {
-    if (location.state?.centerOn) {
-      const { longitude, latitude } = location.state.centerOn;
-      
-      // Esperar a que el mapa esté listo
-      const timer1 = setTimeout(() => {
-        if (mapRef.current) {
-          mapRef.current.easeTo({
-            center: [longitude, latitude],
-            zoom: 16,
-            duration: 1500
-          });
-        }
-      }, 500);
-      
-      // Limpiar el state después de usarlo
-      const timer2 = setTimeout(() => {
-        window.history.replaceState({}, document.title);
-      }, 2100);
-      
-      return () => {
-        clearTimeout(timer1);
-        clearTimeout(timer2);
-      };
-    }
-  }, [location.state]);
+    const hasAutoLocated = sessionStorage.getItem("hasAutoLocated");
+    const savedView = sessionStorage.getItem("lastMapView");
 
-  // Estado para manejar la búsqueda de parkings según la ubicación
-  const [searchLocation, setSearchLocation] = useState(null);
-  const [isLoadingParkings, setIsLoadingParkings] = useState(true);
-  const [parkingsGeoJson, setParkingsGeoJson] = useState(EMPTY_GEOJSON);
-  const [showOnlyMyParkings, setShowOnlyMyParkings] = useState(false);
-  const SEARCH_DISTANCE_KM = 5; // Distancia de búsqueda en kilómetros
-  const handleSearchMove = (result) =>{
-    if(!result || !result.latitude || !result.longitude){
+    if (!location.state?.centerOn && !hasAutoLocated && !savedView) {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { longitude, latitude } = position.coords;
+            sessionStorage.setItem("hasAutoLocated", "true");
+
+            const newView = { ...viewState, longitude, latitude, zoom: 14 };
+            setViewState(newView);
+            setSearchLocation({
+              longitude,
+              latitude,
+              distance: SEARCH_DISTANCE_KM,
+            });
+            lastSearchCoordsRef.current = { latitude, longitude };
+          },
+          (error) => console.warn("Geolocalización declinada", error),
+        );
+      }
+    }
+
+    return () => {
+      if (currentViewRef.current) {
+        sessionStorage.setItem(
+          "lastMapView",
+          JSON.stringify(currentViewRef.current),
+        );
+      }
+    };
+  }, []);
+
+  const handleSearchMove = (result) => {
+    if (!result || !result.latitude || !result.longitude) {
       return;
     }
     setViewState({
@@ -230,56 +310,62 @@ export default function MapPage() {
       longitude: result.longitude,
       zoom: 14,
       transitionDuration: 1500,
-    })
+    });
     setSearchLocation({
       latitude: result.latitude,
       longitude: result.longitude,
       distance: SEARCH_DISTANCE_KM,
-    })
-  }
+    });
+    lastSearchCoordsRef.current = {
+      latitude: result.latitude,
+      longitude: result.longitude,
+    };
+  };
 
   const handleGeolocateClick = () => {
-  if (geolocateControlRef.current) {
-    geolocateControlRef.current.trigger();
-  }
-};
+    if (geolocateControlRef.current) {
+      geolocateControlRef.current.trigger();
+    }
+  };
 
-  useEffect(() =>{
-    const loadParkings = async ()=>{
+  useEffect(() => {
+    const loadParkings = async () => {
       setIsLoadingParkings(true);
       const coords = searchLocation || {
         latitude: viewState.latitude,
         longitude: viewState.longitude,
         distance: SEARCH_DISTANCE_KM,
-      }
+      };
       const data = await getParkings(coords);
-      
+
       // Filtrar solo mis parkings si está activado
       if (showOnlyMyParkings && user) {
         const filteredData = {
           ...data,
-          features: data.features.filter(f => f.properties.ownerId === user.id)
+          features: data.features.filter(
+            (f) => f.properties.ownerId === user.id,
+          ),
         };
         setParkingsGeoJson(filteredData);
       } else {
         setParkingsGeoJson(data);
       }
-      
+      lastSearchCoordsRef.current = {
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+      };
       setIsLoadingParkings(false);
-    }
+    };
     loadParkings();
   }, [searchLocation, showOnlyMyParkings]);
 
-  
-
   // Manejo de los clusters y puntos no agrupados
-  const mapRef = React.useRef(null);
   const onClick = (event) => {
     if (!event.features || event.features.length === 0) {
       return;
     }
     const feature = event.features[0];
-    
+
     // Si es un cluster, expandirlo
     if (feature.layer.id === clusterLayer.id) {
       const clusterId = feature.properties.cluster_id;
@@ -300,14 +386,14 @@ export default function MapPage() {
         });
       });
     }
-    
+
     // Si es un punto individual
     if (feature.layer.id === unclusteredPointLayer.id) {
       const parkingId = feature.properties.id;
-      const parkingName = feature.properties.name || 'Aparcamiento';
+      const parkingName = feature.properties.name || "Aparcamiento";
       const ownerId = feature.properties.ownerId;
       const [longitude, latitude] = feature.geometry.coordinates;
-      
+
       if (parkingId) {
         // Centrar el mapa en el aparcamiento clickeado con transición suave usando easeTo
         if (mapRef.current) {
@@ -315,7 +401,7 @@ export default function MapPage() {
             center: [longitude, latitude],
             zoom: 16,
             duration: 1500, // 1.5 segundos
-            essential: true
+            essential: true,
           });
         }
 
@@ -329,7 +415,7 @@ export default function MapPage() {
             isOpen: true,
             parkingId,
             longitude,
-            latitude
+            latitude,
           });
         }
       }
@@ -339,7 +425,11 @@ export default function MapPage() {
   // Verificación de token (WCAG 3.3.5: Ayuda en caso de error)
   if (!MAPBOX_TOKEN) {
     return (
-      <div className="flex justify-center items-center h-screen text-red-600 font-semibold p-8" role="alert" aria-label="Error de Configuración: Token de Mapbox no configurado">
+      <div
+        className="flex justify-center items-center h-screen text-red-600 font-semibold p-8"
+        role="alert"
+        aria-label="Error de Configuración: Token de Mapbox no configurado"
+      >
         Error de Configuración: Token de Mapbox no configurado. Verifica tu
         archivo .env.
       </div>
@@ -350,32 +440,85 @@ export default function MapPage() {
   return (
     <div className="relative w-full h-full ">
       {showWelcome && <WelcomeLanding onGuest={handleCloseWelcome} />}
+      {showSearchHere && (
+        <div className="absolute top-15 md:top-25 inset-x-0 z-20 flex justify-center pointer-events-none">
+          <button
+            onClick={handleSearchInThisArea}
+            className="pointer-events-auto bg-white text-indigo-600 font-semibold py-2 px-4 rounded-full shadow-xl border border-indigo-100 flex items-center gap-2 hover:bg-indigo-50 transition-all animate-bounce-short"
+            aria-label="Buscar aparcamientos en esta nueva zona del mapa"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            Buscar en esta zona
+          </button>
+        </div>
+      )}
       <title>QuikStop: Mapa </title>
-      <h1 className="justify-center place-self-center text-indigo-600" aria-label="QuikStop: Mapa de Aparcamientos" hidden>QuikStop: Mapa de Aparcamientos</h1>
-      <h2 className="justify-center place-self-center text-indigo-600" aria-label="Mapa interactivo de aparcamientos disponibles en QuikStop" hidden>Mapa interactivo de aparcamientos disponibles</h2>
+      <h1
+        className="justify-center place-self-center text-indigo-600"
+        aria-label="QuikStop: Mapa de Aparcamientos"
+        hidden
+      >
+        QuikStop: Mapa de Aparcamientos
+      </h1>
+      <h2
+        className="justify-center place-self-center text-indigo-600"
+        aria-label="Mapa interactivo de aparcamientos disponibles en QuikStop"
+        hidden
+      >
+        Mapa interactivo de aparcamientos disponibles
+      </h2>
 
       {isLoadingParkings && (
-                <div 
-                className="absolute inset-0 z-[10] flex items-center justify-center bg-gray-100 bg-opacity-75"
-                role="status" // WCAG: Indica que es un área de estado (cargando)
-                aria-live="polite" // WCAG: Anuncia al lector de pantalla que el estado ha cambiado
-                aria-label="Cargando aparcamientos disponibles. Por favor espera. Si la carga tarda mucho, por favor refresca la página o revisa tu conexión a internet."
-                >
-                    <p className="text-indigo-600 font-bold text-xl flex items-center gap-2 p-4 bg-white rounded-lg shadow-lg">
-                        {/* Spinner simple de Tailwind (ejemplo) */}
-                        <svg className="animate-spin h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Cargando aparcamientos disponibles... Si la carga tarda mucho, por favor refresca la página o revisa tu conexión a internet.
-                    </p> 
-                </div>
-            )}
+        <div
+          className="absolute inset-0 z-[10] flex items-center justify-center bg-gray-100 bg-opacity-75"
+          role="status" // WCAG: Indica que es un área de estado (cargando)
+          aria-live="polite" // WCAG: Anuncia al lector de pantalla que el estado ha cambiado
+          aria-label="Cargando aparcamientos disponibles. Por favor espera. Si la carga tarda mucho, por favor refresca la página o revisa tu conexión a internet."
+        >
+          <p className="text-indigo-600 font-bold text-xl flex items-center gap-2 p-4 bg-white rounded-lg shadow-lg">
+            {/* Spinner simple de Tailwind (ejemplo) */}
+            <svg
+              className="animate-spin h-5 w-5 text-indigo-500"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Cargando aparcamientos disponibles... Si la carga tarda mucho, por
+            favor refresca la página o revisa tu conexión a internet.
+          </p>
+        </div>
+      )}
       <Map
         mapboxAccessToken={MAPBOX_TOKEN}
         style={{ width: "100%", height: "100%" }}
         {...viewState}
-        onMove={(evt) => setViewState(evt.viewState)}
+        onMove={handleMapMove}
         mapStyle="mapbox://styles/mapbox/streets-v9"
         interactiveLayerIds={[clusterLayer.id, unclusteredPointLayer.id]}
         onClick={onClick}
@@ -398,11 +541,13 @@ export default function MapPage() {
 
         {/* Control de Geolocalización (Mi Ubicación) */}
         <GeolocateControl
-        ref={geolocateControlRef}
+          ref={geolocateControlRef}
           positionOptions={{ enableHighAccuracy: true }}
           trackUserLocation={true}
           showUserHeading={true}
+          showAccuracyCircle={true}
           position="top-right"
+          auto={true}
           aria-label="Localizar mi ubicación actual"
           style={{ marginRight: "35px", marginTop: "150px" }}
         />
@@ -418,42 +563,74 @@ export default function MapPage() {
             longitude={quickViewModalState.longitude}
             latitude={quickViewModalState.latitude}
             parkingId={quickViewModalState.parkingId}
-            onClose={() => setQuickViewModalState({ isOpen: false, parkingId: null, longitude: null, latitude: null })}
+            onClose={() =>
+              setQuickViewModalState({
+                isOpen: false,
+                parkingId: null,
+                longitude: null,
+                latitude: null,
+              })
+            }
           />
         )}
       </Map>
 
-      <MobileSearchBar onSearch={handleSearchMove} onGeolocate={handleGeolocateClick} />
+      <MobileSearchBar
+        onSearch={handleSearchMove}
+        onGeolocate={handleGeolocateClick}
+      />
       <DesktopSearchBar onSearch={handleSearchMove} />
-      
+
       {/* Botón flotante para filtrar mis aparcamientos - solo para OWNERS */}
-      {user && user.role === 'OWNER' && (
+      {user && user.role === "OWNER" && (
         <button
           onClick={() => setShowOnlyMyParkings(!showOnlyMyParkings)}
           className={`fixed bottom-24 right-4 md:bottom-8 md:right-8 p-4 rounded-full shadow-lg transition-all duration-300 z-10 ${
-            showOnlyMyParkings 
-              ? 'bg-indigo-600 hover:bg-indigo-700' 
-              : 'bg-white hover:bg-gray-100'
+            showOnlyMyParkings
+              ? "bg-indigo-600 hover:bg-indigo-700"
+              : "bg-white hover:bg-gray-100"
           }`}
-          title={showOnlyMyParkings ? 'Mostrar todos los aparcamientos' : 'Mostrar solo mis aparcamientos'}
+          title={
+            showOnlyMyParkings
+              ? "Mostrar todos los aparcamientos"
+              : "Mostrar solo mis aparcamientos"
+          }
         >
           {showOnlyMyParkings ? (
             // Icono cuando está activo (filtro aplicado)
-            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
+            <svg
+              className="w-6 h-6 text-white"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                clipRule="evenodd"
+              />
             </svg>
           ) : (
             // Icono cuando está inactivo
-            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            <svg
+              className="w-6 h-6 text-gray-700"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+              />
             </svg>
           )}
         </button>
       )}
-      
+
       <FloatingMenuButton onToggle={toggleMenu} />
       <SideMenu isOpen={isMenuOpen} onClose={toggleMenu} />
-      
+
       <ParkingActionModal
         isOpen={modalState.isOpen}
         onClose={closeModal}
@@ -472,10 +649,10 @@ export default function MapPage() {
       {/* Diálogo de confirmación */}
       <ConfirmDialog
         isOpen={confirmDialog.isOpen}
-        title="Eliminar Parking"
+        title="Eliminar Aparcamiento"
         message={
           confirmDialog.activeReservations > 0
-            ? `Este parking tiene ${confirmDialog.activeReservations} reservas activas. Al eliminarlo, se cancelarán TODAS automáticamente. Esta acción no se puede deshacer.`
+            ? `Este aparcamiento tiene ${confirmDialog.activeReservations} reservas activas. Al eliminarlo, se cancelarán TODAS automáticamente. Esta acción no se puede deshacer.`
             : `¿Estás seguro de que quieres eliminar "${confirmDialog.parkingName}"? Esta acción no se puede deshacer.`
         }
         onConfirm={confirmDelete}
@@ -487,7 +664,7 @@ export default function MapPage() {
       <StatusMessage
         type={statusMessage.type}
         message={statusMessage.message}
-        onClose={() => setStatusMessage({ type: null, message: '' })}
+        onClose={() => setStatusMessage({ type: null, message: "" })}
       />
     </div>
   );
