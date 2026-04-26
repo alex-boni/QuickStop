@@ -35,7 +35,7 @@ const RegisterForm = () => {
     // Escuchamos el evento mousedown en todo el documento
     document.addEventListener("mousedown", handleClickOutside);
 
-    // Limpieza del evento al desmontar el componente (importante para el rendimiento)
+    // Limpieza del evento al desmontar el componente
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
