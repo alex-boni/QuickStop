@@ -35,7 +35,7 @@ const SideMenu = ({ isOpen, onClose }) => {
   const handleLogout = () => {
     logout();
     onClose();
-    navigate("/login");
+    navigate("/");
   };
 
   const handleNavigation = (path) => {

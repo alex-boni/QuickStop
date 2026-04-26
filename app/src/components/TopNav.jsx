@@ -7,7 +7,7 @@ const TopNav = () => {
   const navigate = useNavigate();
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    navigate("/");
   };
   return (
     <nav className="bg-white shadow-md p-4 flex justify-between items-center z-50">
