@@ -61,7 +61,7 @@ const RegisterForm = () => {
     // Nombre
     if (field === "name") {
       if (!value || value.length < 4)
-        newErrors.name = "El nombre debe tener al menos 4 caracteres.";
+        newErrors.name = "El nombre debe contener al menos 4 caracteres.";
       else delete newErrors.name;
     }
 
@@ -69,7 +69,7 @@ const RegisterForm = () => {
     if (field === "email") {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(value))
-        newErrors.email = "Introduce un correo electrónico válido.";
+        newErrors.email = "Se requiere un formato válido. Ej: ejemplo@dominio.com";
       else delete newErrors.email;
     }
 
@@ -90,14 +90,14 @@ const RegisterForm = () => {
     // Confirm password
     if (field === "confirmPassword") {
       if (value !== formData.password)
-        newErrors.confirmPassword = "Las contraseñas no coinciden.";
+        newErrors.confirmPassword = "Las contraseñas deben coincidir.";
       else delete newErrors.confirmPassword;
     }
 
     // Términos
     if (field === "termsAccepted") {
       if (!value)
-        newErrors.termsAccepted = "Debes aceptar los Términos y Condiciones.";
+        newErrors.termsAccepted = "Para crear una cuenta, se deben aceptar los Términos y Condiciones.";
       else delete newErrors.termsAccepted;
     }
 
@@ -111,20 +111,20 @@ const RegisterForm = () => {
     const newErrors = {};
 
     if (formData.name.length < 4)
-      newErrors.name = "El nombre debe tener al menos 4 caracteres.";
+      newErrors.name = "El nombre debe contener al menos 4 caracteres.";
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email))
-      newErrors.email = "Introduce un correo electrónico válido.";
+      newErrors.email = "Se requiere un formato válido. Ej: ejemplo@dominio.com";
 
     if (formData.password.length < 8)
       newErrors.password = "La contraseña debe tener al menos 8 caracteres.";
 
     if (formData.password !== formData.confirmPassword)
-      newErrors.confirmPassword = "Las contraseñas no coinciden.";
+      newErrors.confirmPassword = "Las contraseñas deben coincidir.";
 
     if (!formData.termsAccepted)
-      newErrors.termsAccepted = "Debes aceptar los Términos y Condiciones.";
+      newErrors.termsAccepted = "Para crear una cuenta, se deben aceptar los Términos y Condiciones.";
 
     setErrors(newErrors);
 
@@ -152,7 +152,7 @@ const RegisterForm = () => {
       navigate("/login");
     } catch (error) {
       if (error.message === "EmailAlreadyExists") {
-        setErrors({ email: "Este correo ya está registrado." });
+        setErrors({ email: "Este correo se encuentra registrado." });
         document.getElementById("email")?.focus();
       } else {
         setErrors({
@@ -189,7 +189,7 @@ const RegisterForm = () => {
           htmlFor="name"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          Nombre completo
+          Nombre
         </label>
         <input
           id="name"
@@ -217,7 +217,7 @@ const RegisterForm = () => {
           htmlFor="email"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          Correo Electrónico
+          Email
         </label>
         <input
           id="email"
@@ -301,7 +301,7 @@ const RegisterForm = () => {
       <div className="pt-2 relative">
         <div className="flex items-center mb-2">
           <span className="block text-sm font-medium text-gray-700">
-            Me registro en QuickStop como:
+            Tipo de cuenta:
           </span>
           {/* Botón de información "?" */}
           <button
@@ -337,13 +337,12 @@ const RegisterForm = () => {
             <div className="space-y-3 text-xs text-gray-600">
               <p>
                 <strong className="text-gray-800">Conductor:</strong> Busca y
-                reserva plazas en tiempo real. Ideal si necesitas aparcar rápido
+                reserva plazas en tiempo real. Ideal si se necesita aparcar rápido
                 y sin complicaciones.
               </p>
               <p>
                 <strong className="text-gray-800">Propietario:</strong> Registra
-                tus plazas de aparcamiento vacías y genera ingresos cuando no
-                las uses.
+                plazas de aparcamiento vacías y genera ingresos.
               </p>
             </div>
           </div>
@@ -408,7 +407,7 @@ const RegisterForm = () => {
             htmlFor="termsAccepted"
             className="ml-3 text-sm font-medium text-gray-700"
           >
-            Acepto los{" "}
+            Se han leído y se aceptan los{" "}
             <a
               href="/terms"
               className="text-indigo-600 hover:text-indigo-800 underline"
