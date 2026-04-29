@@ -22,18 +22,12 @@ import es.quickstop.api.auth.dto.LoginRequestDTO;
 public class AuthController {
 
     private final AuthService authService;
-    
-    // public AuthController(AuthService authService) {
-    //     this.authService = authService;
-    // }
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO> registerUser(@Valid @RequestBody RegisterRequestDTO request){
         try {
             // Delega la lógica de negocio al servicio (encriptación, guardado)
             AuthResponseDTO response = authService.register(request);
-            //mostrar log
-            System.out.println("Usuario registrado: " + response.getEmail());
             // Devuelve 201 Created si la operación fue exitosa
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (EmailAlreadyExistsException e) {
@@ -44,7 +38,6 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> loginUser(@Valid @RequestBody LoginRequestDTO request){
         AuthResponseDTO response = authService.login(request);
-        System.out.println("Usuario logueado: " + response.getEmail());
         return ResponseEntity.ok(response);
     }
 }

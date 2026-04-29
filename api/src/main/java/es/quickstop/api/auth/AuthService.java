@@ -27,8 +27,10 @@ public class AuthService {
         // 1. Validación de Unicidad de Email (Crucial)
         Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
         if (existingUser.isPresent()) {
-            // Lanza la excepción que se mapeará a HTTP 409 Conflict en el ControllerAdvice
-            throw new EmailAlreadyExistsException("El email " + request.getEmail() + " ya está registrado.");
+            AuthResponseDTO response = new AuthResponseDTO();
+            response.setUserId(0L);// ID ficticio para indicar error (podría ser mejor usar un DTO de error específico)
+            response.setEmail(request.getEmail());
+            return response;
         }
 
         // 2. Creación y Mapeo de la Entidad
