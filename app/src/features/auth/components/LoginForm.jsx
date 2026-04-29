@@ -96,7 +96,7 @@ const LoginForm = () => {
 			{errors.global && <p className="text-sm text-red-600" aria-live="assertive">{errors.global}</p>}
 
 			<div>
-				<label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+				<label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
 				<input
 					id="email"
 					type="email"
@@ -105,7 +105,7 @@ const LoginForm = () => {
 					required
 					autoComplete="email"
 					className={getInputClass('email')}
-					placeholder="tu.correo@ejemplo.com"
+					placeholder="Ej: tu.correo@ejemplo.com"
 					aria-invalid={!!errors.email}
 					aria-describedby={errors.email ? 'email-error' : undefined}
 					disabled={isLoading}
@@ -123,7 +123,7 @@ const LoginForm = () => {
 					required
 					autoComplete="current-password"
 					className={getInputClass('password')}
-					placeholder="Mínimo 8 caracteres"
+					placeholder="Introduzca su contraseña"
 					aria-invalid={!!errors.password}
 					aria-describedby={errors.password ? 'password-error' : undefined}
 					disabled={isLoading}
@@ -152,7 +152,7 @@ const LoginForm = () => {
 			</button>
 
 			<p className="text-center text-sm text-gray-600 mt-4">
-				¿No tienes cuenta? <a href="/register" className="p-1 text-indigo-600  hover:bg-indigo-100  focus:text-indigo-700 focus:bg-indigo-200 focus:ring-2 focus:ring-indigo-500 font-medium transition-colors">Regístrate aquí</a>
+				¿No tiene cuenta? <a href="/register" className="p-1 text-indigo-600  hover:bg-indigo-100  focus:text-indigo-700 focus:bg-indigo-200 focus:ring-2 focus:ring-indigo-500 font-medium transition-colors">Regístrese aquí</a>
 			</p>
 		</form>
 	);

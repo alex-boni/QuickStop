@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../AuthService";
+import { loginUser, registerUser } from "../AuthService";
+import { useAuth } from "../../../context/AuthContext";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const infoRef = React.useRef(null);
+    const { login } = useAuth();
   const [showInfo, setShowInfo] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -149,7 +151,17 @@ const RegisterForm = () => {
 
     try {
       await registerUser(formData);
-      navigate("/login");
+      const response = await loginUser({ email: formData.email, password: formData.password });
+      			if (response?.token) {
+				const userData = {
+					id: response.userId,
+					name: response.name,
+					email: response.email,
+					role: response.role
+				};
+				login(response.token, userData);
+			}
+      navigate("/");
     } catch (error) {
       if (error.message === "EmailAlreadyExists") {
         setErrors({ email: "Este correo se encuentra registrado." });
@@ -255,7 +267,7 @@ const RegisterForm = () => {
           required
           autoComplete="new-password"
           className={getInputClass("password")}
-          placeholder="Mínimo 8 caracteres"
+          placeholder="Introduzca una contraseña"
           aria-invalid={!!errors.password}
           aria-describedby={errors.password ? "password-error" : undefined}
           disabled={isLoading}
@@ -283,7 +295,7 @@ const RegisterForm = () => {
           required
           autoComplete="new-password"
           className={getInputClass("confirmPassword")}
-          placeholder="Repite la contraseña"
+          placeholder="Repita la contraseña"
           aria-invalid={!!errors.confirmPassword}
           aria-describedby={
             errors.confirmPassword ? "confirmPassword-error" : undefined
@@ -438,12 +450,12 @@ const RegisterForm = () => {
       </button>
 
       <p className="text-center text-sm text-gray-600 mt-4">
-        ¿Ya tienes cuenta?{" "}
+        ¿Tiene cuenta?{" "}
         <a
           href="/login"
           className="p-1 text-indigo-600 hover:bg-indigo-100 focus:bg-indigo-200 focus:ring-2 focus:ring-indigo-500 rounded"
         >
-          Inicia sesión aquí
+          Inicie sesión aquí
         </a>
       </p>
     </form>
