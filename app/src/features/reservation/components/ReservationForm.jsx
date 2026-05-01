@@ -140,6 +140,11 @@ const ReservationForm = () => {
       ? (diffInHours * parking.pricePerHour).toFixed(2)
       : 0;
   };
+  // Función para formatear números al estilo español Ej: 1234.56 => "1.234,56"
+  const formatSpain = (num) => {
+    const parsedNum = num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return parsedNum.replace(/,/g, "X").replace(/\./g, ",").replace(/X/g, ".");
+  }
   const toLocalISOString = (date) => {
     const offset = date.getTimezoneOffset() * 60000; // diferencia en ms
     const localISOTime = new Date(date - offset).toISOString().slice(0, -1);
@@ -233,7 +238,7 @@ const ReservationForm = () => {
           </button>
           <h1 className="text-3xl font-bold text-gray-900">Confirmar Reserva</h1>
           <p className="text-gray-600 mt-2">
-            Revisa los detalles antes de finalizar tu reserva
+            Revise los detalles antes de confirmar su reserva
           </p>
         </div>
 
@@ -253,7 +258,7 @@ const ReservationForm = () => {
                   : `${dynamicAvailableSpots} plazas libres en este horario`}
               </span>
               <span className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold">
-                {parking.pricePerHour}€ / hora
+                {formatSpain(parking.pricePerHour)} € / hora
               </span>
             </div>
           </div>
@@ -356,7 +361,7 @@ const ReservationForm = () => {
             <p className="text-indigo-200 text-xs uppercase font-bold tracking-wider">
               Total Estimado
             </p>
-            <h2 className="text-3xl text-white">{calculateTotal()}€</h2>
+            <h2 className="text-3xl text-white">{formatSpain(calculateTotal())} €</h2>
           </div>
           <div className="text-right">
             <p className="text-sm opacity-90">Pago</p>

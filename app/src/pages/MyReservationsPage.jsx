@@ -19,7 +19,7 @@ export default function MyReservationsPage() {
 
   // Estado para notificaciones unificadas
   const [status, setStatus] = useState({ type: null, message: null });
-  // 1. Estados adicionales para la confirmación de cancelación
+  // Estados adicionales para la confirmación de cancelación
   const [confirmState, setConfirmState] = useState({
     isOpen: false,
     resId: null,
@@ -29,6 +29,11 @@ export default function MyReservationsPage() {
   const triggerCancel = (id, parkingName) => {
     setConfirmState({ isOpen: true, resId: id, parkingName });
   };
+    // Función para formatear números al estilo español Ej: 1234.56 => "1.234,56"
+  const formatSpain = (num) => {
+    const parsedNum = num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return parsedNum.replace(/,/g, "X").replace(/\./g, ",").replace(/X/g, ".");
+  }
 
   const handleConfirmCancel = async () => {
     const { resId } = confirmState;
@@ -95,7 +100,7 @@ export default function MyReservationsPage() {
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
             <span className="w-1.5 h-1.5 mr-1.5 bg-green-400 rounded-full animate-pulse"></span>
-            Activa
+            Reservada
           </span>
         );
       case "COMPLETED":
@@ -187,7 +192,7 @@ export default function MyReservationsPage() {
           </button>
           <h1 className="text-3xl font-bold text-gray-900">Mis Reservas</h1>
           <p className="text-gray-600 mt-2">
-            Controla tus estacionamientos y pagos
+            Controle sus reservas de aparcamiento y pagos
           </p>
         </div>
 
@@ -309,10 +314,10 @@ export default function MyReservationsPage() {
                   <div className="flex flex-row md:flex-col items-center md:items-end justify-between gap-4 border-t md:border-t-0 pt-4 md:pt-0">
                     <div className="text-right">
                       <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">
-                        Total Pagado
+                        Precio Total
                       </p>
                       <p className="text-2xl font-black text-indigo-700">
-                        {res.totalPrice}€
+                        {formatSpain(res.totalPrice)} €
                       </p>
                     </div>
                     <div className="flex gap-2">
