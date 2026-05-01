@@ -29,11 +29,24 @@ export default function MyReservationsPage() {
   const triggerCancel = (id, parkingName) => {
     setConfirmState({ isOpen: true, resId: id, parkingName });
   };
-    // Función para formatear números al estilo español Ej: 1234.56 => "1.234,56"
+  // Función para formatear números al estilo español Ej: 1234.56 => "1.234,56"
   const formatSpain = (num) => {
-    const parsedNum = num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const parsedNum = num.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
     return parsedNum.replace(/,/g, "X").replace(/\./g, ",").replace(/X/g, ".");
-  }
+  };
+  // Función para formatear fecha y hora al estilo español Ej: "2024-06-30T14:30:00" => "30/06/2024 14:30"
+  const formatDateTimeSpain = (isoString) => {
+    const date = new Date(isoString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
 
   const handleConfirmCancel = async () => {
     const { resId } = confirmState;
@@ -151,7 +164,7 @@ export default function MyReservationsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen py-8 px-4">
       {/* Componente de notificaciones flotante */}
       <StatusMessage
         type={status.type}
@@ -161,7 +174,7 @@ export default function MyReservationsPage() {
       <ConfirmDialog
         isOpen={confirmState.isOpen}
         title="¿Cancelar reserva?"
-        message={`Esta acción cancelará tu plaza en "${confirmState.parkingName}". No se puede deshacer.`}
+        message={`Esta acción cancelará su reserva de la plaza en "${confirmState.parkingName}". Esta acción no se puede deshacer.`}
         onConfirm={handleConfirmCancel}
         onCancel={() =>
           setConfirmState({ isOpen: false, resId: null, parkingName: "" })
@@ -288,7 +301,7 @@ export default function MyReservationsPage() {
                           />
                         </svg>
                         <span>
-                          Entrada: {new Date(res.startTime).toLocaleString()}
+                          Entrada: {formatDateTimeSpain(res.startTime)}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -305,9 +318,7 @@ export default function MyReservationsPage() {
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                           />
                         </svg>
-                        <span>
-                          Salida: {new Date(res.endTime).toLocaleString()}
-                        </span>
+                        <span>Salida: {formatDateTimeSpain(res.endTime)}</span>
                       </div>
                     </div>
                   </div>

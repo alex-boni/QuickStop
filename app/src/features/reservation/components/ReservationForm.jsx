@@ -32,10 +32,10 @@ const ReservationForm = () => {
   const [suggestion, setSuggestion] = useState(null);
   const formatDate = (date) => {
     const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-  }
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   const suggestedDate = location.state?.suggestedDate
     ? new Date(location.state.suggestedDate)
@@ -62,7 +62,9 @@ const ReservationForm = () => {
         setParking(data);
         setDynamicAvailableSpots(data.availableSpots);
       } catch (error) {
-        setErrors({ submit: "No se pudo cargar la información del aparcamiento" });
+        setErrors({
+          submit: "No se pudo cargar la información del aparcamiento",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -142,9 +144,12 @@ const ReservationForm = () => {
   };
   // Función para formatear números al estilo español Ej: 1234.56 => "1.234,56"
   const formatSpain = (num) => {
-    const parsedNum = num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const parsedNum = num.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
     return parsedNum.replace(/,/g, "X").replace(/\./g, ",").replace(/X/g, ".");
-  }
+  };
   const toLocalISOString = (date) => {
     const offset = date.getTimezoneOffset() * 60000; // diferencia en ms
     const localISOTime = new Date(date - offset).toISOString().slice(0, -1);
@@ -216,31 +221,31 @@ const ReservationForm = () => {
         message={status.message}
         onClose={() => setStatus({ type: null, message: null })}
       />
-              <div className="mb-6">
-          <button
-            onClick={() => navigate("/")}
-            className="flex items-center text-indigo-600 hover:text-indigo-700 mb-4 font-medium transition-colors"
+      <div className="mb-6">
+        <button
+          onClick={() => navigate("/")}
+          className="flex items-center text-indigo-600 hover:text-indigo-700 mb-4 font-medium transition-colors"
+        >
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Volver al mapa
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900">Confirmar Reserva</h1>
-          <p className="text-gray-600 mt-2">
-            Revise los detalles antes de confirmar su reserva
-          </p>
-        </div>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Volver al mapa
+        </button>
+        <h1 className="text-3xl font-bold text-gray-900">Confirmar Reserva</h1>
+        <p className="text-gray-600 mt-2">
+          Revise los detalles antes de confirmar su reserva
+        </p>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 ">
         <div className="bg-white rounded-xl shadow-sm  p-4 flex flex-col md:flex-row gap-4">
@@ -361,7 +366,9 @@ const ReservationForm = () => {
             <p className="text-indigo-200 text-xs uppercase font-bold tracking-wider">
               Total Estimado
             </p>
-            <h2 className="text-3xl text-white">{formatSpain(calculateTotal())} €</h2>
+            <h2 className="text-3xl text-white">
+              {formatSpain(calculateTotal())} €
+            </h2>
           </div>
           <div className="text-right">
             <p className="text-sm opacity-90">Pago</p>
