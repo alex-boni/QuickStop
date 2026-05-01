@@ -37,7 +37,7 @@ export default function WelcomeLanding({ onGuest }) {
             onClick={onGuest}
             className="mt-2  text-gray-500 hover:text-indigo-600 underline underline-offset-4"
           >
-            Explorar como invitado
+            Explorar sin cuenta
           </button>
         </div>
       </div>
