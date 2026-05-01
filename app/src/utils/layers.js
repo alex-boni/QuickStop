@@ -26,7 +26,7 @@ export const clusterLayer = {
             40
         ],
         
-        // Borde blanco limpio
+        // Borde blanco
         'circle-stroke-width': 2,
         'circle-stroke-color': '#ffffff',
     }
@@ -73,9 +73,40 @@ export const unclusteredShadowLayer = {
     source: PARKING_SOURCE_ID,
     filter: ['!', ['has', 'point_count']],
     paint: {
-        'circle-color': '#4f46e5', // Usamos el color de la marca (Índigo)
+        'circle-color': '#4f46e5', //color de la marca (Índigo)
         'circle-radius': 11,
         'circle-opacity': 0.3,
         'circle-translate': [1, 1] 
     }
+};
+export const buildingLayer = {
+  id: '3d-buildings',
+  source: 'composite',
+  'source-layer': 'building',
+  filter: ['==', 'extrude', 'true'],
+  type: 'fill-extrusion',
+  minzoom: 13, // El 3D solo se ve al acercarse para no saturar el rendimiento
+  paint: {
+    'fill-extrusion-color': '#e0e7ff', // Un color marca (índigo muy claro)
+    // Usa la altura real del edificio proporcionada por Mapbox
+    'fill-extrusion-height': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      13,
+      0,
+      13.05,
+      ['get', 'height']
+    ],
+    'fill-extrusion-base': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      13,
+      0,
+      13.05,
+      ['get', 'min_height']
+    ],
+    'fill-extrusion-opacity': 0.7 // transparencia para que no opaque los parkings
+  }
 };

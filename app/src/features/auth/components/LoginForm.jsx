@@ -29,8 +29,8 @@ const LoginForm = () => {
 		}
 		}
 		if (field === 'password') {
-			if (!value || value.length < 8) {
-				newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
+			if (!value) {
+				newErrors.password = 'La contraseña es obligatoria.';
 			} else {
 				delete newErrors.password;
 			}
@@ -45,8 +45,8 @@ const LoginForm = () => {
 			newErrors.email = 'Introduce un correo electrónico válido.';
 			isValid = false;
 		}
-		if (!formData.password || formData.password.length < 8) {
-			newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
+		if (!formData.password) {
+			newErrors.password = 'La contraseña es obligatoria.';
 			isValid = false;
 		}
 		setErrors(newErrors);
