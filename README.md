@@ -1,18 +1,19 @@
-# 🚗 PWA de Búsqueda y Gestión de Parkings en Tiempo Real
+# 🚗 QuickStop: PWA de Búsqueda y Gestión de Parkings en Tiempo Real
 
-Este proyecto es una **Aplicación Web Progresiva (PWA)** que permite a los usuarios **buscar parkings cercanos**, **ver disponibilidad en tiempo real**, **realizar reservas**, **compartir disponibilidad de tus parkings** y **rebicir cobros y generar pagos**.  
-Todo ello cumpliendo con la **normativa europea de accesibilidad (EAA 2025)** y con una arquitectura moderna, escalable y profesional.
+Quickstop es una **Aplicación Web Progresiva (PWA)** desarrollada como Proyecto de Fin de Grado de Ingeniería en Software en la Universidad Complutense de Madrid. Ha sido diseñada bajo el modelo de economía colaborativa. Permite a los usuarios **buscar plazas libres en tiempo real mediante cartografía 3D**, **gestionar reservas**, y a los propietarios **monetizar sus espacios vacíos**. 
+
+Todo el desarrollo se ha estructurado bajo una arquitectura moderna, escalable y centrada en el usuario, garantizando el cumplimiento estricto de la **normativa europea de accesibilidad (EAA 2025)**, siendo esta la principal prioridad en el desarrollo, brindar una aplicación accesible.
 
 ## 🧱 Arquitectura General
-| Capa | Tecnología |
-|------|-------------|
-| Frontend | React + Vite (PWA) |
-| Backend | Spring Boot (REST + Lombok y decoradores + JPA) |
-| Base de datos | PostgreSQL + PostGIS |
-| Comunicación | REST (JSON) |
-| Monorepo | npm workspaces |
+| Capa | Tecnología Principal | Herramientas Adicionales |
+|------|----------------------|--------------------------|
+| **Frontend** | React + Vite (PWA) | Tailwind CSS, Mapbox GL JS (`react-map-gl`), |
+| **Backend** | Spring Boot 3 | REST API, Spring Security (JWT) |
+| **Base de Datos** | PostgreSQL | PostGIS (Consultas espaciales), Hibernate Spatial |
+
 
 ## 📂 Estructura del Monorepo
+El proyecto utiliza `npm workspaces` para gestionar tanto el cliente como la API desde un único repositorio.
 ```
 root/
 ├── package.json
@@ -21,193 +22,93 @@ root/
 │    │   ├── manifest.webmanifest    # Requerido para PWA
 │    │   └── icons/                  # Íconos de aplicación
 |    |
-├    ├── src/
+├    └── src/
 │         ├── assets/                 # Imágenes, fuentes (no dinámicas)
-│         │   └── logo.svg
-│         │
-│         ├── components/             # Componentes de UI reutilizables (Botón, Input, Tarjeta) y que comparten las demas features
-│         │   └── shared/             # (Opcional) Elementos muy genéricos
-│         │       ├── Button.jsx
-│         │       └── Card.jsx
-│         │
-│         ├── features/               # El núcleo: Lógica y componentes agrupados por dominio
-│         │   ├── users/               # Gestión de Login, Registro, Logout, Contraseña
-│         │   │   ├── components/     # Componentes específicos de Auth (ej: LoginForm)
-│         │   │   ├── hooks/          # Hooks de Auth (ej: useAuth)
-│         │   │   └── services/       # Lógica de la API de Auth
-│         │   │
-│         │   ├── parking/            # Lógica y UI para la búsqueda y gestión de parkings
-│         │   │   ├── components/     # ParkingsMap, SearchBarOverlay, ParkingDetailsCard
-│         │   │   ├── hooks/          
-│         │   │   └── services/       # Conexión con la API de Parkings (REST, WebSockets)
-│         │   │
-│         │   ├── owner/             
-│         │   │   ├── components/     
-│         │   │   ├── hooks/          
-│         │   │   └── services/      
-│         │   ├── driver/            
-│         │   │   ├── components/     
-│         │   │   ├── hooks/          
-│         │   │   └── services/        Parkings (REST, WebSockets)
-│         │   └── reservations/       # Gestión de reservas, historial, etc.
-│         │   │   ├── components/     
-│         │   │   ├── hooks/          
-│         │   │   └── services/       
-│         │
-│         ├── layouts/                # Componentes estructurales de alto nivel
-│         │   ├── AppLayout.jsx       # El componente principal que definimos (Header, Main, Footer)
-│         │   └── AuthLayout.jsx      # Layout para Login/Registro (centrado, sin nav principal)
-│         │
-│         ├── pages/                  # Componentes que se mapean directamente a rutas (pages)
-│         │   ├── HomePage.jsx        # Muestra el AppLayout con el ParkingMap
-│         │   ├── LoginPage.jsx       # Usa el AuthLayout con el LoginForm
-│         │   └── RegisterPage.jsx    # Usa el AuthLayout con el RegisterForm
-│         │
+│         ├── components/             # Componentes de UI reutilizables (Modales, Ilustraciones)
+│         ├── features/               # Servicios y componentes agrupadas por dominio (Auth, Parking, Owner, Driver) 
+│         ├── layouts/                # # Estructuras maestras (ej. AuthLayout asimétrico, AppLayout)
+│         ├── pages/                  # # Vistas ruteables (MapPage con renderizado 3D, Login, Register)
 │         ├── services/               # Lógica global no ligada a un dominio específico
-│         │   ├── apiClient.js        # Instancia de Axios o Fetch configurada (para el proxy de Vite)
-│         │   └── msWWorker.js        # Configuración de MSW para mocking
-│         │
-│         ├── hooks/                  # Hooks reutilizables a nivel global (ej: useLocalStorage)
-│         │
-│         ├── context/                # Contextos globales de React (ej: AuthProvider)
-│         │
-│         ├── styles/                 # Archivos CSS globales y configuración de Tailwind
-│         │   └── index.css           # Punto de entrada de Tailwind
-│         │
+│         │   ├── apiClient.js        # Instancia de Axios para backend (a traves del proxy de Vite)
+│         │   └── mapService.js       # Conexion con Mapbox (mapa)
+│         ├── utils/                  # Configuraciones (ej. layers.js para Mapbox)
+│         ├── context/                # Contextos globales de React (ej: AuthContext)
 │         └── main.jsx                # Punto de entrada de la aplicación (Router, Providers)
 │         
 │         
 ├── api/src/main/java/es/quickstop         ← Backend (Spring Boot + PostGIS)
-│    ├── common/                  # Elementos generales o reutilizables
-│    │   ├── dto/                 # DTOs globales (ej. ErrorResponse, TokenResponse)
-│    │   ├── exception/           # Excepciones personalizadas (ej. ResourceNotFoundException)
-│    │   └── util/                
-│    │
-│    ├── config/                  # Archivos de configuración de Spring
-│    │   ├── SecurityConfig.java  # Configuración de Spring Security (JWT, CORS)
-│    │   └── WebSocketConfig.java # Configuración de WebSockets STOMP
-│    │
-│    ├── auth/                    # DOMINIO: Autenticación y Usuarios
-│    │   ├── controller/          # AuthController (Login, Register)
-│    │   ├── service/             # AuthService.java (Lógica de registro/login, encriptación)
-│    │   ├── repository/          # UserRepository (Spring Data JPA)
-│    │   ├── model/               # User.java (@Entity), Role.java (Enum)
-│    │   └── dto/                 # RegisterRequestDTO, LoginRequestDTO, AuthResponseDTO
-│    │
-│    ├── parking/                 # DOMINIO: Búsqueda y Gestión de Parkings
-│    │   ├── controller/          # ParkingController (GET /parkings, POST /parkings)
-│    │   ├── service/             # ParkingService (Lógica de búsqueda con PostGIS)
-│    │   ├── repository/          # ParkingRepository, ParkingSpecification
-│    │   ├── model/               # Parking.java (@Entity con PostGIS Geometry)
+│    ├── common/                  # Elementos generales o reutilizables          
+│    ├── config/                  # Archivos de configuración de Spring (CORS)
+│    ├── auth/                   # DOMINIO: Autenticación y Usuarios
+│    │   ├── dto/                 # RegisterRequestDTO, LoginRequestDTO, AuthResponseDTO
+│    │   └──  Auth*.java          # Controller, Service y Mapper (Lógica de registro/login)
+│    ├── parking/                # DOMINIO: Búsqueda y Gestión de Parkings
+│    │   ├── controller.java      # Endpoints (GET /parkings, POST /parkings)
+│    │   ├── service.java         # Lógica de negocio con PostGIS
+│    │   ├── mapper.java          # Transformación de DTOs a Entities
+│    │   ├── repository.java      # Acceso a base de datos
+│    │   ├── model/               # Entidades(@Entity con PostGIS Geometry)
 │    │   └── dto/                 # ParkingDTO, ParkingCreationRequest
 │    │
-│    ├── user/                 # DOMINIO: Búsqueda y Gestión de Users
-│    │   ├── controller/          # UserController (GET /users, POST /users)
-│    │   ├── service/             # UserService (Lógica de búsqueda con PostGIS)
-│    │   ├── repository/          # UserRepository, UserSpecification
-│    │   ├── model/               # User.java (@Entity con PostGIS Geometry)
+│    ├── user/                   # DOMINIO: Búsqueda y Gestión de Users
+│    │   ├── controller.java      # Endpoints (GET /users, POST /users)
+│    │   ├── service.java         # Lógica de negocio con PostGIS
+│    │   ├── mapper.java          # Transformación de DTOs a Entities
+│    │   ├── repository.java      # Acceso a base de datos
+│    │   ├── model/               # Entidades (@Entity con PostGIS Geometry)
 │    │   └── dto/                 # UserDTO, UserCreationRequest
 │    │
-│    ├── owner/                 # DOMINIO: Búsqueda y Gestión de Owners
-│    │   ├── controller/          # OwnerController (GET /owners, POST /owners)
-│    │   ├── service/             # OwnerService (Lógica de búsqueda con PostGIS)
-│    │   ├── repository/          # OwnerRepository, OwnerSpecification
-│    │   ├── model/               # Owner.java (@Entity con PostGIS Geometry)
-│    │   └── dto/                 # OwnerDTO, OwnerCreationRequest
-│    │
-│    ├── driver/                 # DOMINIO: Búsqueda y Gestión de Drivers
-│    │   ├── controller/          # DriverController (GET /drivers, POST /drivers)
-│    │   ├── service/             # DriverService (Lógica de búsqueda con PostGIS)
-│    │   ├── repository/          # DriverRepository, DriverSpecification
-│    │   ├── model/               # Driver.java (@Entity con PostGIS Geometry)
-│    │   └── dto/                 # DriverDTO, DriverCreationRequest
-│    │
-│    └── reservation/             # DOMINIO: Reservas y Tiempo Real
-│        ├── controller/          # ReservationController (CRUD)
-│        ├── service/             # ReservationService (Lógica de booking, llamadas a WebSocket)
-│        ├── repository/          # ReservationRepository
-│        └── model/               # Reservation.java
+│    └── reservation/             # DOMINIO: Busqueda y Gestión de reservas
+│        ├── controller.java      # Endpoints (GET /users, POST /users)
+│        ├── service.java         # Lógica de negocio con PostGIS
+│        ├── mapper.java          # Transformación de DTOs a Entities
+│        ├── repository.java      # Acceso a base de datos
+│        ├── model/               # Entidades (@Entity con PostGIS Geometry)
 │        └── dto/                 # ReservationDTO
+│
 └── README.md
-│    
+    
 ```
 
-## 🎯 Objetivo del Proyecto
-Construir una **plataforma estilo “Mini Uber/Cabify de parkings”** que permita:
-- Buscar parkings cercanos en un mapa interactivo
-- Consultar disponibilidad y precio en tiempo real
-- Reservar plazas
-- Recibir notificaciones en tiempo real (WebSockets / Push)
-- Interactuar con empresas (chat opcional)
-- Funcionar offline (PWA)
-- Cumplir accesibilidad UE 2025
+## 🎯 Funcionalidades Principales Implementadas
 
-## 🖥 Frontend – React + Vite (PWA)
-- SPA modular (arquitectura por features)
-- PWA (manifest, service worker, offline-first, instalación)
-- WebSockets para tiempo real
-- Mapas (Leaflet / MapLibre / Mapbox)
-- Gestión estado global (Redux/Zustand/Context)
-- Hooks personalizados
-- Testing (unit + e2e)
-- Accesibilidad WCAG 2.2 / EAA 2025
+### 👨‍✈️ Perfil Conductor
+*   **Cartografía 3D Interactiva:** Visualización del entorno urbano con volumetría de edificios usando Mapbox GL.
+*   **Geolocalización In-App:** Búsqueda dinámica de plazas en un radio cercano (`ST_DWithin`).
+*   **Agrupación de Datos (Clustering):** Manejo eficiente de múltiples marcadores en el mapa para evitar saturación visual.
+*   **Reservas en Tiempo Real:** Bloqueo de plazas y actualización de disponibilidad instantánea.
 
-## ⚙️ Backend – Spring Boot
-- REST API (Spring MVC)
-- WebSockets (STOMP)
-- Spring Security (JWT, roles: owner, driver, admin)
-- Postgres + PostGIS (consultas geoespaciales)
-- Spring Data JPA / Hibernate Spatial
-- OpenAPI/Swagger (documentación automática)
-- Validación (Bean Validation)
-- Testing con JUnit + Testcontainers
-- Monitoring con Spring Actuator
+### 🏢 Perfil Propietario 
+*   **Gestión de Inventario:** Publicación ágil de plazas individuales o múltiples en una misma ubicación (autocompletado contextual).
+*   **Geoposicion de Control:** Visualización de plazas activas y ofertas de otros usuarios.
 
-## 🗃️ Base de datos – PostgreSQL + PostGIS
-Tablas:
-- user
-- owner
-- driver
-- parking (geom Point, SRID 4326, índice GiST)
-- reservation
-- notification
-- messages (chat opcional)
+### ⚙️ Características Transversales
+*   **Experiencia PWA:** Instalable en dispositivos móviles, cacheo de recursos (Service Workers) y diseño "Mobile-First".
+*   **Diseño Accesible (EAA 2025):** Contraste optimizado, navegación por teclado y estructura semántica.
+*   **Autenticación Segura:** Sistema de login/registro diferenciado por roles con diseño asimétrico de doble panel y avatares vectoriales.
 
-Consultas:
-- ST_DWithin → parkings en radio
-- ST_Distance → distancia exacta
+---
+## 🗃️ Modelo de Base de Datos Espacial
 
-## 🔄 Comunicación Front ↔ Back
-**REST (HTTP + JSON)**
-- POST /api/auth/login
-- GET /api/parkings
-- POST /api/reservation-requests
-- Añadir poco a poco todas
+QuickStop utiliza **PostgreSQL con la extensión PostGIS** para resolver cálculos de distancias directamente en el motor de base de datos, optimizando el rendimiento.
 
-**WebSockets**
-- /enterprise/{id}/queue/updates
-- /chat/{reservationId}
+*   **Tablas Principales:** `user`, `owner`, `driver`, `parking`, `reservation`.
+*   **Geometría:** Uso del tipo `Point` con el sistema de referencia de coordenadas **SRID 4326** (WGS 84).
+*   **Índices:** Implementación de índices **GiST** en columnas espaciales para acelerar las búsquedas por radio.
 
-## ♿ Accesibilidad (EAA 2025)
+---
+
+
+## ♿ Accesibilidad Verificada (EAA 2025)
 - WCAG 2.2 AA
 - Navegación por teclado
 - Roles ARIA
 - Contraste adecuado
 - Focus visible
 - Formularios accesibles
-- aria-live para avisos
+- Aria-live para avisos
 - Testing con axe, Lighthouse
-- Añadir más...
-
-## ✅ MVP (Conductor)
-- Registro/login
-- Buscar parkings (GPS + PostGIS)
-- Ver mapa y lista
-- Ver detalles del parking
-- Solicitar/cancelar/ver reserva solicitada
-- Notificación en tiempo real
-- PWA instalable
-- Accesibilidad básica
+---
 
 ## 🚀 Futuro
 - Chat usuarios
@@ -215,51 +116,37 @@ Consultas:
 - Filtros avanzados
 - Panel admin
 - Push notifications
+---
+## ⚙️ Despliegue y Ejecución
 
-## ⚙️ Ejecución (resumen)
-- Crear un .env en la raiz del proyecto del codigo con los datos que se encuentran en .env del google drive (dentro la carpeta desarrollo/codigo)
+Para levantar el entorno de desarrollo local, asegúrate de configurar las variables de entorno:
+1. Crea un archivo `.env` en la raíz del proyecto basándote en el entorno proporcionado (incluye `VITE_API_MAP_BOX_KEY` y credenciales de BD).
+2. Asegúrate de tener **Docker Desktop** (para Windows/Mac) o el servicio Docker (Linux) en ejecución.
 
-**PARA AMBOS SISTEMAS PARA INSTALAR**
-```
+**Instalación de dependencias:**
+```bash
 git clone https://github.com/alex-boni/QuickStop.git
 cd QuickStop
 npm install
 ```
-**EJECUCION Linux**
-```
+**Ejecución en entorno Linux/macOS:**
+```bash
 npm run dev
 ```
-
-
-**EJECUCION Windows. Necesita installar docker-desktop**
-```
+**Ejecución en entorno Windows:**
+```bash
 npm run dev:windows
 ```
+---
 
-## ✅ Por qué este stack
-- React (UX + PWA)
-- Spring Boot (robusto, seguro, WebSockets)
-- PostGIS (geolocalización real)
-- Arquitectura escalable
-- Cumplimiento accesibilidad UE
-- Comunicación desacoplada (REST/WebSockets)
 
-## 🗺️ Hemos realizado
-1. Definir casos de uso y entidades
-2. Definicion de historias de usuario
-3. División de HU en tareas
-3. Configurar monorepo (npm workspaces)
+## 🗺️ Roadmap
+Hitos Completados
+1. Definición de casos de uso y modelado PostGIS.
+2. Configuración de arquitectura Monorepo.
+3. Implementación de funciones principales.
+3. Comprobación de Accesibilidad.
 
-## 🗺️ Próximos pasos
-1. Estimar nuesto backlog del MVP
-2. Diseñar contrato OpenAPI inicial
-3. Configurar monorepo (npm workspaces)
-4. Scaffold frontend y backend
-5. Implementar primer corte vertical (parkings)
-6. Añadir auth, reservas, tiempo real
-7. PWA offline y push
-8. Accesibilidad avanzada
-9. Testing completo
 
 ---
 **Autor:**  
