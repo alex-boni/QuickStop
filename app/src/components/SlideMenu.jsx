@@ -77,9 +77,9 @@ const SideMenu = ({ isOpen, onClose }) => {
                 <div className="flex-col items-center justify-center text-center space-x-3">
                   <div className="flex-row items-center content-center justify-center ">
                     <img
-                      src="../../public/vite.svg"
+                      src={user?.profilePicture || user && user.role === "DRIVER" ? "../../public/driver-icon.png" : "../../public/owner-icon.png"}
                       alt={user?.name ? `Foto de perfil de ${user.name}` : "Foto de perfil de usuario"}
-                      className="mx-auto"
+                      className="w-20 h-20 bg-indigo-100 hover:bg-indigo-150 rounded-full mx-auto object-cover"
                     />
                     <span className="font-medium">
                       {user?.name || user?.username || "Usuario"}
