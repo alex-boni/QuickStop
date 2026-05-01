@@ -3,7 +3,7 @@ import AuthLayout from "../Layouts/AuthLayout";
 function Register() {
 
     return (
-            <AuthLayout title="Crear una cuenta" subtitle="Introduce tus datos y pulsa en el botón Crear Cuenta para acceder a todas las funcionalidades">
+            <AuthLayout title="Crear una cuenta" subtitle="Introduzca sus datos para registrarse">
                 <RegisterForm />
             </AuthLayout>
     );

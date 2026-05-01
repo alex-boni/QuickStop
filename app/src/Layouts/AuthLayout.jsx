@@ -5,9 +5,9 @@ import CitySkylineIllustration from "../components/CitySkylineIllustration";
 const AuthLayout = ({ children, title, subtitle }) => {
   return (
     // Contenedor principal con degradado
-    <div className="min-h-screen w-full flex flex-col md:flex-row bg-gradient-to-br from-indigo-50 via-white to-indigo-100">
+    <div className="h-full w-full flex flex-col md:flex-row bg-gradient-to-br from-indigo-50 via-white to-white relative ">
       {/* PANEL IZQUIERDO: Beneficios*/}
-      <div className="hidden md:flex md:w-1/2 flex-col justify-center pl-12 lg:pl-24 relative overflow-hidden">
+      <div className="hidden md:flex md:w-1/2 flex-col top-50 pl-12 lg:pl-36 relative overflow-hidden">
         {/* Contenido de texto */}
         <div className="z-10 space-y-6 mb-20">
           <p className="text-2xl font-semibold text-gray-800 flex items-center gap-4 ">
@@ -18,7 +18,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
             />
             Tu ciudad, sin problemas de aparcamiento.
           </p>
-          <ul className="space-y-4 text-gray-600">
+          <ul className="space-y-4 text-gray-900">
             <li className="flex items-center gap-3">
               <span className="text-indigo-500 font-bold">✦</span> Encuentra
               plazas libres en tiempo real.
@@ -38,7 +38,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
       <CitySkylineIllustration className="bottom-0" />
 
       {/* PANEL DERECHO: Formulario */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12">
+      <div className="flex-1 flex flex-col items-center pt-32 md:pt-12">
         <div className="w-full max-w-md bg-white/80 backdrop-blur-sm p-10 space-y-4 shadow-2xl rounded-2xl border border-white">
           <header className="text-center md:text-left space-y-2">
             {/* Logo solo visible en móvil*/}

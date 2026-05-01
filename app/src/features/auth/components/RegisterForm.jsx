@@ -189,7 +189,7 @@ const RegisterForm = () => {
   const isDriver = formData.role === "DRIVER";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-3">
       {errors.global && (
         <p className="text-sm text-red-600" aria-live="assertive">
           {errors.global}
@@ -450,15 +450,6 @@ const RegisterForm = () => {
         {isLoading ? "Registrando..." : "Crear Cuenta"}
       </button>
 
-      <p className="text-center text-sm text-gray-600 mt-4">
-        ¿Tiene cuenta?{" "}
-        <a
-          href="/login"
-          className="p-1 text-indigo-600 hover:bg-indigo-100 focus:bg-indigo-200 focus:ring-2 focus:ring-indigo-500 rounded"
-        >
-          Inicie sesión aquí
-        </a>
-      </p>
     </form>
   );
 };

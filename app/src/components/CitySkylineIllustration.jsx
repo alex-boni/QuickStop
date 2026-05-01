@@ -7,7 +7,7 @@ const CitySkylineIllustration = ({ className }) => {
 
   return (
     <div className={containerClasses}>
-      <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" className="w-full h-full opacity-80">
+      <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" className="w-full h-full opacity-70">
         <defs>
           {/* Patrones de ventanas */}
           <pattern id="windows1" width="16" height="20" patternUnits="userSpaceOnUse">

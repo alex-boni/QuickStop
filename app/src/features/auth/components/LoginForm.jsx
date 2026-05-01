@@ -152,7 +152,7 @@ const LoginForm = () => {
 			</button>
 
 			<p className="text-center text-sm text-gray-600 mt-4">
-				¿No tiene cuenta? <a href="/register" className="p-1 text-indigo-600  hover:bg-indigo-100  focus:text-indigo-700 focus:bg-indigo-200 focus:ring-2 focus:ring-indigo-500 font-medium transition-colors">Regístrese aquí</a>
+				¿No tiene cuenta? <button onClick={() => navigate('/register')} className="p-1 text-indigo-600  hover:bg-indigo-100  focus:text-indigo-700 focus:bg-indigo-200 focus:ring-2 focus:ring-indigo-500 font-medium transition-colors">Regístrese aquí</button>
 			</p>
 		</form>
 	);
