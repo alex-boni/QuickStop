@@ -307,7 +307,7 @@ const ReservationForm = () => {
             </button>
           </div>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-4 rounded-xl border border-gray-200">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-4 rounded-xl border border-gray-200">
           {/* Inicio */}
           <div className="space-y-3">
             <h3 className="font-bold text-indigo-700 flex items-center gap-2">
@@ -364,7 +364,7 @@ const ReservationForm = () => {
         <div className="bg-indigo-700 text-white p-4 rounded-xl flex justify-between items-center shadow-lg">
           <div>
             <p className="text-indigo-200 text-xs uppercase font-bold tracking-wider">
-              Total Estimado
+              Precio Total
             </p>
             <h2 className="text-3xl text-white">
               {formatSpain(calculateTotal())} €
