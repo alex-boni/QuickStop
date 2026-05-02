@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getParkingById, updateParking } from '../ParkingService';
 import { useAuth } from '../../../context/AuthContext';
@@ -13,6 +13,8 @@ export default function EditParkingForm() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const [showDescriptionHelp, setShowDescriptionHelp] = useState(false);
+    const backButtonRef = useRef(null);
     const [formData, setFormData] = useState({
         name: '',
         address: '',
@@ -56,6 +58,12 @@ export default function EditParkingForm() {
         }
     }, [id, user]);
 
+    useEffect(() => {
+        if (success) {
+            backButtonRef.current?.focus();
+        }
+    }, [success]);
+
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => ({
@@ -80,11 +88,6 @@ export default function EditParkingForm() {
             
             await updateParking(id, updatedData);
             setSuccess(true);
-            
-            // Redirigir después de 2 segundos
-            setTimeout(() => {
-                navigate('/my-parkings');
-            }, 2000);
         } catch (err) {
             setError('Error al actualizar el aparcamiento');
             console.error(err);
@@ -120,7 +123,7 @@ export default function EditParkingForm() {
                         onClick={() => navigate('/my-parkings')}
                         className="bg-indigo-600 text-white py-2.5 px-6 rounded-lg hover:bg-indigo-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     >
-                        Volver a mis aparcamientos
+                        Volver a mis plazas de aparcamiento
                     </button>
                 </div>
             </div>
@@ -135,7 +138,7 @@ export default function EditParkingForm() {
                     onClick={() => navigate('/my-parkings')}
                     className="bg-indigo-600 text-white py-2.5 px-6 rounded-lg hover:bg-indigo-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                    Volver a mis aparcamientos
+                    Volver a mis plazas de aparcamiento
                 </button>
             </div>
         );
@@ -213,7 +216,7 @@ export default function EditParkingForm() {
                         min="0"
                         step="0.01"
                         className={getInputClass('pricePerHour')}
-                        placeholder="Ej: 2.50"
+                        placeholder="Introduce el coste de la plaza por hora"
                         disabled={saving}
                     />
                 </div>
@@ -221,9 +224,21 @@ export default function EditParkingForm() {
 
             {/* Descripción */}
             <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                    Descripción (opcional)
-                </label>
+                <div className="flex items-center gap-2 mb-1">
+                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                        Descripción (opcional)
+                    </label>
+                    <button
+                        type="button"
+                        className="w-5 h-5 rounded-full border border-gray-300 text-xs font-bold text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        aria-label="Mostrar información sobre la descripción"
+                        aria-expanded={showDescriptionHelp}
+                        aria-controls="description-help-edit-parking"
+                        onClick={() => setShowDescriptionHelp(prev => !prev)}
+                    >
+                        i
+                    </button>
+                </div>
                 <textarea
                     id="description"
                     name="description"
@@ -231,36 +246,57 @@ export default function EditParkingForm() {
                     onChange={handleChange}
                     rows="4"
                     className={getInputClass('description')}
-                    placeholder="Describe las características del aparcamiento..."
+                    placeholder="Introduce una breve descripción del tipo de aparcamiento"
                     disabled={saving}
                 />
+                {showDescriptionHelp && (
+                    <p id="description-help-edit-parking" className="mt-2 text-xs text-gray-600">
+                        Puedes indicar datos útiles como el tipo de plaza (garaje, urbanización o casa), si tiene vigilancia, el acceso y cualquier restricción.
+                    </p>
+                )}
             </div>
 
-            {/* Toggle Aparcamiento activo */}
-            <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                <span className="text-sm font-medium text-gray-700">
-                    Aparcamiento activo
-                </span>
-                <label htmlFor="isActive" className="relative inline-flex items-center cursor-pointer">
-                    <input
-                        type="checkbox"
-                        id="isActive"
-                        name="isActive"
-                        checked={formData.isActive}
-                        onChange={handleChange}
-                        className="sr-only peer"
-                        disabled={saving}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                </label>
+            {/* Toggle disponibilidad de reservas */}
+            <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-700">
+                            Disponible para reservar
+                        </span>
+                        <button
+                            type="button"
+                            className="w-5 h-5 rounded-full border border-gray-300 text-xs font-bold text-gray-600 bg-white"
+                            title="Activado: los usuarios pueden reservar esta plaza. Desactivado: no acepta nuevas reservas."
+                            aria-label="Información sobre disponibilidad para reservar"
+                        >
+                            i
+                        </button>
+                    </div>
+                    <label htmlFor="isActive" className="relative inline-flex items-center cursor-pointer">
+                        <input
+                            type="checkbox"
+                            id="isActive"
+                            name="isActive"
+                            checked={formData.isActive}
+                            onChange={handleChange}
+                            className="sr-only peer"
+                            disabled={saving}
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    </label>
+                </div>
+                <p className="mt-2 text-xs text-gray-600">
+                    {formData.isActive
+                        ? "Esta plaza está disponible y puede recibir reservas."
+                        : "Esta plaza no acepta nuevas reservas."}
+                </p>
             </div>
 
             {success && (
                 <div className="p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
                     <span className="text-2xl">✅</span>
                     <div>
-                        <p className="text-sm font-medium text-green-800">¡Aparcamiento actualizado exitosamente!</p>
-                        <p className="text-xs text-green-600">Redirigiendo a mis aparcamientos...</p>
+                        <p className="text-sm font-medium text-green-800">Cambios guardados.</p>
                     </div>
                 </div>
             )}
@@ -286,10 +322,11 @@ export default function EditParkingForm() {
                 <button
                     type="button"
                     onClick={() => navigate('/my-parkings')}
+                    ref={backButtonRef}
                     disabled={saving}
                     className="px-6 py-2.5 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    Cancelar
+                    Volver
                 </button>
             </div>
         </form>

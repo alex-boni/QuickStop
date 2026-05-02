@@ -329,6 +329,10 @@ export default function MapPage() {
     }
   };
 
+  const handleAddParkingQuickAction = () => {
+    navigate("/select-parking-location");
+  };
+
   useEffect(() => {
     const loadParkings = async () => {
       setIsLoadingParkings(true);
@@ -547,7 +551,11 @@ export default function MapPage() {
         onSearch={handleSearchMove}
         onGeolocate={handleGeolocateClick}
       />
-      <DesktopSearchBar onSearch={handleSearchMove} />
+      <DesktopSearchBar
+        onSearch={handleSearchMove}
+        onOwnerAddParking={handleAddParkingQuickAction}
+        showOwnerAddParking={user?.role === "OWNER"}
+      />
 
       {/* Botón flotante para filtrar mis aparcamientos - solo para OWNERS */}
       {user && user.role === "OWNER" && (
@@ -561,7 +569,7 @@ export default function MapPage() {
           title={
             showOnlyMyParkings
               ? "Mostrar todos los aparcamientos"
-              : "Mostrar solo mis aparcamientos"
+              : "Mostrar solo mis plazas de aparcamiento"
           }
         >
           {showOnlyMyParkings ? (

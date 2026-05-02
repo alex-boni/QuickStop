@@ -164,13 +164,13 @@ const SideMenu = ({ isOpen, onClose }) => {
                     d="M4 6h16M4 10h16M4 14h16M4 18h16"
                   />
                 </svg>
-                <span className="font-medium">Mis Aparcamientos</span>
+                <span className="font-medium">Mis plazas de aparcamiento</span>
               </button>
 )}
 {user && user.role === "OWNER" && (
 
               <button
-                onClick={() => handleNavigation('/addparking')}
+                onClick={() => handleNavigation('/select-parking-location')}
                 className="flex w-full text-left text-gray-700 hover:text-indigo-600 
              focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg p-2"
               >

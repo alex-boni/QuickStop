@@ -3,6 +3,7 @@ import MapPage from "./pages/MapPage";
 import RegisterPage from "./pages/RegisterPage";
 import Login from "./pages/Login";
 import AddParking from "./pages/AddParking";
+import SelectParkingLocation from "./pages/SelectParkingLocation";
 import MapPageBonito from "./pages/MapPageBonito";
 import ViewAccountDetails from "./pages/ViewAccountDetails";
 import ViewParkingDetails from "./pages/ViewParkingDetails";
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="/account" element={<ViewAccountDetails />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/my-parkings" element={<MyParkingsPage />} />
+          <Route path="/select-parking-location" element={<SelectParkingLocation />} />
           <Route path="/addparking" element={<AddParking />} />
           <Route path="/parking/:id" element={<ViewParkingDetails />} />
           <Route path="/parking/edit/:id" element={<EditParking />} />

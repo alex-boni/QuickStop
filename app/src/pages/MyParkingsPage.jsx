@@ -152,8 +152,8 @@ export default function MyParkingsPage() {
                         </svg>
                         Volver al mapa
                     </button>
-                    <h1 className="text-3xl font-bold text-gray-900">Mis Aparcamientos</h1>
-                    <p className="text-gray-600 mt-2">Gestiona todos tus aparcamientos</p>
+                    <h1 className="text-3xl font-bold text-gray-900">Mis plazas de aparcamiento</h1>
+                    <p className="text-gray-600 mt-2">Gestiona todas tus plazas de aparcamiento</p>
                 </div>
 
                 {/* Filtros y búsqueda */}
@@ -230,7 +230,7 @@ export default function MyParkingsPage() {
                         </p>
                         {!searchTerm && filter === 'all' && (
                             <button
-                                onClick={() => navigate('/addparking')}
+                                onClick={() => navigate('/select-parking-location')}
                                 className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
                             >
                                 Agregar Aparcamiento
@@ -308,7 +308,7 @@ export default function MyParkingsPage() {
                 {/* Botón flotante para agregar */}
                 {!loading && (
                     <button
-                        onClick={() => navigate('/addparking')}
+                        onClick={() => navigate('/select-parking-location')}
                         className="fixed bottom-8 right-8 bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition-colors"
                         title="Agregar aparcamiento"
                     >

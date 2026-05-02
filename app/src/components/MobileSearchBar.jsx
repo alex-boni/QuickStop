@@ -170,7 +170,7 @@ const handleManualSearch = () => {
     }
 
     if (user.role === "OWNER") {
-      navigate("/my-parkings"); // Ruta para dueños
+      navigate("/select-parking-location");
     } else {
       navigate("/my-reservations"); // Ruta para conductores
     }
@@ -198,9 +198,9 @@ const handleManualSearch = () => {
         <button
           onClick={handleQuickAction}
           className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-700"
-          title={user?.role === "OWNER" ? "Mis Aparcamientos" : "Mis Reservas"}
+          title={user?.role === "OWNER" ? "Añadir parking" : "Mis Reservas"}
           aria-label={
-            user?.role === "OWNER" ? "Ir a mis aparcamientos" : "Ir a mis reservas"
+            user?.role === "OWNER" ? "Seleccionar ubicación para añadir parking" : "Ir a mis reservas"
           }
         >
           {user?.role === "OWNER" ? <OwnerIcon /> : <DriverIcon />}
