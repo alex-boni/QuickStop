@@ -275,6 +275,7 @@ export default function MyReservationsPage() {
             {filteredReservations.map((res) => (
               <div
                 key={res.id}
+                onClick={() => navigate(`/reservation/details/${res.id}`)}
                 className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow p-6"
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -390,7 +391,7 @@ export default function MyReservationsPage() {
                         !isPastReservation(res.endTime) && (
                           <button
                             onClick={() =>
-                              navigate(`/parking/${res.parkingId}`)
+                              navigate(`/reservation/details/${res.id}`)
                             }
                             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-bold text-sm"
                           >

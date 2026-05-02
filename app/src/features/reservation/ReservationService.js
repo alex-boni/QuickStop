@@ -3,6 +3,7 @@ import apiClient from "../../services/apiClient";
 const RESERVATION_ENDPOINTS = {
     GET_RESERVATIONS_BY_USER: '/reservation/user',
     GET_RESERVATIONS_BY_PARKING: '/reservation/parking',
+    GET_RESERVATION_DETAILS: '/reservation/details',
     CREATE_RESERVATION: '/reservation/create',
     CANCEL_RESERVATION: '/reservation/cancel',
     GET_NEXT_AVAILABLE: '/reservation/next-available',
@@ -44,6 +45,20 @@ export const getUserReservations = async (userId) => {
 export const getReservationsByParking = async (parkingId) => {
     try {
         const response = await apiClient.get(`${RESERVATION_ENDPOINTS.GET_RESERVATIONS_BY_PARKING}/${parkingId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener reservas por parking:", error);
+        throw error;
+    }
+}
+
+/**
+ * Obtiene los detalles de la reserva por el identificador específico.
+ * @param {number} reservationId
+ */
+export const getReservationById = async (reservationId) => {
+    try {
+        const response = await apiClient.get(`${RESERVATION_ENDPOINTS.GET_RESERVATION_DETAILS}/${reservationId}`);
         return response.data;
     } catch (error) {
         console.error("Error al obtener reservas por parking:", error);
