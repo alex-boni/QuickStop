@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { createParking } from "../ParkingService";
 import { useAuth } from "../../../context/AuthContext";
 import { useDebounce } from "../../../hooks/useDebounce";
-import { fetchGeocodingResults } from "../../../services/mapService";
+import { fetchGeocodingResults, fetchReverseGeocodingAddress } from "../../../services/mapService";
 import StatusMessage from "../../../components/StatusMessage";
 import Map, { Marker } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -51,6 +51,7 @@ const SuggestionItem = ({ place, onClick }) => (
 
 const AddParkingForm = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { user } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -70,16 +71,98 @@ const AddParkingForm = () => {
         type: null,
         message: ''
     });
-    const [viewState, setViewState] = useState({
+    const [viewState, setViewState] = useState({ //TODO por defecto madrid
         latitude: 28.4682,
         longitude: -16.2546,
         zoom: 12
     });
     const [markerPosition, setMarkerPosition] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
+    const [showDescriptionHelp, setShowDescriptionHelp] = useState(false);
+    const [showAvailabilityHelp, setShowAvailabilityHelp] = useState(false);
     const mapRef = useRef(null);
 
     const debouncedAddress = useDebounce(formData.address, 300);
+    const initialCoordinates = location.state?.coordinates;
+    const initialAddress = location.state?.address;
+    const hasInitialCoordinates =
+        Number.isFinite(initialCoordinates?.latitude) &&
+        Number.isFinite(initialCoordinates?.longitude);
+
+    useEffect(() => {
+        if (!hasInitialCoordinates) {
+            return;
+        }
+
+        const { latitude, longitude } = initialCoordinates;
+
+        setViewState(prev => ({ ...prev, latitude, longitude, zoom: 15 }));
+        setMarkerPosition({ latitude, longitude });
+        setFormData(prev => ({
+            ...prev,
+            longitude: longitude.toString(),
+            latitude: latitude.toString(),
+            ...(typeof initialAddress === "string" && initialAddress.trim()
+                ? { address: initialAddress }
+                : {})
+        }));
+        setErrors(prev => ({ ...prev, longitude: null, latitude: null }));
+        if (typeof initialAddress === "string" && initialAddress.trim()) {
+            setErrors(prev => ({ ...prev, address: null }));
+            return;
+        }
+
+        fetchReverseGeocodingAddress(longitude, latitude).then((reverseAddress) => {
+            if (!reverseAddress) return;
+            setFormData(prev => ({
+                ...prev,
+                address: reverseAddress
+            }));
+            setErrors(prev => ({ ...prev, address: null }));
+        });
+    }, [hasInitialCoordinates, initialCoordinates, initialAddress]);
+
+    useEffect(() => {
+        if (hasInitialCoordinates) {
+            return;
+        }
+
+        if (!navigator.geolocation) {
+            return;
+        }
+
+        let isCancelled = false;
+
+        navigator.geolocation.getCurrentPosition( //cambio maricruz para obtener una geolocalizacio actual a la hora de añadir 
+            ({ coords }) => {
+
+                if (isCancelled) return;
+
+                const { latitude, longitude } = coords;
+                //console.log(coords);
+                setViewState(prev => ({ ...prev, latitude, longitude, zoom: 14 }));
+                setMarkerPosition({ latitude, longitude });
+                setFormData(prev => ({
+                    ...prev,
+                    longitude: longitude.toString(),
+                    latitude: latitude.toString()
+                }));
+                setErrors(prev => ({ ...prev, longitude: null, latitude: null }));
+            },
+            (error) => {
+                console.warn('No se pudo obtener la ubicación actual del usuario:', error);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 300000
+            }
+        );
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [hasInitialCoordinates]);
 
     useEffect(() => {
         if (debouncedAddress.length < 3) {
@@ -115,7 +198,21 @@ const AddParkingForm = () => {
         }
     };
 
-    const handleMapClick = (event) => {
+    const updateAddressFromCoordinates = async (longitude, latitude) => {
+        const reverseAddress = await fetchReverseGeocodingAddress(longitude, latitude);
+        if (!reverseAddress) {
+            return;
+        }
+
+        setFormData(prev => ({
+            ...prev,
+            address: reverseAddress
+        }));
+        setErrors(prev => ({ ...prev, address: null }));
+        setSuggestions([]);
+    };
+
+    const handleMapClick = async (event) => {
         const { lngLat } = event;
         setMarkerPosition({
             longitude: lngLat.lng,
@@ -127,6 +224,7 @@ const AddParkingForm = () => {
             latitude: lngLat.lat.toString()
         }));
         setErrors(prev => ({ ...prev, longitude: null, latitude: null }));
+        await updateAddressFromCoordinates(lngLat.lng, lngLat.lat);
     };
 
     const handleAddressSearch = async (searchText) => {
@@ -320,18 +418,35 @@ const AddParkingForm = () => {
                 </div>
 
                 <div>
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                        Descripción (opcional)
-                    </label>
+                    <div className="flex items-center gap-2 mb-1">
+                        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                            Descripción (opcional)
+                        </label>
+                        <button
+                            type="button"
+                            className="w-5 h-5 rounded-full border border-gray-300 text-xs font-bold text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            aria-label="Mostrar información sobre la descripción"
+                            aria-expanded={showDescriptionHelp}
+                            aria-controls="description-help-add-parking"
+                            onClick={() => setShowDescriptionHelp(prev => !prev)}
+                        >
+                            i
+                        </button>
+                    </div>
                     <input
                         id="description"
                         type="text"
                         value={formData.description}
                         onChange={handleChange}
                         className={getInputClass('description')}
-                        placeholder="Ej: Aparcamiento céntrico con vigilancia"
+                        placeholder="Introduce una breve descripción del tipo de aparcamiento"
                         disabled={isLoading}
                     />
+                    {showDescriptionHelp && (
+                        <p id="description-help-add-parking" className="mt-2 text-xs text-gray-600">
+                            Puedes indicar datos útiles como si tiene vigilancia, si es urbanización, casa, garaje, el acceso y cualquier restricción.
+                        </p>
+                    )}
                 </div>
             </div>
 
@@ -464,22 +579,41 @@ const AddParkingForm = () => {
                 </div>
             </div>
 
-            {/* Toggle Parking activo */}
-            <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                <span className="text-sm font-medium text-gray-700">
-                    Aparcamiento activo
-                </span>
-                <label htmlFor="isActive" className="relative inline-flex items-center cursor-pointer">
-                    <input
-                        id="isActive"
-                        type="checkbox"
-                        checked={formData.isActive}
-                        onChange={handleChange}
-                        className="sr-only peer"
-                        disabled={isLoading}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                </label>
+            {/* Toggle disponibilidad de reservas */}
+            <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-700">
+                            Disponible para reservar
+                        </span>
+                        <button
+                            type="button"
+                            className="w-5 h-5 rounded-full border border-gray-300 text-xs font-bold text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            aria-label="Mostrar información sobre disponibilidad para reservar"
+                            aria-expanded={showAvailabilityHelp}
+                            aria-controls="availability-help-add-parking"
+                            onClick={() => setShowAvailabilityHelp(prev => !prev)}
+                        >
+                            i
+                        </button>
+                    </div>
+                    <label htmlFor="isActive" className="relative inline-flex items-center cursor-pointer">
+                        <input
+                            id="isActive"
+                            type="checkbox"
+                            checked={formData.isActive}
+                            onChange={handleChange}
+                            className="sr-only peer"
+                            disabled={isLoading}
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    </label>
+                </div>
+                {showAvailabilityHelp && (
+                    <p id="availability-help-add-parking" className="mt-2 text-xs text-gray-600">
+                        Activado: los usuarios pueden reservar esta plaza. Desactivado: no acepta nuevas reservas.
+                    </p>
+                )}
             </div>
 
             {errors.submit && (

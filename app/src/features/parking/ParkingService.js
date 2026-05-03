@@ -7,6 +7,7 @@ export const EMPTY_GEOJSON = {
 
 const PARKING_ENDPOINTS = {
     GET_ALL_PARKINGS: '/parking/find-all',
+    GET_PARKINGS_BY_OWNER: '/parking/owner',
     GET_PARKINGS: '/parking/search',
     GET_PARKING_BY_ID: 'parking',
     CREATE_PARKING: 'parking/create'
@@ -58,6 +59,16 @@ export const getParkingById = async (id) => {
         return response.data;
     } catch (error) {
         console.error("Error fetching parking by ID:", error);
+        throw error;
+    }
+};
+
+export const getParkingsByOwner = async (ownerId) => {
+    try {
+        const response = await apiClient.get(`${PARKING_ENDPOINTS.GET_PARKINGS_BY_OWNER}/${ownerId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching parkings by owner:", error);
         throw error;
     }
 };

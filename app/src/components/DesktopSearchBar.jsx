@@ -54,7 +54,7 @@ const SuggestionItem = ({ place, onClick }) => {
     </li>
   );
 };
-const DesktopSearchBar = ({ onSearch }) => {
+const DesktopSearchBar = ({ onSearch, onOwnerAddParking, showOwnerAddParking = false }) => {
   // Estados
   const [query, setQuery] = useState(""); // Texto visible en el input
   const [suggestions, setSuggestions] = useState([]); // Resultados del autocompletado
@@ -180,6 +180,37 @@ const DesktopSearchBar = ({ onSearch }) => {
           </svg>
             Buscar
           </button>
+          {showOwnerAddParking && (
+            <button
+              className="flex items-center whitespace-nowrap px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors ml-2 focus:ring-emerald-500 focus:outline-none focus:ring-2"
+              title="Añadir parking"
+              aria-label="Seleccionar ubicación para añadir parking"
+              onClick={onOwnerAddParking}
+              type="button"
+            >
+              <svg
+                className="w-5 h-5 mr-1 mt-0.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              Nueva plaza
+            </button>
+          )}
         </div>
 
         {/* Lista de Sugerencias (Lista Desplegable) */}

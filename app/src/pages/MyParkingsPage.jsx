@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getParkings, deleteParking, getParkingDeleteInfo } from '../features/parking/ParkingService';
+import { getParkingsByOwner, deleteParking, getParkingDeleteInfo } from '../features/parking/ParkingService';
 import ConfirmDialog from '../components/ConfirmDialog';
 import StatusMessage from '../components/StatusMessage';
 
@@ -34,27 +34,22 @@ export default function MyParkingsPage() {
     const loadMyParkings = async () => {
         try {
             setLoading(true);
-            // TODO: Crear endpoint en backend para obtener parkings por owner
-            // Por ahora simulamos obteniendo todos y filtrando en frontend
-            const allParkings = await getParkings({ 
-                latitude: 40.4168, 
-                longitude: -3.7038, 
-                distance: 100 
-            });
-            
-            // Filtrar solo mis parkings
-            const myParkings = allParkings.features
-                .filter(f => f.properties.ownerId === user?.id)
-                .map(f => ({
-                    id: f.properties.id,
-                    name: f.properties.name,
-                    ownerId: f.properties.ownerId,
-                    spots: f.properties.spots,
-                    price: f.properties.price,
-                    available: f.properties.available,
-                    latitude: f.geometry.coordinates[1],
-                    longitude: f.geometry.coordinates[0]
-                }));
+            if (!user?.id) {
+                setParkings([]);
+                return;
+            }
+
+            const ownerParkings = await getParkingsByOwner(user.id);
+            const myParkings = ownerParkings.map((parking) => ({
+                id: parking.id,
+                name: parking.name,
+                ownerId: parking.ownerId,
+                spots: parking.availableSpots,
+                price: parking.pricePerHour,
+                available: parking.isActive,
+                latitude: parking.latitude,
+                longitude: parking.longitude
+            }));
             
             setParkings(myParkings);
         } catch (error) {
@@ -152,8 +147,8 @@ export default function MyParkingsPage() {
                         </svg>
                         Volver al mapa
                     </button>
-                    <h1 className="text-3xl font-bold text-gray-900">Mis Aparcamientos</h1>
-                    <p className="text-gray-600 mt-2">Gestiona todos tus aparcamientos</p>
+                    <h1 className="text-3xl font-bold text-gray-900">Mis plazas de aparcamiento</h1>
+                    <p className="text-gray-600 mt-2">Gestiona todas tus plazas de aparcamiento</p>
                 </div>
 
                 {/* Filtros y búsqueda */}
@@ -230,7 +225,7 @@ export default function MyParkingsPage() {
                         </p>
                         {!searchTerm && filter === 'all' && (
                             <button
-                                onClick={() => navigate('/addparking')}
+                                onClick={() => navigate('/select-parking-location')}
                                 className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
                             >
                                 Agregar Aparcamiento
@@ -294,6 +289,7 @@ export default function MyParkingsPage() {
                                         </button>
                                         <button
                                             onClick={() => handleDelete(parking.id, parking.name)}
+                                            id={`delete-parking-${parking.id}`}
                                             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm"
                                         >
                                             Eliminar
@@ -308,7 +304,7 @@ export default function MyParkingsPage() {
                 {/* Botón flotante para agregar */}
                 {!loading && (
                     <button
-                        onClick={() => navigate('/addparking')}
+                        onClick={() => navigate('/select-parking-location')}
                         className="fixed bottom-8 right-8 bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition-colors"
                         title="Agregar aparcamiento"
                     >

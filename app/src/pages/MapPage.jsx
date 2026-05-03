@@ -42,7 +42,7 @@ const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
 export default function MapPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const geolocateControlRef = useRef();
 
   // Estado para controlar la barra lateral (SideMenu) en escritorio
@@ -174,10 +174,10 @@ export default function MapPage() {
   useEffect(() => {
     // Solo mostramos si el usuario NO está logueado y es la primera vez en esta sesión
     const hasSeenWelcome = sessionStorage.getItem("welcomeShown");
-    if (!user && !hasSeenWelcome) {
+    if (!isAuthenticated && !hasSeenWelcome) {
       setShowWelcome(true);
     }
-  }, [user]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     currentViewRef.current = viewState;
@@ -348,6 +348,10 @@ export default function MapPage() {
     if (geolocateControlRef.current) {
       geolocateControlRef.current.trigger();
     }
+  };
+
+  const handleAddParkingQuickAction = () => {
+    navigate("/select-parking-location");
   };
 
   useEffect(() => {
@@ -566,7 +570,11 @@ export default function MapPage() {
         onSearch={handleSearchMove}
         onGeolocate={handleGeolocateClick}
       />
-      <DesktopSearchBar onSearch={handleSearchMove} />
+      <DesktopSearchBar
+        onSearch={handleSearchMove}
+        onOwnerAddParking={handleAddParkingQuickAction}
+        showOwnerAddParking={user?.role === "OWNER"}
+      />
 
       {/* Botón flotante para filtrar mis aparcamientos - solo para OWNERS */}
       {user && user.role === "OWNER" && (
@@ -580,7 +588,7 @@ export default function MapPage() {
           title={
             showOnlyMyParkings
               ? "Mostrar todos los aparcamientos"
-              : "Mostrar solo mis aparcamientos"
+              : "Mostrar solo mis plazas de aparcamiento"
           }
         >
           {showOnlyMyParkings ? (

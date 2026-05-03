@@ -1,0 +1,14 @@
+ {
+   "standard": "WCAG2AA",
+   "timeout": 60000,
+   "wait": 1500,
+   "includeWarnings": true,
+   "includeNotices": false,
+   "chromeLaunchConfig": {
+     "args": [
+       "--no-sandbox",
+       "--disable-setuid-sandbox",
+       "--disable-dev-shm-usage"
+     ]
+   }
+ }
