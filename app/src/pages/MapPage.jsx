@@ -42,7 +42,7 @@ const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
 export default function MapPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const geolocateControlRef = useRef();
 
   // Estado para controlar la barra lateral (SideMenu) en escritorio
@@ -175,10 +175,10 @@ export default function MapPage() {
   useEffect(() => {
     // Solo mostramos si el usuario NO está logueado y es la primera vez en esta sesión
     const hasSeenWelcome = sessionStorage.getItem("welcomeShown");
-    if (!user && !hasSeenWelcome) {
+    if (!isAuthenticated && !hasSeenWelcome) {
       setShowWelcome(true);
     }
-  }, [user]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     currentViewRef.current = viewState;

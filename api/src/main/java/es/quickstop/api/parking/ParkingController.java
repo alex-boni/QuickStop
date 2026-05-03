@@ -31,6 +31,12 @@ public class ParkingController {
         return new ResponseEntity<>(parkings, HttpStatus.OK);
     }
 
+    @GetMapping("/owner/{ownerId}")
+    public ResponseEntity<List<ParkingDTO>> getParkingsByOwner(@PathVariable Long ownerId) {
+        List<ParkingDTO> parkings = parkingService.getParkingsByOwnerId(ownerId);
+        return new ResponseEntity<>(parkings, HttpStatus.OK);
+    }
+
     @GetMapping("/search")
     public ResponseEntity<List<ParkingDTO>> searchParkings(
             @RequestParam double latitude,

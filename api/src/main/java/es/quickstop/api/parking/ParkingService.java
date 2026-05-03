@@ -34,6 +34,17 @@ public class ParkingService {
                 .collect(Collectors.toList());
     }
 
+    public List<ParkingDTO> getParkingsByOwnerId(Long ownerId) {
+        return parkingRepository.findAllActiveByOwnerId(ownerId)
+                .stream()
+                .map(parking -> {
+                    ParkingDTO dto = parkingMapper.toDTO(parking);
+                    dto.setAvailableSpots(getRealTimeAvailableSpots(parking));
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
     public List<ParkingDTO> searchParkings(double latitude, double longitude, double distance) {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         Point punto = geometryFactory.createPoint(new Coordinate(longitude, latitude));

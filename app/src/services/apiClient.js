@@ -51,13 +51,25 @@ apiClient.interceptors.response.use(
   },
   (error) => {
     const status = error.response ? error.response.status : null;
+    const requestUrl = error.config?.url || '';
+    const normalizedUrl = requestUrl.toLowerCase();
+    const isPublicEndpoint =
+      normalizedUrl.includes('/parking') ||
+      normalizedUrl.startsWith('parking') ||
+      normalizedUrl.includes('/reservation') ||
+      normalizedUrl.startsWith('reservation');
     
     // WCAG 3.3.4: Manejo de errores de autenticación o servidor
     if (status === 401) {
-      // Si no autorizado, redirigir al login y limpiar el token
-      console.error("Error 401: No autorizado. Redirigiendo a Login...");
-      localStorage.removeItem('authToken');
-      // window.location.href = '/login'; // Descomentar al tener el router completo
+      if (isPublicEndpoint) {
+        console.warn("Error 401 en endpoint público. Se mantiene la sesión local.");
+      } else {
+        // Si no autorizado en endpoint protegido, limpiar datos de sesión
+        console.error("Error 401: No autorizado. Cerrando sesión local...");
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userData');
+        // window.location.href = '/login'; // Descomentar al tener el router completo
+      }
     } else if (status === 500) {
         // Error de servidor: Se puede mostrar un mensaje global genérico
         console.error("Error 500: Fallo interno del servidor. Por favor, inténtelo más tarde.");

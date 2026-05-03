@@ -18,4 +18,7 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
     
     @Query("SELECT p FROM Parking p WHERE p.deletedAt IS NULL")
     List<Parking> findAllActive();
+
+    @Query("SELECT p FROM Parking p WHERE p.deletedAt IS NULL AND p.ownerId = :ownerId")
+    List<Parking> findAllActiveByOwnerId(Long ownerId);
 }
