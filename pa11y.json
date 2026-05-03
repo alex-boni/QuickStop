@@ -1,5 +1,15 @@
 {
-  "chromeLaunchConfig": {
-    "args": ["--no-sandbox", "--disable-setuid-sandbox"]
-  }
-}
+   "standard": "WCAG2AA",
+   "timeout": 60000,
+   "chromeLaunchConfig": {
+     "args": ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
+   },
+   "actions": [
+     "wait for element #root to be visible",
+     "screen capture /tmp/pa11y-my-parkings-1.png",
+     "wait for element button[id^='delete-parking-'] to be visible",
+     "click element button[id^='delete-parking-']",
+     "wait for element #confirm-dialog to be visible",
+     "screen capture /tmp/pa11y-my-parkings-2.png"
+   ]
+ }

@@ -294,6 +294,7 @@ export default function MyParkingsPage() {
                                         </button>
                                         <button
                                             onClick={() => handleDelete(parking.id, parking.name)}
+                                            id={`delete-parking-${parking.id}`}
                                             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm"
                                         >
                                             Eliminar

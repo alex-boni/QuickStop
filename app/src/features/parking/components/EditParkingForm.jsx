@@ -11,10 +11,13 @@ export default function EditParkingForm() {
     const [parking, setParking] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState(null);
+    const [loadError, setLoadError] = useState(null);
+    const [submitError, setSubmitError] = useState(null);
+    const [fieldErrors, setFieldErrors] = useState({});
     const [success, setSuccess] = useState(false);
     const [showDescriptionHelp, setShowDescriptionHelp] = useState(false);
     const backButtonRef = useRef(null);
+    const redirectTimeoutRef = useRef(null);
     const [formData, setFormData] = useState({
         name: '',
         address: '',
@@ -24,15 +27,36 @@ export default function EditParkingForm() {
         isActive: true
     });
 
+    const getApiErrorMessage = (err, fallbackMessage) => {
+        if (err?.code === 'ECONNABORTED') {
+            return 'El servidor no responde. Verifica que el backend esté activo.';
+        }
+
+        const status = err?.response?.status;
+        if (status === 400) return 'Los datos enviados no son válidos.';
+        if (status === 401) return 'Tu sesión ha caducado. Inicia sesión de nuevo.';
+        if (status === 403) return 'No tienes permisos para editar este aparcamiento.';
+        if (status === 404) return 'No se encontró el aparcamiento solicitado.';
+        if (status === 409) return 'No se puede guardar: hay un conflicto con el estado actual.';
+        if (status >= 500) return 'Error interno del servidor. Inténtalo más tarde.';
+
+        if (typeof err?.response?.data?.message === 'string' && err.response.data.message.trim()) {
+            return err.response.data.message;
+        }
+
+        return fallbackMessage;
+    };
+
     useEffect(() => {
         const fetchParking = async () => {
             try {
                 setLoading(true);
+                setLoadError(null);
                 const data = await getParkingById(id);
                 
                 // Verificar que el usuario sea el owner
                 if (data.ownerId !== user?.id) {
-                    setError('No tienes permisos para editar este aparcamiento');
+                    setLoadError('No tienes permisos para editar este aparcamiento');
                     return;
                 }
                 
@@ -46,7 +70,7 @@ export default function EditParkingForm() {
                     isActive: data.isActive ?? true
                 });
             } catch (err) {
-                setError('Error al cargar los detalles del aparcamiento');
+                setLoadError(getApiErrorMessage(err, 'Error al cargar los detalles del aparcamiento'));
                 console.error(err);
             } finally {
                 setLoading(false);
@@ -59,10 +83,21 @@ export default function EditParkingForm() {
     }, [id, user]);
 
     useEffect(() => {
-        if (success) {
-            backButtonRef.current?.focus();
+        if (!success) {
+            return;
         }
-    }, [success]);
+
+        backButtonRef.current?.focus();
+        redirectTimeoutRef.current = setTimeout(() => {
+            navigate('/my-parkings');
+        }, 2000);
+
+        return () => {
+            if (redirectTimeoutRef.current) {
+                clearTimeout(redirectTimeoutRef.current);
+            }
+        };
+    }, [success, navigate]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -70,26 +105,59 @@ export default function EditParkingForm() {
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
+        if (fieldErrors[name]) {
+            setFieldErrors(prev => ({ ...prev, [name]: null }));
+        }
+        if (submitError) {
+            setSubmitError(null);
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!formData.name || formData.name.trim().length < 3) {
+            newErrors.name = 'El nombre debe tener al menos 3 caracteres.';
+        }
+
+        const spots = Number.parseInt(formData.availableSpots, 10);
+        if (Number.isNaN(spots) || spots <= 0) {
+            newErrors.availableSpots = 'El número de plazas debe ser mayor que 0.';
+        }
+
+        const price = Number.parseFloat(formData.pricePerHour);
+        if (Number.isNaN(price) || price <= 0) {
+            newErrors.pricePerHour = 'El precio por hora debe ser mayor que 0.';
+        }
+
+        setFieldErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!validateForm()) {
+            return;
+        }
+        if (redirectTimeoutRef.current) {
+            clearTimeout(redirectTimeoutRef.current);
+        }
         setSaving(true);
-        setError(null);
+        setSubmitError(null);
         setSuccess(false);
 
         try {
             const updatedData = {
                 ...parking,
                 ...formData,
-                availableSpots: parseInt(formData.availableSpots),
-                pricePerHour: parseFloat(formData.pricePerHour)
+                availableSpots: Number.parseInt(formData.availableSpots, 10),
+                pricePerHour: Number.parseFloat(formData.pricePerHour)
             };
             
             await updateParking(id, updatedData);
             setSuccess(true);
         } catch (err) {
-            setError('Error al actualizar el aparcamiento');
+            setSubmitError(getApiErrorMessage(err, 'Error al actualizar el aparcamiento'));
             console.error(err);
         } finally {
             setSaving(false);
@@ -97,7 +165,11 @@ export default function EditParkingForm() {
     };
 
     const getInputClass = (field) => {
-        return `w-full p-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500`;
+        return `w-full p-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 ${
+            fieldErrors[field]
+                ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
+        }`;
     };
 
     if (loading) {
@@ -109,13 +181,13 @@ export default function EditParkingForm() {
         );
     }
 
-    if (error && !parking) {
+    if (loadError && !parking) {
         return (
             <div className="text-center py-8">
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg inline-flex items-center gap-3">
                     <span className="text-2xl">❌</span>
                     <div className="text-left">
-                        <p className="text-sm font-medium text-red-800">{error}</p>
+                        <p className="text-sm font-medium text-red-800">{loadError}</p>
                     </div>
                 </div>
                 <div className="mt-6">
@@ -161,8 +233,15 @@ export default function EditParkingForm() {
                         required
                         className={getInputClass('name')}
                         placeholder="Ej: Aparcamiento Centro"
+                        aria-invalid={!!fieldErrors.name}
+                        aria-describedby={fieldErrors.name ? 'name-error' : undefined}
                         disabled={saving}
                     />
+                    {fieldErrors.name && (
+                        <p id="name-error" className="mt-1 text-xs text-red-600" aria-live="assertive">
+                            {fieldErrors.name}
+                        </p>
+                    )}
                 </div>
 
                 <div>
@@ -198,8 +277,15 @@ export default function EditParkingForm() {
                         min="0"
                         className={getInputClass('availableSpots')}
                         placeholder="Ej: 10"
+                        aria-invalid={!!fieldErrors.availableSpots}
+                        aria-describedby={fieldErrors.availableSpots ? 'availableSpots-error' : undefined}
                         disabled={saving}
                     />
+                    {fieldErrors.availableSpots && (
+                        <p id="availableSpots-error" className="mt-1 text-xs text-red-600" aria-live="assertive">
+                            {fieldErrors.availableSpots}
+                        </p>
+                    )}
                 </div>
 
                 <div>
@@ -217,8 +303,15 @@ export default function EditParkingForm() {
                         step="0.01"
                         className={getInputClass('pricePerHour')}
                         placeholder="Introduce el coste de la plaza por hora"
+                        aria-invalid={!!fieldErrors.pricePerHour}
+                        aria-describedby={fieldErrors.pricePerHour ? 'pricePerHour-error' : undefined}
                         disabled={saving}
                     />
+                    {fieldErrors.pricePerHour && (
+                        <p id="pricePerHour-error" className="mt-1 text-xs text-red-600" aria-live="assertive">
+                            {fieldErrors.pricePerHour}
+                        </p>
+                    )}
                 </div>
             </div>
 
@@ -301,12 +394,12 @@ export default function EditParkingForm() {
                 </div>
             )}
 
-            {error && parking && (
+            {submitError && parking && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
                     <span className="text-2xl">❌</span>
                     <div>
                         <p className="text-sm font-medium text-red-800">Error al actualizar el aparcamiento</p>
-                        <p className="text-xs text-red-600">{error}</p>
+                        <p className="text-xs text-red-600">{submitError}</p>
                     </div>
                 </div>
             )}

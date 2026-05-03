@@ -66,8 +66,7 @@ const SideMenu = ({ isOpen, onClose }) => {
         >
           &times;
         </button>
-        <nav className="space-y-6 mt-16 text-xl">
-          <h1 className="justify-center place-self-center text-indigo-600" aria-label="Menú lateral" hidden></h1>
+        <nav className="space-y-6 mt-16 text-xl" aria-label="Menú lateral">
           {isAuthenticated ? (
             <>
               <button

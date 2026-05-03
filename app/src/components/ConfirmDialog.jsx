@@ -7,7 +7,10 @@ const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel, type = 'da
   const isDanger = type === 'danger';
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+    <div
+      id="confirm-dialog"
+      className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+    >
       <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="p-6">
           <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-red-50 text-red-600">
@@ -31,12 +34,14 @@ const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel, type = 'da
         <div className="flex gap-2 border-t border-gray-100 p-2">
           <button
             onClick={onCancel}
+            id="confirm-dialog-cancel"
             className="flex-1 px-4 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-200 bg-gray-100 transition-colors"
           >
             Cancelar
           </button>
           <button
             onClick={onConfirm}
+            id="confirm-dialog-confirm"
             className={`flex-1 px-4 py-3 text-sm font-semibold text-white transition-colors ${
               isDanger ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-600 hover:bg-indigo-700'
             }`}
