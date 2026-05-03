@@ -54,7 +54,12 @@ const SuggestionItem = ({ place, onClick }) => {
     </li>
   );
 };
-const DesktopSearchBar = ({ onSearch, onOwnerAddParking, showOwnerAddParking = false }) => {
+const DesktopSearchBar = ({
+  onSearch,
+  onOwnerAddParking,
+  onOwnerAddParkingAtCurrentLocation,
+  showOwnerAddParking = false,
+}) => {
   // Estados
   const [query, setQuery] = useState(""); // Texto visible en el input
   const [suggestions, setSuggestions] = useState([]); // Resultados del autocompletado
@@ -181,35 +186,56 @@ const DesktopSearchBar = ({ onSearch, onOwnerAddParking, showOwnerAddParking = f
             Buscar
           </button>
           {showOwnerAddParking && (
-            <button
-              className="flex items-center whitespace-nowrap px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors ml-2 focus:ring-emerald-500 focus:outline-none focus:ring-2"
-              title="Añadir parking"
-              aria-label="Seleccionar ubicación para añadir parking"
-              onClick={onOwnerAddParking}
-              type="button"
-            >
-              <svg
-                className="w-5 h-5 mr-1 mt-0.5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
+            <>
+              <button
+                className="flex items-center whitespace-nowrap px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors ml-2 focus:ring-emerald-500 focus:outline-none focus:ring-2"
+                title="Añadir parking en esta zona del mapa"
+                aria-label="Seleccionar ubicación para añadir parking en esta zona del mapa"
+                onClick={onOwnerAddParking}
+                type="button"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              Nueva plaza
-            </button>
+                <svg
+                  className="w-5 h-5 mr-1 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                Nueva plaza
+              </button>
+              <button
+                className="flex items-center whitespace-nowrap px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors ml-2 focus:ring-cyan-500 focus:outline-none focus:ring-2"
+                title="Añadir parking en mi ubicación actual"
+                aria-label="Seleccionar ubicación para añadir parking en mi ubicación actual"
+                onClick={onOwnerAddParkingAtCurrentLocation}
+                type="button"
+              >
+                <svg
+                  className="w-5 h-5 mr-1 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 2v3m0 14v3m10-10h-3M5 12H2m15.07 7.07l-2.12-2.12M9.05 9.05 6.93 6.93m10.14 0-2.12 2.12M9.05 14.95l-2.12 2.12" />
+                  <circle cx="12" cy="12" r="3" strokeWidth="2" />
+                </svg>
+                Mi ubicación
+              </button>
+            </>
           )}
         </div>
 

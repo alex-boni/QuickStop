@@ -157,11 +157,13 @@ export default function MyParkingsPage() {
                         {/* Búsqueda */}
                         <div className="flex-1">
                             <input
+                                id="my-parkings-search"
                                 type="text"
                                 placeholder="Buscar por nombre..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                aria-label="Buscar aparcamientos por nombre"
                             />
                         </div>
 
@@ -215,9 +217,9 @@ export default function MyParkingsPage() {
                         <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                         </svg>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                        <h2 className="text-xl font-semibold text-gray-900 mb-2">
                             {searchTerm || filter !== 'all' ? 'No se encontraron aparcamientos' : 'No tienes aparcamientos'}
-                        </h3>
+                        </h2>
                         <p className="text-gray-600 mb-4">
                             {searchTerm || filter !== 'all' 
                                 ? 'Intenta con otros filtros' 
@@ -225,7 +227,7 @@ export default function MyParkingsPage() {
                         </p>
                         {!searchTerm && filter === 'all' && (
                             <button
-                                onClick={() => navigate('/select-parking-location')}
+                                onClick={() => navigate('/addparking')}
                                 className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
                             >
                                 Agregar Aparcamiento
@@ -301,17 +303,20 @@ export default function MyParkingsPage() {
                     </div>
                 )}
 
-                {/* Botón flotante para agregar */}
-                {!loading && (
-                    <button
-                        onClick={() => navigate('/select-parking-location')}
-                        className="fixed bottom-8 right-8 bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition-colors"
-                        title="Agregar aparcamiento"
-                    >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                    </button>
+                {/* Botón para agregar */}
+                {!loading && filteredParkings.length > 0 && (
+                    <div className="mt-6 flex justify-end">
+                        <button
+                            onClick={() => navigate('/addparking')}
+                            className="inline-flex items-center gap-2 bg-indigo-600 text-white px-5 py-3 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors font-semibold"
+                            title="Agregar aparcamiento"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                            Agregar Aparcamiento
+                        </button>
+                    </div>
                 )}
             </div>
 

@@ -58,7 +58,7 @@ const SuggestionItem = ({ place, onClick }) => {
     </li>
   );
 };
-const MobileSearchBar = ({ onSearch, onGeolocate }) => {
+const MobileSearchBar = ({ onSearch, onGeolocate, onOwnerAddParking, onOwnerAddParkingAtCurrentLocation }) => {
   // Estados
   const [query, setQuery] = useState(""); // Texto visible en el input
   const [suggestions, setSuggestions] = useState([]); // Resultados del autocompletado
@@ -170,7 +170,11 @@ const handleManualSearch = () => {
     }
 
     if (user.role === "OWNER") {
-      navigate("/select-parking-location");
+      if (onOwnerAddParking) {
+        onOwnerAddParking();
+        return;
+      }
+      return;
     } else {
       navigate("/my-reservations"); // Ruta para conductores
     }
@@ -205,6 +209,27 @@ const handleManualSearch = () => {
         >
           {user?.role === "OWNER" ? <OwnerIcon /> : <DriverIcon />}
         </button>
+        {user?.role === "OWNER" && (
+          <button
+            onClick={onOwnerAddParkingAtCurrentLocation}
+            className="p-2 bg-cyan-600 text-white rounded-full hover:bg-cyan-700 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-700"
+            title="Nueva plaza en mi ubicación actual"
+            aria-label="Seleccionar nueva plaza en mi ubicación actual"
+            type="button"
+          >
+            <svg
+              className="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 2v3m0 14v3m10-10h-3M5 12H2m15.07 7.07l-2.12-2.12M9.05 9.05 6.93 6.93m10.14 0-2.12 2.12M9.05 14.95l-2.12 2.12" />
+              <circle cx="12" cy="12" r="3" strokeWidth="2" />
+            </svg>
+          </button>
+        )}
 
         {/* Barra de Búsqueda */}
         <label htmlFor="search-input-mobile" className="sr-only">

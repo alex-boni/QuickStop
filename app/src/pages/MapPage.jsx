@@ -153,6 +153,7 @@ export default function MapPage() {
   });
 
   const [showWelcome, setShowWelcome] = useState(false);
+  const [isPickingNewParkingOnMap, setIsPickingNewParkingOnMap] = useState(false);
 
   const openModal = (parkingId, parkingName, ownerId) => {
     setModalState({
@@ -330,7 +331,62 @@ export default function MapPage() {
   };
 
   const handleAddParkingQuickAction = () => {
-    navigate("/select-parking-location");
+    setIsPickingNewParkingOnMap(true);
+  };
+
+  const handleAddParkingAtCurrentLocation = () => {
+    if (!("geolocation" in navigator)) {
+      setStatusMessage({
+        type: "error",
+        message: "Tu navegador no permite obtener la ubicación actual.",
+      });
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const nextViewState = {
+          ...viewState,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          zoom: 16,
+          transitionDuration: 1200,
+        };
+        setViewState(nextViewState);
+        setSearchLocation({
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          distance: SEARCH_DISTANCE_KM,
+        });
+        setIsPickingNewParkingOnMap(true);
+      },
+      () => {
+        setStatusMessage({
+          type: "error",
+          message: "No se pudo obtener tu ubicación actual.",
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000,
+      },
+    );
+  };
+
+  const handleCancelAddParkingOnMap = () => {
+    setIsPickingNewParkingOnMap(false);
+  };
+
+  const handleConfirmAddParkingOnMap = () => {
+    navigate("/addparking", {
+      state: {
+        coordinates: {
+          latitude: viewState.latitude,
+          longitude: viewState.longitude,
+        },
+      },
+    });
   };
 
   useEffect(() => {
@@ -366,6 +422,9 @@ export default function MapPage() {
 
   // Manejo de los clusters y puntos no agrupados
   const onClick = (event) => {
+    if (isPickingNewParkingOnMap) {
+      return;
+    }
     if (!event.features || event.features.length === 0) {
       return;
     }
@@ -469,6 +528,38 @@ export default function MapPage() {
           </button>
         </div>
       )}
+      {isPickingNewParkingOnMap && (
+        <>
+          <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
+            <div className="text-5xl drop-shadow-xl" aria-hidden="true">
+              📍
+            </div>
+          </div>
+          <div className="absolute inset-x-0 bottom-20 z-30 px-4">
+            <div className="mx-auto max-w-lg rounded-xl bg-white/95 border border-indigo-100 shadow-2xl p-4">
+              <p className="text-sm text-gray-700">
+                Mueve el mapa y coloca el pin en el centro para seleccionar la ubicación de la nueva plaza.
+              </p>
+              <div className="mt-3 flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleCancelAddParkingOnMap}
+                  className="flex-1 rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmAddParkingOnMap}
+                  className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  Confirmar ubicación
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
       <title>QuikStop: Mapa </title>
       <h1
         className="justify-center place-self-center text-indigo-600"
@@ -550,10 +641,13 @@ export default function MapPage() {
       <MobileSearchBar
         onSearch={handleSearchMove}
         onGeolocate={handleGeolocateClick}
+        onOwnerAddParking={handleAddParkingQuickAction}
+        onOwnerAddParkingAtCurrentLocation={handleAddParkingAtCurrentLocation}
       />
       <DesktopSearchBar
         onSearch={handleSearchMove}
         onOwnerAddParking={handleAddParkingQuickAction}
+        onOwnerAddParkingAtCurrentLocation={handleAddParkingAtCurrentLocation}
         showOwnerAddParking={user?.role === "OWNER"}
       />
 
