@@ -51,7 +51,6 @@ export default function MapPage() {
 
   // Estado para manejar la búsqueda de parkings según la ubicación
   const [searchLocation, setSearchLocation] = useState(null);
-  const [isLoadingParkings, setIsLoadingParkings] = useState(true);
   const [parkingsGeoJson, setParkingsGeoJson] = useState(EMPTY_GEOJSON);
   const [showOnlyMyParkings, setShowOnlyMyParkings] = useState(false);
   const SEARCH_DISTANCE_KM = 5; // Distancia de búsqueda en kilómetros
@@ -270,8 +269,30 @@ export default function MapPage() {
   useEffect(() => {
     const hasAutoLocated = sessionStorage.getItem("hasAutoLocated");
     const savedView = sessionStorage.getItem("lastMapView");
-
-    if (!location.state?.centerOn && !hasAutoLocated && !savedView) {
+    if (location.state?.centerOn && location.state?.isReservation) {
+      const { latitude, longitude } = location.state.centerOn;
+      setViewState({
+        latitude,
+        longitude,
+        zoom: 16,
+        transitionDuration: 2000,
+      });
+      window.history.replaceState({}, document.title); // Limpiar el state para evitar re-centrar al volver
+      const coordsReservation = {
+        latitude,
+        longitude,
+        distance: 0, // Solo queremos ese punto exacto para mostrar su popup
+      };
+      setSearchLocation(coordsReservation);
+      //abrir el popup del parking reservado
+      setQuickViewModalState({
+        isOpen: true,
+        parkingId: location.state.parkingId,
+        longitude,
+        latitude,
+      });
+      setShowSearchHere(true);
+    } else if (!location.state?.centerOn && !hasAutoLocated && !savedView) {
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
@@ -331,7 +352,6 @@ export default function MapPage() {
 
   useEffect(() => {
     const loadParkings = async () => {
-      setIsLoadingParkings(true);
       const coords = searchLocation || {
         latitude: viewState.latitude,
         longitude: viewState.longitude,
@@ -355,7 +375,6 @@ export default function MapPage() {
         latitude: coords.latitude,
         longitude: coords.longitude,
       };
-      setIsLoadingParkings(false);
     };
     loadParkings();
   }, [searchLocation, showOnlyMyParkings]);
