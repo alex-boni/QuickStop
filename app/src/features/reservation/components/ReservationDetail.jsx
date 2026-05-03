@@ -54,6 +54,22 @@ const ReservationDetails = () => {
       }),
     };
   };
+
+  const handleViewOnMap = async () => {
+    // promise to data
+
+    navigate("/", {
+      state: {
+        centerOn: {
+          latitude: parking.latitude,
+          longitude: parking.longitude,
+        },
+        isReservation: true,
+        parkingId: parking.id,
+      },
+    });
+  };
+
   const getStatusBadge = (status) => {
     switch (status) {
       case "ACTIVE":
@@ -157,19 +173,29 @@ const ReservationDetails = () => {
 
       <div className="space-y-4">
         {/* Info del Parking */}
-        <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col md:flex-row gap-4 border border-gray-100">
-          <div className="flex-1">
-            <h2 className="text-xl font-bold text-indigo-700">
-              {parking.name}
-            </h2>
-            <p className="text-sm text-gray-600 mb-4">{parking.address}</p>
-            <div className="flex gap-4">
-              <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded text-xs font-bold">
-                Tarifa aplicada: {formatSpain(parking.pricePerHour)} € / hora
+        <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col gap-4 border border-gray-100">
+          <div className="flex-1 ">
+            <div className="flex justify-between items-center gap-4">
+              <h2 className="text-xl font-bold text-indigo-700">
+                {parking.name}
+              </h2>
+              <span className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold">
+                Tarifa Actual: {formatSpain(parking.pricePerHour)} €/h
               </span>
             </div>
+            <p className="text-sm text-gray-600 mb-0">{parking.address}</p>
           </div>
-          <div className="w-full md:w-48 h-32 rounded-lg overflow-hidden border border-gray-200">
+          <div
+            className="w-full md:w-140 h-60 rounded-lg overflow-hidden border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            key={parking.id}
+            tabIndex={0}
+            role="button"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                handleViewOnMap();
+              }
+            }}
+          >
             <Map
               initialViewState={{
                 longitude: parking.longitude,
@@ -181,9 +207,12 @@ const ReservationDetails = () => {
               interactive={false}
             >
               <Marker
+                aria-label={`Ver ubicación de ${parking.name} en el mapa`}
                 longitude={parking.longitude}
                 latitude={parking.latitude}
-                color="red"
+                color="blue"
+                onClick={() => handleViewOnMap()}
+                className="cursor-pointer"
               />
             </Map>
           </div>
@@ -210,9 +239,9 @@ const ReservationDetails = () => {
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-              <p className="text-lg font-semibold text-gray-800">
-                {startInfo.day}
-              </p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {startInfo.day}
+                </p>
               </div>
               <div className="flex items-center gap-1">
                 <svg
@@ -228,7 +257,7 @@ const ReservationDetails = () => {
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-              <p className="text-lg text-gray-500">{startInfo.time}</p>
+                <p className="text-lg text-gray-500">{startInfo.time}</p>
               </div>
             </div>
           </div>
@@ -277,7 +306,7 @@ const ReservationDetails = () => {
         </div>
 
         {/* Total y Resumen */}
-        <div className="bg-indigo-700 text-white p-6 rounded-xl flex justify-between items-center shadow-lg">
+        <div className="bg-indigo-700 text-white p-6 mb-8 rounded-xl flex justify-between items-center shadow-lg">
           <div>
             <p className="text-indigo-200 text-xs uppercase font-bold tracking-wider">
               Precio Total

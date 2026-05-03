@@ -8,6 +8,7 @@ import {
 } from "../features/reservation/ReservationService";
 import StatusMessage from "../components/StatusMessage";
 import ConfirmDialog from "../components/ConfirmDialog";
+import { getParkingById } from "../features/parking/ParkingService";
 export default function MyReservationsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -26,7 +27,8 @@ export default function MyReservationsPage() {
     parkingName: "",
   });
 
-  const triggerCancel = (id, parkingName) => {
+  const triggerCancel = (e, id, parkingName) => {
+    e.stopPropagation();
     setConfirmState({ isOpen: true, resId: id, parkingName });
   };
   // Función para formatear números al estilo español Ej: 1234.56 => "1.234,56"
@@ -48,7 +50,25 @@ export default function MyReservationsPage() {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
 
-  const handleConfirmCancel = async () => {
+  const handleViewOnMap = async (e, res) => {
+    e.stopPropagation();
+    // promise to data
+    const parkingReservation = await getParkingById(res.parkingId);
+
+    navigate("/", {
+      state: {
+        centerOn: {
+          latitude: parkingReservation.latitude,
+          longitude: parkingReservation.longitude,
+        },
+        isReservation: true,
+        parkingId: res.parkingId,
+      },
+    });
+  };
+
+  const handleConfirmCancel = async (e) => {
+    e.stopPropagation();
     const { resId } = confirmState;
     setConfirmState({ ...confirmState, isOpen: false }); // Cerrar modal inmediatamente
 
@@ -90,7 +110,8 @@ export default function MyReservationsPage() {
     }
   };
 
-  const handleUpdateStatus = async (id, newStatus) => {
+  const handleUpdateStatus = async (e, id, newStatus) => {
+    e.stopPropagation();
     try {
       await updateReservationStatus(id, newStatus);
       setStatus({
@@ -275,8 +296,17 @@ export default function MyReservationsPage() {
             {filteredReservations.map((res) => (
               <div
                 key={res.id}
+                tabIndex="0" // Permite seleccionar con el tabulador
+                role="button" // Indica a los lectores de pantalla que actúa como un botón
+                aria-label={`Ver detalles de la reserva en ${res.parkingName}`}
                 onClick={() => navigate(`/reservation/details/${res.id}`)}
-                className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow p-6"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    navigate(`/reservation/details/${res.id}`);
+                  }
+                }}
+                className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:bg-gray-100 transition-shadow p-6 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="flex-1">
@@ -284,7 +314,38 @@ export default function MyReservationsPage() {
                       <h3 className="text-xl font-bold text-gray-900">
                         {res.parkingName}
                       </h3>
-                      {getStatusBadge(res.status)}
+                      <div className="flex items-center justify-end gap-3 ml-auto md:ml-0">
+                        {getStatusBadge(res.status)}
+
+                        {/* ICONO para ver en mapa */}
+                        {res.status === "ACTIVE" && (
+                          <button
+                            onClick={(e) => handleViewOnMap(e, res)}
+                            className="md:hidden p-0.5 bg-indigo-50 text-indigo-600 rounded-full hover:bg-indigo-200 transition-colors"
+                            title="Ver en mapa"
+                          >
+                            <svg
+                              className="w-8 h-8"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
@@ -323,7 +384,7 @@ export default function MyReservationsPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-row md:flex-col items-center md:items-end justify-between gap-4 border-t md:border-t-0 pt-4 md:pt-0">
+                  <div className="flex flex-row md:flex-col items-center md:items-end justify-between gap-4 border-t border-gray-300 md:border-t-0 pt-4 md:pt-0">
                     <div className="text-right">
                       <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">
                         Precio Total
@@ -337,8 +398,27 @@ export default function MyReservationsPage() {
                         isPastReservation(res.endTime) && (
                           <>
                             <button
-                              onClick={() =>
-                                handleUpdateStatus(res.id, "COMPLETED")
+                              onClick={(e) => handleViewOnMap(e, res)}
+                              className="hidden md:flex px-4 py-2 bg-white border-2 border-indigo-300 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors font-bold text-sm items-center gap-2"
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                                />
+                              </svg>
+                              Ver en mapa
+                            </button>
+                            <button
+                              onClick={(e) =>
+                                handleUpdateStatus(e, res.id, "COMPLETED")
                               }
                               className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-green-500 transition-colors flex items-center gap-2 font-bold text-sm shadow-sm"
                               title="Confirmar que usé la plaza"
@@ -356,10 +436,10 @@ export default function MyReservationsPage() {
                               Hecho!
                             </button>
                             <button
-                              onClick={() =>
-                                handleUpdateStatus(res.id, "NOT_COMPLETED")
+                              onClick={(e) =>
+                                handleUpdateStatus(e, res.id, "NOT_COMPLETED")
                               }
-                              className="px-4 py-2 border-2 border-gray-200 text-gray-500 rounded-lg hover:bg-gray-100  transition-colors font-bold text-sm"
+                              className="px-4 py-2 border-2 border-gray-200 hover:border-gray-400 text-gray-500 rounded-lg hover:bg-gray-300  transition-colors font-bold text-sm"
                               title="No pude usar la plaza"
                             >
                               <svg
@@ -379,8 +459,8 @@ export default function MyReservationsPage() {
                       {res.status === "ACTIVE" &&
                         !isPastReservation(res.endTime) && (
                           <button
-                            onClick={() =>
-                              triggerCancel(res.id, res.parkingName)
+                            onClick={(e) =>
+                              triggerCancel(e, res.id, res.parkingName)
                             }
                             className="px-4 py-2 border-2 border-red-100 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-bold text-sm"
                           >
