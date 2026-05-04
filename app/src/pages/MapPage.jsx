@@ -146,7 +146,7 @@ export default function MapPage() {
   // Estado para el popup quick view (no owner) - anclado al mapa
   const [quickViewModalState, setQuickViewModalState] = useState({
     isOpen: false,
-    parkingId: null,
+    parkingIds: [],
     longitude: null,
     latitude: null,
   });
@@ -288,7 +288,7 @@ export default function MapPage() {
       //abrir el popup del parking reservado
       setQuickViewModalState({
         isOpen: true,
-        parkingId: location.state.parkingId,
+        parkingIds: [location.state.parkingId],
         longitude,
         latitude,
       });
@@ -445,10 +445,14 @@ export default function MapPage() {
       return;
     }
     if (!event.features || event.features.length === 0) {
+      setQuickViewModalState(prev => ({ ...prev, isOpen: false }));
       return;
     }
     const feature = event.features[0];
 
+    if (event.originalEvent) {
+    event.originalEvent.stopPropagation();
+  }
     // Si es un cluster, expandirlo
     if (feature.layer.id === clusterLayer.id) {
       const clusterId = feature.properties.cluster_id;
@@ -472,6 +476,10 @@ export default function MapPage() {
 
     // Si es un punto individual
     if (feature.layer.id === unclusteredPointLayer.id) {
+      const allFeaturesAtPoint = event.features.filter(
+        (f) => f.layer.id === unclusteredPointLayer.id,
+      );
+
       const parkingId = feature.properties.id;
       const parkingName = feature.properties.name || "Aparcamiento";
       const ownerId = feature.properties.ownerId;
@@ -494,9 +502,10 @@ export default function MapPage() {
           openModal(parkingId, parkingName, ownerId);
         } else {
           // No es el owner, mostrar quick view anclado al mapa
+          const parkingIds = allFeaturesAtPoint.map((f) => f.properties.id);
           setQuickViewModalState({
             isOpen: true,
-            parkingId,
+            parkingIds: parkingIds,
             longitude,
             latitude,
           });
@@ -644,15 +653,8 @@ export default function MapPage() {
           <ParkingQuickViewPopup
             longitude={quickViewModalState.longitude}
             latitude={quickViewModalState.latitude}
-            parkingId={quickViewModalState.parkingId}
-            onClose={() =>
-              setQuickViewModalState({
-                isOpen: false,
-                parkingId: null,
-                longitude: null,
-                latitude: null,
-              })
-            }
+            parkingIds={quickViewModalState.parkingIds}
+onClose={() => setQuickViewModalState({ ...quickViewModalState, isOpen: false })}
           />
         )}
       </Map>
