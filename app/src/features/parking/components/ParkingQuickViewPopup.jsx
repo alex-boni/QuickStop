@@ -132,7 +132,7 @@ const ParkingQuickViewPopup = ({
 
         {!loading && !error && parking && (
           <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div className="border-b border-gray-300 pb-2 pr-6"> {/* Espacio extra a la derecha para la X */}
+            <div className="border-b border-gray-300 pb-2 pr-6">
               <h3 className="text-lg font-bold text-gray-900 truncate">
                 {parking.name}
               </h3>

@@ -2,12 +2,14 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import WelcomeLanding from "../components/WelcomeLanding";
-import ParkingActionModal from "../features/parking/components/ParkingActionModal";
+import OwnerParkingQuickViewPopup from "../features/parking/components/OwnerParkingQuickViewPopup";
 import ParkingDetailsModal from "../features/parking/components/ParkingDetailsModal";
 import ParkingQuickViewPopup from "../features/parking/components/ParkingQuickViewPopup";
 import {
   deleteParking,
+  getParkingById,
   getParkingDeleteInfo,
+  updateParking,
 } from "../features/parking/ParkingService";
 import ConfirmDialog from "../components/ConfirmDialog";
 import StatusMessage from "../components/StatusMessage";
@@ -118,17 +120,19 @@ export default function MapPage() {
   // Estado para el modal de acciones (owner)
   const [modalState, setModalState] = useState({
     isOpen: false,
-    parkingId: null,
+    parkingIds: [],
+    longitude: null,
+    latitude: null,
     parkingName: "",
-    ownerId: null,
   });
 
-  // Estado para confirmación de eliminación
+  // Estado para confirmación de cambios (eliminar/reactivar)
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     parkingId: null,
-    parkingName: "",
-    activeReservations: 0,
+    title: "",
+    message: "",
+    type: "", // "delete" para eliminar, "reactivate" para reactivar
   });
 
   // Estado para mensajes de estado
@@ -152,24 +156,21 @@ export default function MapPage() {
   });
 
   const [showWelcome, setShowWelcome] = useState(false);
-  const [isPickingNewParkingOnMap, setIsPickingNewParkingOnMap] = useState(false);
+  const [isPickingNewParkingOnMap, setIsPickingNewParkingOnMap] =
+    useState(false);
 
-  const openModal = (parkingId, parkingName, ownerId) => {
+  const openModal = (parkingIds, parkingName, longitude, latitude) => {
     setModalState({
       isOpen: true,
-      parkingId,
+      parkingIds,
       parkingName,
-      ownerId,
+      longitude,
+      latitude,
     });
   };
 
   const closeModal = () => {
-    setModalState({
-      isOpen: false,
-      parkingId: null,
-      parkingName: "",
-      ownerId: null,
-    });
+    setModalState((prev) => ({ ...prev, isOpen: false }));
   };
 
   useEffect(() => {
@@ -189,59 +190,99 @@ export default function MapPage() {
     setShowWelcome(false);
   };
 
-  const handleViewDetails = () => {
-    // Cerrar el modal de acciones y abrir el modal de detalles completo (para owner)
-    const parkingId = modalState.parkingId;
+  const handleViewDetails = (id) => {
     closeModal();
-    setDetailsModalState({
-      isOpen: true,
-      parkingId,
-    });
+    setDetailsModalState({ isOpen: true, parkingId: id });
   };
 
-  const handleEdit = () => {
-    navigate(`/parking/edit/${modalState.parkingId}`);
+  const handleEdit = (id) => {
+    navigate(`/parking/edit/${id}`);
     closeModal();
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (id, name) => {
     try {
-      const info = await getParkingDeleteInfo(modalState.parkingId);
-
+      const info = await getParkingDeleteInfo(id);
       setConfirmDialog({
         isOpen: true,
-        parkingId: modalState.parkingId,
-        parkingName: modalState.parkingName,
-        activeReservations: info.activeReservations,
+        parkingId: id,
+        title: "Eliminar Aparcamiento",
+        message: `¿Estás seguro de que quieres eliminar el aparcamiento "${name}"? ${info.activeReservations > 0 ? `Tiene ${info.activeReservations} reservas activas que serán canceladas.` : "No tiene reservas activas."}`,
+        type: "delete",
       });
       closeModal();
     } catch (error) {
-      console.error("Error obteniendo info del parking:", error);
+      console.error("Error al obtener información de eliminación:", error);
       setStatusMessage({
         type: "error",
-        message:
-          "Error al obtener información del aparcamiento. Inténtalo de nuevo.",
+        message: "Error al obtener información.",
       });
-      closeModal();
     }
   };
 
+
+  const handleReactivate = async (id, name) => {
+    try {
+      setConfirmDialog({
+        isOpen: true,
+        parkingId: id,
+        title: "Reactivar Aparcamiento",
+        message: `¿Estás seguro de que quieres reactivar el aparcamiento "${name}"?`,
+        type: "reactivate",
+      });
+      closeModal();
+    } catch (error) {
+      console.error("Error al obtener información de eliminación:", error);
+      setStatusMessage({
+        type: "error",
+        message: "Error al obtener información.",
+      });
+    }
+  }
+
+  const confirmReactivate = async () => {
+    const { parkingId } = confirmDialog;
+    try {      
+      let parking = await getParkingById(parkingId);
+      if (parking) {
+        parking.isActive=true;
+      }
+      await updateParking(parkingId, parking);
+      const message = "Aparcamiento reactivado exitosamente.";
+      setStatusMessage({
+        type: "success",
+        message,
+      });
+    } catch (error) {
+      console.error("Error al reactivar aparcamiento:", error);
+      setStatusMessage({
+        type: "error",
+        message: "Error al reactivar el aparcamiento. Inténtalo de nuevo.",
+      });
+    } finally {
+      setConfirmDialog({
+        isOpen: false,
+        parkingId: null,
+        title: "",
+        message: "",
+        type: "",
+      });
+    }
+  }
+
   const confirmDelete = async () => {
-    const { parkingId, parkingName, activeReservations } = confirmDialog;
+    const { parkingId } = confirmDialog;
 
     try {
       await deleteParking(parkingId);
 
-      const message =
-        activeReservations > 0
-          ? `Aparcamiento "${parkingName}" eliminado y ${activeReservations} reservas canceladas`
-          : `Aparcamiento "${parkingName}" eliminado correctamente`;
+      const message = "Aparcamiento eliminado exitosamente.";
 
       setStatusMessage({
         type: "success",
         message,
       });
-      setTimeout(() => window.location.reload(), 1500);
+      handleSearchInThisArea(); // Refrescar la búsqueda para actualizar el mapa
     } catch (error) {
       console.error("Error al eliminar aparcamiento:", error);
       setStatusMessage({
@@ -252,18 +293,20 @@ export default function MapPage() {
       setConfirmDialog({
         isOpen: false,
         parkingId: null,
-        parkingName: "",
-        activeReservations: 0,
+        title: "",
+        message: "",
+        type: "",
       });
     }
   };
 
-  const cancelDelete = () => {
+  const cancel = () => {
     setConfirmDialog({
       isOpen: false,
       parkingId: null,
-      parkingName: "",
-      activeReservations: 0,
+      title: "",
+      message: "",
+      type: "",
     });
   };
 
@@ -413,103 +456,78 @@ export default function MapPage() {
   useEffect(() => {
     const loadParkings = async () => {
       const coords = searchLocation || {
-        latitude: viewState.latitude,
-        longitude: viewState.longitude,
+        ...viewState,
         distance: SEARCH_DISTANCE_KM,
       };
       const data = await getParkings(coords);
-
-      // Filtrar solo mis parkings si está activado
       if (showOnlyMyParkings && user) {
-        const filteredData = {
+        setParkingsGeoJson({
           ...data,
           features: data.features.filter(
             (f) => f.properties.ownerId === user.id,
           ),
-        };
-        setParkingsGeoJson(filteredData);
+        });
       } else {
         setParkingsGeoJson(data);
       }
-      lastSearchCoordsRef.current = {
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-      };
     };
     loadParkings();
-  }, [searchLocation, showOnlyMyParkings]);
+  }, [searchLocation, showOnlyMyParkings, user]);
 
   // Manejo de los clusters y puntos no agrupados
   const onClick = (event) => {
-    if (isPickingNewParkingOnMap) {
-      return;
-    }
-    if (!event.features || event.features.length === 0) {
-      setQuickViewModalState(prev => ({ ...prev, isOpen: false }));
-      return;
-    }
-    const feature = event.features[0];
+    if (isPickingNewParkingOnMap) return;
 
-    if (event.originalEvent) {
-    event.originalEvent.stopPropagation();
-  }
-    // Si es un cluster, expandirlo
+    if (!event.features || event.features.length === 0) {
+      setQuickViewModalState((prev) => ({ ...prev, isOpen: false }));
+      setModalState((prev) => ({ ...prev, isOpen: false }));
+      return;
+    }
+
+    const feature = event.features[0];
+    if (event.originalEvent) event.originalEvent.stopPropagation();
+
     if (feature.layer.id === clusterLayer.id) {
       const clusterId = feature.properties.cluster_id;
-      const mapboxSource = mapRef.current.getSource("parkings");
-
-      // Mapbox calcula el zoom necesario para expandir el cluster
-      mapboxSource.getClusterExpansionZoom(clusterId, (err, zoom) => {
-        if (err) {
-          return;
-        }
-
-        // Anima el movimiento del mapa al centro del cluster con el zoom calculado
-        setViewState({
-          latitude: feature.geometry.coordinates[1], // [lng, lat]
-          longitude: feature.geometry.coordinates[0],
-          zoom,
-          transitionDuration: 500,
+      mapRef.current
+        .getSource("parkings")
+        .getClusterExpansionZoom(clusterId, (err, zoom) => {
+          if (!err)
+            setViewState({
+              latitude: feature.geometry.coordinates[1],
+              longitude: feature.geometry.coordinates[0],
+              zoom,
+              transitionDuration: 500,
+            });
         });
-      });
+      return;
     }
 
-    // Si es un punto individual
     if (feature.layer.id === unclusteredPointLayer.id) {
       const allFeaturesAtPoint = event.features.filter(
         (f) => f.layer.id === unclusteredPointLayer.id,
       );
-
-      const parkingId = feature.properties.id;
-      const parkingName = feature.properties.name || "Aparcamiento";
-      const ownerId = feature.properties.ownerId;
       const [longitude, latitude] = feature.geometry.coordinates;
+      const parkingIds = allFeaturesAtPoint.map((f) => f.properties.id);
 
-      if (parkingId) {
-        // Centrar el mapa en el aparcamiento clickeado con transición suave usando easeTo
-        if (mapRef.current) {
-          mapRef.current.easeTo({
-            center: [longitude, latitude],
-            zoom: 16,
-            duration: 1500, // 1.5 segundos
-            essential: true,
-          });
-        }
+      if (mapRef.current) {
+        mapRef.current.easeTo({
+          center: [longitude, latitude],
+          zoom: 16,
+          duration: 1000,
+        });
+      }
 
-        // Verificar si el usuario es el owner
-        if (user && user.id === ownerId) {
-          // Es el owner, mostrar modal de acciones
-          openModal(parkingId, parkingName, ownerId);
-        } else {
-          // No es el owner, mostrar quick view anclado al mapa
-          const parkingIds = allFeaturesAtPoint.map((f) => f.properties.id);
-          setQuickViewModalState({
-            isOpen: true,
-            parkingIds: parkingIds,
-            longitude,
-            latitude,
-          });
-        }
+      // Si el primero de la lista es del usuario actual, tratamos el grupo como "propios"
+      if (user && user.id === feature.properties.ownerId) {
+        openModal(parkingIds, feature.properties.name, longitude, latitude);
+      } else {
+        setQuickViewModalState({
+          isOpen: true,
+          parkingIds,
+          longitude,
+          latitude,
+        });
       }
     }
   };
@@ -566,7 +584,8 @@ export default function MapPage() {
           <div className="absolute inset-x-0 bottom-20 z-30 px-4">
             <div className="mx-auto max-w-lg rounded-xl bg-white/95 border border-indigo-100 shadow-2xl p-4">
               <p className="text-sm text-gray-700">
-                Mueve el mapa y coloca el pin en el centro para seleccionar la ubicación de la nueva plaza.
+                Mueve el mapa y coloca el pin en el centro para seleccionar la
+                ubicación de la nueva plaza.
               </p>
               <div className="mt-3 flex gap-3">
                 <button
@@ -654,7 +673,21 @@ export default function MapPage() {
             longitude={quickViewModalState.longitude}
             latitude={quickViewModalState.latitude}
             parkingIds={quickViewModalState.parkingIds}
-onClose={() => setQuickViewModalState({ ...quickViewModalState, isOpen: false })}
+            onClose={() =>
+              setQuickViewModalState({ ...quickViewModalState, isOpen: false })
+            }
+          />
+        )}
+        {modalState.isOpen && user?.role === "OWNER" && (
+          <OwnerParkingQuickViewPopup
+            longitude={modalState.longitude}
+            latitude={modalState.latitude}
+            parkingIds={modalState.parkingIds}
+            onClose={closeModal}
+            onView={handleViewDetails}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onReactivate={handleReactivate}
           />
         )}
       </Map>
@@ -722,15 +755,6 @@ onClose={() => setQuickViewModalState({ ...quickViewModalState, isOpen: false })
       <FloatingMenuButton onToggle={toggleMenu} />
       <SideMenu isOpen={isMenuOpen} onClose={toggleMenu} />
 
-      <ParkingActionModal
-        isOpen={modalState.isOpen}
-        onClose={closeModal}
-        onView={handleViewDetails}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        parkingName={modalState.parkingName}
-      />
-
       <ParkingDetailsModal
         isOpen={detailsModalState.isOpen}
         onClose={() => setDetailsModalState({ isOpen: false, parkingId: null })}
@@ -740,14 +764,10 @@ onClose={() => setQuickViewModalState({ ...quickViewModalState, isOpen: false })
       {/* Diálogo de confirmación */}
       <ConfirmDialog
         isOpen={confirmDialog.isOpen}
-        title="Eliminar Aparcamiento"
-        message={
-          confirmDialog.activeReservations > 0
-            ? `Este aparcamiento tiene ${confirmDialog.activeReservations} reservas activas. Al eliminarlo, se cancelarán TODAS automáticamente. Esta acción no se puede deshacer.`
-            : `¿Estás seguro de que quieres eliminar "${confirmDialog.parkingName}"? Esta acción no se puede deshacer.`
-        }
-        onConfirm={confirmDelete}
-        onCancel={cancelDelete}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        onConfirm={confirmDialog.type === "delete" ? confirmDelete : confirmReactivate}
+        onCancel={cancel}
         type="danger"
       />
 
