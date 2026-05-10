@@ -188,7 +188,7 @@ const DesktopSearchBar = ({
           {showOwnerAddParking && (
             <>
               <button
-                className="flex items-center whitespace-nowrap px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors ml-2 focus:ring-emerald-500 focus:outline-none focus:ring-2"
+                className="flex items-center whitespace-nowrap px-4 py-2 bg-emerald-800 text-white rounded-lg hover:bg-emerald-900 transition-colors ml-2 focus:ring-emerald-700 focus:outline-none focus:ring-2"
                 title="Añadir parking en esta zona del mapa"
                 aria-label="Seleccionar ubicación para añadir parking en esta zona del mapa"
                 onClick={onOwnerAddParking}
@@ -217,7 +217,7 @@ const DesktopSearchBar = ({
                 Nueva plaza
               </button>
               <button
-                className="flex items-center whitespace-nowrap px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors ml-2 focus:ring-cyan-500 focus:outline-none focus:ring-2"
+                className="flex items-center whitespace-nowrap px-4 py-2 bg-cyan-800 text-white rounded-lg hover:bg-cyan-900 transition-colors ml-2 focus:ring-cyan-700 focus:outline-none focus:ring-2"
                 title="Añadir parking en mi ubicación actual"
                 aria-label="Seleccionar ubicación para añadir parking en mi ubicación actual"
                 onClick={onOwnerAddParkingAtCurrentLocation}
