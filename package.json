@@ -23,7 +23,9 @@
     "build": "npm run build:app && npm run build:api",
     "build:windows": "npm run build:app && npm run build:windows:api",
     "start:app": "npm run preview --workspace=app",
-    "start:api": "dotenv -e .env -- java -jar api/target/api-0.0.1-SNAPSHOT.jar"
+    "start:api": "dotenv -e .env -- java -jar api/target/api-0.0.1-SNAPSHOT.jar",
+    "start": "npm run dev:db && concurrently -n WEB,API -c cyan,magenta \"npm run start:app\" \"npm run start:api\"",
+    "start:windows": "npm run dev:db && concurrently -n WEB,API -c cyan,magenta \"npm run start:app\" \"npm run start:api\""
   },
   "repository": {
     "type": "git",
