@@ -54,3 +54,12 @@ body {
   }
 
 }
+
+/* Mejora de tamaño táctil para controles de Mapbox */
+.mapboxgl-ctrl-logo {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  box-sizing: border-box;
+  background-position: center;
+}

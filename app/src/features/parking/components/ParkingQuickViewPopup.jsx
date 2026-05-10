@@ -145,20 +145,20 @@ const ParkingQuickViewPopup = ({
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              <div className="bg-indigo-50 rounded-lg p-2 text-center">
-                <p className="text-sm text-indigo-600 font-bold">Precio</p>
-                <p className="text-lg font-bold text-indigo-700">{parking.pricePerHour}€</p>
-                <p className="text-sm text-indigo-500">por hora</p>
+              <div className="bg-indigo-100 rounded-lg p-2 text-center">
+                <p className="text-sm text-indigo-800 font-bold">Precio</p>
+                <p className="text-lg font-bold text-indigo-900">{parking.pricePerHour}€</p>
+                <p className="text-sm text-indigo-800">por hora</p>
               </div>
 
-              <div className={`rounded-lg p-2 text-center ${parking.availableSpots > 0 ? "bg-green-50" : "bg-red-50"}`}>
-                <p className={`text-sm font-bold ${parking.availableSpots > 0 ? "text-green-600" : "text-red-600"}`}>
+              <div className={`rounded-lg p-2 text-center ${parking.availableSpots > 0 ? "bg-green-100" : "bg-red-100"}`}>
+                <p className={`text-sm font-bold ${parking.availableSpots > 0 ? "text-green-800" : "text-red-800"}`}>
                   {parking.availableSpots > 0 ? "Disponibles" : "Lleno"}
                 </p>
-                <p className={`text-lg font-bold ${parking.availableSpots > 0 ? "text-green-700" : "text-red-700"}`}>
+                <p className={`text-lg font-bold ${parking.availableSpots > 0 ? "text-green-900" : "text-red-900"}`}>
                   {parking.availableSpots}
                 </p>
-                <p className={`text-sm ${parking.availableSpots > 0 ? "text-green-500" : "text-red-500"}`}>plazas</p>
+                <p className={`text-sm ${parking.availableSpots > 0 ? "text-green-800" : "text-red-800"}`}>plazas</p>
               </div>
             </div>
 

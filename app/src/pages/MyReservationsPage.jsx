@@ -284,9 +284,9 @@ export default function MyReservationsPage() {
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
               />
             </svg>
-            <h3 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900">
               No hay reservas
-            </h3>
+            </h2>
             <p className="text-gray-600 mt-2">
               ¿Necesitas aparcar? Busca un sitio en el mapa.
             </p>
@@ -311,9 +311,9 @@ export default function MyReservationsPage() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-xl font-bold text-gray-900">
+                      <h2 className="text-xl font-bold text-gray-900">
                         {res.parkingName}
-                      </h3>
+                      </h2>
                       <div className="flex items-center justify-end gap-3 ml-auto md:ml-0">
                         {getStatusBadge(res.status)}
 

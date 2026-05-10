@@ -313,6 +313,9 @@ const ReservationForm = () => {
             <h3 className="font-bold text-indigo-700 flex items-center gap-2">
               Entrada
             </h3>
+            <label htmlFor="startDate" className="sr-only">
+              Fecha de entrada
+            </label>
             <input
               type="date"
               id="startDate"
@@ -321,6 +324,9 @@ const ReservationForm = () => {
               onChange={handleChange}
               className={`w-40 md:w-full mr-4  p-3 border rounded-lg outline-none transition-all ${errors.startTime ? "border-red-500" : "border-gray-300"}`}
             />
+            <label htmlFor="startTime" className="sr-only">
+              Hora de entrada
+            </label>
             <input
               type="time"
               id="startTime"
@@ -338,6 +344,9 @@ const ReservationForm = () => {
             <h3 className="font-bold text-indigo-700 flex items-center gap-2">
               Salida
             </h3>
+            <label htmlFor="endDate" className="sr-only">
+              Fecha de salida
+            </label>
             <input
               type="date"
               id="endDate"
@@ -346,6 +355,9 @@ const ReservationForm = () => {
               min={formData.startDate}
               className={`w-40 md:w-full  mr-4 p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all ${errors.endTime ? "border-red-500" : "border-gray-300"}`}
             />
+            <label htmlFor="endTime" className="sr-only">
+              Hora de salida
+            </label>
             <input
               type="time"
               id="endTime"
@@ -397,7 +409,7 @@ const ReservationForm = () => {
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="px-6 py-4 border-2 border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition-all"
+            className="px-6 py-4 border-2 border-gray-300 rounded-xl font-bold text-gray-700 hover:bg-gray-100 transition-all"
           >
             Cancelar
           </button>

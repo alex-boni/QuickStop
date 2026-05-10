@@ -71,17 +71,17 @@ const ParkingQuickViewModal = ({ isOpen, onClose, parkingId }) => {
             {/* Info principal en cards */}
             <div className="grid grid-cols-2 gap-3">
               {/* Precio */}
-              <div className="bg-indigo-50 rounded-xl p-3 text-center">
-                <p className="text-xs text-indigo-600 font-medium mb-1">Precio</p>
-                <p className="text-2xl font-bold text-indigo-700">{parking.pricePerHour}€</p>
-                <p className="text-xs text-indigo-500">por hora</p>
+              <div className="bg-indigo-100 rounded-xl p-3 text-center">
+                <p className="text-xs text-indigo-800 font-medium mb-1">Precio</p>
+                <p className="text-2xl font-bold text-indigo-900">{parking.pricePerHour}€</p>
+                <p className="text-xs text-indigo-800">por hora</p>
               </div>
 
               {/* Plazas disponibles */}
-              <div className="bg-green-50 rounded-xl p-3 text-center">
-                <p className="text-xs text-green-600 font-medium mb-1">Disponibles</p>
-                <p className="text-2xl font-bold text-green-700">{parking.availableSpots}</p>
-                <p className="text-xs text-green-500">plazas libres</p>
+              <div className="bg-green-100 rounded-xl p-3 text-center">
+                <p className="text-xs text-green-800 font-medium mb-1">Disponibles</p>
+                <p className="text-2xl font-bold text-green-900">{parking.availableSpots}</p>
+                <p className="text-xs text-green-800">plazas libres</p>
               </div>
             </div>
 

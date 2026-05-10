@@ -186,15 +186,8 @@ const ReservationDetails = () => {
             <p className="text-sm text-gray-600 mb-0">{parking.address}</p>
           </div>
           <div
-            className="w-full md:w-140 h-60 rounded-lg overflow-hidden border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            className="w-full md:w-140 h-60 rounded-lg overflow-hidden border border-gray-200"
             key={parking.id}
-            tabIndex={0}
-            role="button"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                handleViewOnMap();
-              }
-            }}
           >
             <Map
               initialViewState={{
@@ -211,11 +204,17 @@ const ReservationDetails = () => {
                 longitude={parking.longitude}
                 latitude={parking.latitude}
                 color="blue"
-                onClick={() => handleViewOnMap()}
-                className="cursor-pointer"
               />
             </Map>
           </div>
+          <button
+            type="button"
+            onClick={handleViewOnMap}
+            className="w-full md:w-fit min-h-11 px-4 py-3 border border-indigo-300 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 mt-2"
+            aria-label={`Ver ${parking.name} en el mapa principal`}
+          >
+            Ver en el mapa
+          </button>
         </div>
 
         {/* Bloque de Tiempos (Lectura) */}
