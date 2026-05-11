@@ -303,22 +303,23 @@ export default function MyParkingsPage() {
                     </div>
                 )}
 
-                {/* Botón para agregar */}
-                {!loading && filteredParkings.length > 0 && (
-                    <div className="mt-6 flex justify-end">
-                        <button
-                            onClick={() => navigate('/addparking')}
-                            className="inline-flex items-center gap-2 bg-indigo-600 text-white px-5 py-3 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors font-semibold"
-                            title="Agregar aparcamiento"
-                        >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                            </svg>
-                            Agregar Aparcamiento
-                        </button>
-                    </div>
-                )}
             </div>
+
+            {/* Botón flotante para agregar aparcamiento */}
+            {!loading && (
+                <button
+                    onClick={() => navigate('/addparking')}
+                    className="fixed bottom-24 right-4 md:bottom-10 md:right-8 z-30 inline-flex h-14 w-14 items-center justify-center rounded-full bg-indigo-700 text-white shadow-lg transition-colors hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 md:h-auto md:w-auto md:gap-2 md:px-5 md:py-3 md:font-semibold"
+                    aria-label="Agregar un nuevo aparcamiento"
+                    title="Agregar aparcamiento"
+                    type="button"
+                >
+                    <svg className="h-6 w-6 md:h-5 md:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span className="hidden md:inline">Agregar aparcamiento</span>
+                </button>
+            )}
 
             {/* Diálogo de confirmación */}
             <ConfirmDialog
