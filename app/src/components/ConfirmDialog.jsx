@@ -11,7 +11,13 @@ const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel, type = 'da
       id="confirm-dialog"
       className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-dialog-title"
+        aria-describedby="confirm-dialog-description"
+        className="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+      >
         <div className="p-6">
           <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-red-50 text-red-600">
             {isDanger ? (
@@ -25,8 +31,8 @@ const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel, type = 'da
             )}
           </div>
           
-          <h3 className="text-lg font-bold text-center text-gray-900">{title}</h3>
-          <p className="mt-2 text-sm text-center text-gray-500 leading-relaxed">
+          <h2 id="confirm-dialog-title" className="text-lg font-bold text-center text-gray-900">{title}</h2>
+          <p id="confirm-dialog-description" className="mt-2 text-sm text-center text-gray-500 leading-relaxed">
             {message}
           </p>
         </div>

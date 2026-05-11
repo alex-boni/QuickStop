@@ -34,6 +34,9 @@ const ParkingQuickViewModal = ({ isOpen, onClose, parkingId }) => {
       onClick={onClose}
     >
       <div 
+        role="dialog"
+        aria-modal="true"
+        aria-label="Vista rápida de aparcamiento"
         className="bg-white rounded-2xl p-5 max-w-sm w-full mx-4 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
@@ -59,7 +62,7 @@ const ParkingQuickViewModal = ({ isOpen, onClose, parkingId }) => {
           <div className="space-y-4">
             {/* Título */}
             <div className="border-b pb-3">
-              <h3 className="text-xl font-bold text-gray-900">{parking.name}</h3>
+              <h2 className="text-xl font-bold text-gray-900">{parking.name}</h2>
               <p className="text-sm text-gray-500 mt-1 flex items-center">
                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />

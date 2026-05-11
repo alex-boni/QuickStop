@@ -245,7 +245,7 @@ export default function MyParkingsPage() {
                                     {/* Info del parking */}
                                     <div className="flex-1">
                                         <div className="flex items-center gap-3 mb-2">
-                                            <h3 className="text-xl font-bold text-gray-900">{parking.name}</h3>
+                                            <h2 className="text-xl font-bold text-gray-900">{parking.name}</h2>
                                             {parking.available ? (
                                                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                     <span className="w-1.5 h-1.5 mr-1.5 bg-green-400 rounded-full animate-pulse"></span>

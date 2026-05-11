@@ -50,6 +50,7 @@ const StatusMessage = ({ type, message, onClose, duration = 4000 }) => {
         </div>
         <button
           onClick={onClose}
+          aria-label="Cerrar mensaje"
           className={`ml-4 flex-shrink-0 ${styles.textColor} hover:opacity-50 transition-opacity`}
         >
           <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

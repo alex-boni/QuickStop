@@ -34,6 +34,9 @@ const ParkingDetailsModal = ({ isOpen, onClose, parkingId }) => {
       onClick={onClose}
     >
       <div 
+        role="dialog"
+        aria-modal="true"
+        aria-label="Detalles del aparcamiento"
         className="bg-white rounded-lg p-6 max-w-lg w-full mx-4 shadow-xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >

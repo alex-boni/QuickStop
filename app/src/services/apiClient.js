@@ -1,6 +1,7 @@
 // app/src/services/apiClient.js
 
 import axios from 'axios';
+import { notifyAuthStateChanged } from '../features/auth/authSession';
 
 /**
  * 💡 Configuración Central de Axios para QuickStop / ParkIT.
@@ -68,6 +69,7 @@ apiClient.interceptors.response.use(
         console.error("Error 401: No autorizado. Cerrando sesión local...");
         localStorage.removeItem('authToken');
         localStorage.removeItem('userData');
+        notifyAuthStateChanged();
         // window.location.href = '/login'; // Descomentar al tener el router completo
       }
     } else if (status === 500) {

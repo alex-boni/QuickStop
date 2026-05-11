@@ -1,35 +1,105 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { logoutUser } from '../features/auth/AuthService';
+import { getCurrentUser } from '../features/user/UserService';
+import { AUTH_STATE_CHANGED_EVENT, notifyAuthStateChanged } from '../features/auth/authSession';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(() => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    const storedUser = localStorage.getItem('userData');
+    if (!storedUser) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(storedUser);
+    } catch (error) {
+      console.error('Error leyendo userData desde localStorage:', error);
+      localStorage.removeItem('userData');
+      return null;
+    }
+  });
+
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     if (typeof window !== 'undefined') {
       return !!localStorage.getItem('authToken');
     }
     return false;
   });
-  
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     const token = localStorage.getItem('authToken');
-    const userDataString = localStorage.getItem('userData');
-    
-    if (token && userDataString) {
+    if (!token) {
+      setIsAuthenticated(false);
+      setUser(null);
+      return;
+    }
+
+    const syncUserFromBackend = async () => {
       try {
-        const parsedUser = JSON.parse(userDataString);
+        const currentUser = await getCurrentUser();
+        const normalizedUser = {
+          id: currentUser.id,
+          name: currentUser.name,
+          email: currentUser.email,
+          role: currentUser.role,
+        };
+        localStorage.setItem('userData', JSON.stringify(normalizedUser));
         setIsAuthenticated(true);
-        setUser(parsedUser);
+        setUser(normalizedUser);
       } catch (error) {
-        console.error('Error parseando los datos del usuario:', error);
+        console.error('Error recuperando sesión del backend:', error);
         localStorage.removeItem('authToken');
         localStorage.removeItem('userData');
         setIsAuthenticated(false);
         setUser(null);
       }
+    };
+
+    syncUserFromBackend();
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
     }
+
+    const syncFromStorage = () => {
+      const token = localStorage.getItem('authToken');
+      const storedUser = localStorage.getItem('userData');
+
+      setIsAuthenticated(!!token);
+
+      if (!storedUser) {
+        setUser(null);
+        return;
+      }
+
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error('Error leyendo userData desde localStorage:', error);
+        localStorage.removeItem('userData');
+        setUser(null);
+      }
+    };
+
+    window.addEventListener('storage', syncFromStorage);
+    window.addEventListener(AUTH_STATE_CHANGED_EVENT, syncFromStorage);
+
+    return () => {
+      window.removeEventListener('storage', syncFromStorage);
+      window.removeEventListener(AUTH_STATE_CHANGED_EVENT, syncFromStorage);
+    };
   }, []);
 
   const login = (token, userData) => {
@@ -37,12 +107,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('userData', JSON.stringify(userData));
     setIsAuthenticated(true);
     setUser(userData);
+    notifyAuthStateChanged();
   };
 
   const logout = () => {
     logoutUser();
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');  
     setIsAuthenticated(false);
     setUser(null);
   };
@@ -53,14 +122,10 @@ export const AuthProvider = ({ children }) => {
       return; 
     }
 
-    if (updatedData && typeof updatedData.preventDefault === 'function') {
-      console.error("Estás pasando el evento del formulario en lugar de los datos.");
-      return;
-    }
-
     const updatedUser = { ...user, ...updatedData };
     localStorage.setItem('userData', JSON.stringify(updatedUser));
     setUser(updatedUser);
+    notifyAuthStateChanged();
   };
 
   return (

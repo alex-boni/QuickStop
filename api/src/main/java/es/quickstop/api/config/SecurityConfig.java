@@ -8,19 +8,24 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
+import lombok.RequiredArgsConstructor;
 
 
 @Configuration
 @EnableWebSecurity // Habilita la seguridad web en la aplicación
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     @Value("${FRONTEND_URL:http://localhost:5173}")
     private String frontendUrl;
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     // ... Bean de PasswordEncoder ...
     
     // Configuración del filtro de seguridad
@@ -45,16 +50,17 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
+                    "/swagger-ui.html",
                     "/index.html", // Rutas para que el frontend funcione
-                    "/"
+                    "/",
+                    "/error"
                 ).permitAll()
                 
                 // Las demás peticiones REQUIEREN autenticación
                 .anyRequest().authenticated()
             );
 
-        // Si usas JWT, aquí añadirías el filtro de JWT
-        // http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

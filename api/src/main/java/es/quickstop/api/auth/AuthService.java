@@ -20,17 +20,17 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthMapper authMapper;
+    private final JwtService jwtService;
     
 @Transactional // Asegura que la operación sea atómica (éxito total o fallo total)
     public AuthResponseDTO register(RegisterRequestDTO request) {
+        String normalizedEmail = request.getEmail().trim().toLowerCase();
+        request.setEmail(normalizedEmail);
         
         // 1. Validación de Unicidad de Email (Crucial)
-        Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
+        Optional<User> existingUser = userRepository.findByEmail(normalizedEmail);
         if (existingUser.isPresent()) {
-            AuthResponseDTO response = new AuthResponseDTO();
-            response.setUserId(0L);// ID ficticio para indicar error (podría ser mejor usar un DTO de error específico)
-            response.setEmail(request.getEmail());
-            return response;
+            throw new EmailAlreadyExistsException("El correo " + normalizedEmail + " ya está registrado.");
         }
 
         // 2. Creación y Mapeo de la Entidad
@@ -54,13 +54,16 @@ public class AuthService {
         // 5. Persistencia y Generación de Respuesta
         User savedUser = userRepository.save(user);
 
-        // Mapea la entidad guardada al DTO de respuesta.
-        return authMapper.toAuthResponseDTO(savedUser);
+        AuthResponseDTO response = authMapper.toAuthResponseDTO(savedUser);
+        response.setToken(jwtService.generateToken(savedUser));
+        response.setRole(savedUser.getRole().name());
+        return response;
     }
 
     public AuthResponseDTO login(es.quickstop.api.auth.dto.LoginRequestDTO request) {
+        String normalizedEmail = request.getEmail().trim().toLowerCase();
         // Buscar el usuario por email
-        Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
+        Optional<User> userOpt = userRepository.findByEmail(normalizedEmail);
         if (userOpt.isEmpty()) {
             throw new IllegalArgumentException("Credenciales inválidas.");
         }
@@ -72,8 +75,9 @@ public class AuthService {
             throw new IllegalArgumentException("Credenciales inválidas.");
         }
 
-        // Si las credenciales son válidas, mapear y devolver el DTO de respuesta
-        return authMapper.toAuthResponseDTO(user);
+        AuthResponseDTO response = authMapper.toAuthResponseDTO(user);
+        response.setToken(jwtService.generateToken(user));
+        response.setRole(user.getRole().name());
+        return response;
     }
 }
-

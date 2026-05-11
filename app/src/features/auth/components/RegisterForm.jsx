@@ -151,12 +151,6 @@ const RegisterForm = () => {
 
     try {
       const response = await registerUser(formData);
-      if (response?.userId === 0) {
-        const errorMsg = "El correo " + formData.email + " se encuentra registrado.";
-        setErrors({ email: errorMsg });
-        document.getElementById("email")?.focus();
-        return;
-      }else
       if (response?.token) {
 				const userData = {
 					id: response.userId,
@@ -169,6 +163,12 @@ const RegisterForm = () => {
       navigate("/");
     } catch (error) {
       console.error("Error en el registro:", error);
+      if (error.message === "EmailAlreadyExists") {
+        const errorMsg = "El correo " + formData.email + " se encuentra registrado.";
+        setErrors({ email: errorMsg });
+        document.getElementById("email")?.focus();
+        return;
+      }
         setErrors({
           global: "No se ha podido procesar el registro en este momento. Por favor, inténtelo de nuevo en unos minutos.",
         });

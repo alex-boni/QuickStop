@@ -117,6 +117,7 @@ const OwnerParkingQuickViewPopup = ({
           <div className="absolute inset-x-0 -bottom-8 -translate-y-1/2 flex justify-between px-4 z-10 pointer-events-none">
             <button
               onClick={handlePrev}
+              aria-label="Aparcamiento anterior"
               className="pointer-events-auto bg-white/90 text-indigo-600 p-4 rounded-full shadow-md hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-110"
             >
               <svg
@@ -135,6 +136,7 @@ const OwnerParkingQuickViewPopup = ({
             </button>
             <button
               onClick={handleNext}
+              aria-label="Siguiente aparcamiento"
               className="pointer-events-auto bg-white/90 text-indigo-600 p-4 rounded-full shadow-md hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-110"
             >
               <svg

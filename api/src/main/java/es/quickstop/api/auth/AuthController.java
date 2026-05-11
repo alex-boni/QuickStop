@@ -26,18 +26,20 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO> registerUser(@Valid @RequestBody RegisterRequestDTO request){
         try {
-            // Delega la lógica de negocio al servicio (encriptación, guardado)
             AuthResponseDTO response = authService.register(request);
-            // Devuelve 201 Created si la operación fue exitosa
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (EmailAlreadyExistsException e) {
-            throw e; // Será manejada por un manejador global de excepciones
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> loginUser(@Valid @RequestBody LoginRequestDTO request){
-        AuthResponseDTO response = authService.login(request);
-        return ResponseEntity.ok(response);
+        try {
+            AuthResponseDTO response = authService.login(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 }

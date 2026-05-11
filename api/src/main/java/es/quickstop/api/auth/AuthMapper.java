@@ -43,7 +43,7 @@ public interface AuthMapper {
      * @Mapping se usa para asignar campos con nombres diferentes (aunque aquí coinciden).
      * Nota: El campo 'token' se establecería en el servicio después de la generación de JWT.
      */
-    @Mapping(target = "token", source = "password") // Se asume que el token se añade al DTO en el servicio
+    @Mapping(target = "token", ignore = true)
     @Mapping(target = "userId", source = "id")
     @Mapping(target = "name", source = "name")
     @Mapping(target = "email", source = "email")

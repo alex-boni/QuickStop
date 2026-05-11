@@ -101,6 +101,7 @@ const ParkingQuickViewPopup = ({
           <div className="absolute inset-x-0 -bottom-8 -translate-y-1/2 flex justify-between px-4 z-10 pointer-events-none">
             <button
               onClick={handlePrev}
+              aria-label="Aparcamiento anterior"
               className="pointer-events-auto bg-white/90 text-indigo-600 p-4 rounded-full shadow-md hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-110"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,6 +110,7 @@ const ParkingQuickViewPopup = ({
             </button>
             <button
               onClick={handleNext}
+              aria-label="Siguiente aparcamiento"
               className="pointer-events-auto bg-white/90 text-indigo-600 p-4 rounded-full shadow-md hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-110"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,9 +135,9 @@ const ParkingQuickViewPopup = ({
         {!loading && !error && parking && (
           <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="border-b border-gray-300 pb-2 pr-6">
-              <h3 className="text-lg font-bold text-gray-900 truncate">
+              <h2 className="text-lg font-bold text-gray-900 truncate">
                 {parking.name}
-              </h3>
+              </h2>
               <p className="text-xs text-gray-500 mt-1 flex items-center">
                 <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />

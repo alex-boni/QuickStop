@@ -152,7 +152,7 @@ export default function MyReservationsPage() {
         );
       case "NOT_COMPLETED":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-400">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
             No realizada
           </span>
         );
@@ -233,11 +233,16 @@ export default function MyReservationsPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-2 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1  p-2">
+              <label htmlFor="my-reservations-search" className="sr-only">
+                Buscar reservas por aparcamiento
+              </label>
               <input
+                id="my-reservations-search"
                 type="text"
                 placeholder="Buscar por aparcamiento..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                aria-label="Buscar reservas por aparcamiento"
                 className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
               />
             </div>

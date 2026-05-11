@@ -1,4 +1,5 @@
 import apiClient from "../../services/apiClient";
+import { notifyAuthStateChanged } from "./authSession";
 
 //Definicion de Endpoints
 const AUTH_ENDPOINTS = {
@@ -28,12 +29,7 @@ export const registerUser = async (userData) => {
 export const loginUser = async (credentials) => {
     try {
         const response = await apiClient.post(AUTH_ENDPOINTS.LOGIN, credentials);
-        const data = response.data;
-        // Si la API devuelve un token, lo guardamos para futuras peticiones
-        if (data?.token) {
-            localStorage.setItem('authToken', data.token);
-        }
-        return data;
+        return response.data;
     } catch (error) {
         // Mapear errores para el frontend
         const status = error.response?.status;
@@ -49,6 +45,7 @@ export const logoutUser = () => {
     // Limpiar tokens y datos del usuario
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
+    notifyAuthStateChanged();
 };
 
 //Aqui se pueden definir mas servicios como logoutUser, etc. Para luego exportarlos y usarlos en los componentes correspondientes.

@@ -1,19 +1,47 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getCurrentUser, updateCurrentUser } from '../features/user/UserService';
 
 export default function ProfilePage() {
     const navigate = useNavigate();
-const { user, updateUser } = useAuth();
+    const { user, updateUser } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [errors, setErrors] = useState({});
+    const [loadingProfile, setLoadingProfile] = useState(true);
 
     const [formData, setFormData] = useState({
         name: user?.name || '',
         email: user?.email || ''
     });
+
+    useEffect(() => {
+        const loadProfile = async () => {
+            try {
+                const profile = await getCurrentUser();
+                const normalizedUser = {
+                    id: profile.id,
+                    name: profile.name,
+                    email: profile.email,
+                    role: profile.role
+                };
+                updateUser(normalizedUser);
+                setFormData({
+                    name: normalizedUser.name || '',
+                    email: normalizedUser.email || ''
+                });
+            } catch (error) {
+                console.error('Error al cargar el perfil:', error);
+                setErrors({ submit: 'No se pudieron cargar los datos del perfil.' });
+            } finally {
+                setLoadingProfile(false);
+            }
+        };
+
+        loadProfile();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -54,9 +82,16 @@ const { user, updateUser } = useAuth();
         setErrors({});
 
         try {
-            console.log('Actualizando perfil:', formData);
-            await new Promise(resolve => setTimeout(resolve, 1000)); //TODO Revisar
-            updateUser(formData);
+            const updated = await updateCurrentUser({
+                name: formData.name.trim(),
+                email: formData.email.trim().toLowerCase()
+            });
+            updateUser({
+                id: updated.id,
+                name: updated.name,
+                email: updated.email,
+                role: updated.role
+            });
 
             setSuccess(true);
             setIsEditing(false);
@@ -64,7 +99,11 @@ const { user, updateUser } = useAuth();
                 setSuccess(false);
             }, 3000);
         } catch (err) {
-            setErrors({ submit: 'Error al actualizar el perfil' });
+            if (err.response?.status === 409) {
+                setErrors({ email: 'Ese correo ya está en uso por otro usuario.' });
+            } else {
+                setErrors({ submit: 'Error al actualizar el perfil' });
+            }
             console.error(err);
         } finally {
             setLoading(false);
@@ -88,6 +127,12 @@ const { user, updateUser } = useAuth();
     return (
         <div className="min-h-screen bg-gray-50 px-4 pt-16 md:py-8">
             <div className="max-w-2xl mx-auto">
+                {loadingProfile ? (
+                    <div className="bg-white rounded-lg shadow p-6">
+                        <p className="text-gray-600">Cargando perfil...</p>
+                    </div>
+                ) : (
+                    <>
                 {/* Header */}
                 <div className="mb-6">
                     <button
@@ -217,6 +262,8 @@ const { user, updateUser } = useAuth();
                         </div>
                     </form>
                 </div>
+                    </>
+                )}
             </div>
         </div>
     );
