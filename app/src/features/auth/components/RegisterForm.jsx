@@ -15,7 +15,8 @@ const RegisterForm = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "DRIVER",
+    isDriverRole: true,
+    isOwnerRole: false,
     termsAccepted: false,
   });
 
@@ -103,6 +104,16 @@ const RegisterForm = () => {
       else delete newErrors.termsAccepted;
     }
 
+    if (field === "isDriverRole" || field === "isOwnerRole") {
+      const nextDriver = field === "isDriverRole" ? value : formData.isDriverRole;
+      const nextOwner = field === "isOwnerRole" ? value : formData.isOwnerRole;
+      if (!nextDriver && !nextOwner) {
+        newErrors.role = "Selecciona al menos un tipo de cuenta.";
+      } else {
+        delete newErrors.role;
+      }
+    }
+
     setErrors(newErrors);
   };
 
@@ -128,6 +139,9 @@ const RegisterForm = () => {
     if (!formData.termsAccepted)
       newErrors.termsAccepted = "Para crear una cuenta, se deben aceptar los Términos y Condiciones.";
 
+    if (!formData.isDriverRole && !formData.isOwnerRole)
+      newErrors.role = "Selecciona al menos un tipo de cuenta.";
+
     setErrors(newErrors);
 
     return { isValid: Object.keys(newErrors).length === 0, newErrors };
@@ -150,7 +164,18 @@ const RegisterForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await registerUser(formData);
+      const role = formData.isDriverRole && formData.isOwnerRole
+        ? "BOTH"
+        : formData.isOwnerRole
+          ? "OWNER"
+          : "DRIVER";
+
+      const response = await registerUser({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role,
+      });
       if (response?.token) {
 				const userData = {
 					id: response.userId,
@@ -167,6 +192,14 @@ const RegisterForm = () => {
         const errorMsg = "El correo " + formData.email + " se encuentra registrado.";
         setErrors({ email: errorMsg });
         document.getElementById("email")?.focus();
+        return;
+      }
+      if (error.message === "InvalidCredentials") {
+        setErrors({
+          password:
+            "Si el correo ya existe para otro rol, introduce la misma contraseña para activar ambos perfiles.",
+        });
+        document.getElementById("password")?.focus();
         return;
       }
         setErrors({
@@ -186,7 +219,14 @@ const RegisterForm = () => {
     }
   `;
 
-  const isDriver = formData.role === "DRIVER";
+  const toggleRole = (field) => {
+    const nextValue = !formData[field];
+    setFormData((prev) => ({
+      ...prev,
+      [field]: nextValue,
+    }));
+    validateField(field, nextValue);
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
@@ -357,50 +397,56 @@ const RegisterForm = () => {
                 <strong className="text-gray-800">Propietario:</strong> Registra
                 plazas de aparcamiento vacías y genera ingresos.
               </p>
+              <p>
+                <strong className="text-gray-800">Ambos:</strong> Permite buscar
+                y reservar plazas, y también publicar plazas con el mismo correo.
+              </p>
             </div>
           </div>
         )}
 
         <div
           className="flex bg-gray-100 rounded-xl p-1 shadow-inner"
-          role="radiogroup"
+          role="group"
+          aria-label="Tipo de cuenta"
         >
           <button
             type="button"
-            onClick={() => setFormData((prev) => ({ ...prev, role: "DRIVER" }))}
+            onClick={() => toggleRole("isDriverRole")}
             className={`
         flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 
         focus:outline-none focus:ring-2 focus:ring-indigo-500
         ${
-          isDriver
+          formData.isDriverRole
             ? "bg-indigo-600 text-white shadow-md"
             : "text-gray-600 hover:bg-gray-200"
         }
       `}
-            role="radio"
-            aria-checked={isDriver}
+            aria-pressed={formData.isDriverRole}
           >
             Conductor
           </button>
 
           <button
             type="button"
-            onClick={() => setFormData((prev) => ({ ...prev, role: "OWNER" }))}
+            onClick={() => toggleRole("isOwnerRole")}
             className={`
         flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200
         focus:outline-none focus:ring-2 focus:ring-indigo-500
         ${
-          !isDriver
+          formData.isOwnerRole
             ? "bg-indigo-600 text-white shadow-md"
             : "text-gray-600 hover:bg-gray-200"
         }
       `}
-            role="radio"
-            aria-checked={!isDriver}
+            aria-pressed={formData.isOwnerRole}
           >
             Propietario
           </button>
         </div>
+        {errors.role && (
+          <p className="mt-1 text-sm text-red-600">{errors.role}</p>
+        )}
       </div>
 
       {/* Términos */}

@@ -35,7 +35,7 @@ public class User {
 
     @Enumerated(EnumType.STRING) // Almacena el enum como String en la base de datos
     @Column(nullable = false)
-    private UserRole role; // Enum para definir el rol del usuario (OWNER, DRIVER)
+    private UserRole role; // Enum para definir el rol del usuario (OWNER, DRIVER, BOTH)
 
     @Column(nullable = false)
     private boolean termsAccepted; // Indica si el usuario aceptó los términos y condiciones

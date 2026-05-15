@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getCurrentUser, updateCurrentUser } from '../features/user/UserService';
+import { getRoleLabel, hasOwnerRole } from '../features/auth/roleUtils';
 
 export default function ProfilePage() {
     const navigate = useNavigate();
@@ -152,13 +153,13 @@ export default function ProfilePage() {
                 <div className="bg-white rounded-lg shadow p-6 mb-6">
                     <div className="flex items-center mb-6">
                                             <img
-                      src={user?.profilePicture || user && user.role === "DRIVER" ? "../../public/driver-icon.png" : "../../public/owner-icon.png"}
+                      src={user?.profilePicture || (hasOwnerRole(user?.role) ? "../../public/owner-icon.png" : "../../public/driver-icon.png")}
                       alt={user?.name ? `Foto de perfil de ${user.name}` : "Foto de perfil de usuario"}
                       className="w-20 h-20 bg-indigo-100 rounded-full object-cover"
                     />
                         <div className="ml-4">
                             <h2 className="text-xl font-bold text-gray-900">{user?.name}</h2>
-                            <p className="text-sm text-gray-500">{user?.role === "DRIVER" ? "Conductor" : "Propietario"}</p>
+                            <p className="text-sm text-gray-500">{getRoleLabel(user?.role)}</p>
                         </div>
                     </div>
 

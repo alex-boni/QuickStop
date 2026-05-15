@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { getRoleLabel, hasDriverRole, hasOwnerRole } from "../features/auth/roleUtils";
 
 const SideMenu = ({ isOpen, onClose }) => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -76,7 +77,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                 <div className="flex-col items-center justify-center text-center space-x-3">
                   <div className="flex-row items-center content-center justify-center ">
                     <img
-                      src={user?.profilePicture || user && user.role === "DRIVER" ? "../../public/driver-icon.png" : "../../public/owner-icon.png"}
+                      src={user?.profilePicture || (hasOwnerRole(user?.role) ? "../../public/owner-icon.png" : "../../public/driver-icon.png")}
                       alt={user?.name ? `Foto de perfil de ${user.name}` : "Foto de perfil de usuario"}
                       className="w-20 h-20 bg-indigo-100 hover:bg-indigo-150 rounded-full mx-auto object-cover"
                     />
@@ -85,7 +86,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                     </span>
                   </div>
                   <span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-0.5 text-sm font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
-                    Mi Cuenta
+                    {getRoleLabel(user?.role) || "Mi Cuenta"}
                   </span>
                 </div>
               </button>
@@ -117,7 +118,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                 </svg>
                 <span className="font-medium">Mapa</span>
               </button>
-              {user && user.role === "DRIVER" && (
+              {user && hasDriverRole(user.role) && (
               <button
                 onClick={() => handleNavigation("/my-reservations")}
                 className="flex w-full text-left text-gray-700 hover:text-indigo-600 
@@ -143,7 +144,7 @@ const SideMenu = ({ isOpen, onClose }) => {
 
           
 
-{user && user.role === "OWNER" && (
+{user && hasOwnerRole(user.role) && (
               <button
                 onClick={() => handleNavigation('/my-parkings')}
                 className="flex w-full text-left text-gray-700 hover:text-indigo-600 
@@ -166,7 +167,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                 <span className="font-medium">Mis plazas de aparcamiento</span>
               </button>
 )}
-{user && user.role === "OWNER" && (
+{user && hasOwnerRole(user.role) && (
 
               <button
                 onClick={() => handleNavigation('/addparking')}

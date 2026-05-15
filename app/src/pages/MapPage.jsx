@@ -37,6 +37,7 @@ import MobileSearchBar from "../components/MobileSearchBar";
 import SideMenu from "../components/SlideMenu";
 import DesktopSearchBar from "../components/DesktopSearchBar";
 import { getParkings, EMPTY_GEOJSON } from "../features/parking/ParkingService";
+import { hasOwnerRole } from "../features/auth/roleUtils";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_API_MAP_BOX_KEY;
 // const PARKINGS_DATA = await getParkings();
@@ -678,7 +679,7 @@ export default function MapPage() {
             }
           />
         )}
-        {modalState.isOpen && user?.role === "OWNER" && (
+        {modalState.isOpen && hasOwnerRole(user?.role) && (
           <OwnerParkingQuickViewPopup
             longitude={modalState.longitude}
             latitude={modalState.latitude}
@@ -702,11 +703,11 @@ export default function MapPage() {
         onSearch={handleSearchMove}
         onOwnerAddParking={handleAddParkingQuickAction}
         onOwnerAddParkingAtCurrentLocation={handleAddParkingAtCurrentLocation}
-        showOwnerAddParking={user?.role === "OWNER"}
+        showOwnerAddParking={hasOwnerRole(user?.role)}
       />
 
       {/* Botón flotante para filtrar mis aparcamientos - solo para OWNERS */}
-      {user && user.role === "OWNER" && (
+      {user && hasOwnerRole(user.role) && (
         <button
           onClick={() => setShowOnlyMyParkings(!showOnlyMyParkings)}
           className={`fixed bottom-24 right-4 md:bottom-8 md:right-8 p-4 rounded-full shadow-lg transition-all duration-300 z-10 ${

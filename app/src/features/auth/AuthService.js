@@ -20,6 +20,9 @@ export const registerUser = async (userData) => {
         if (error.response?.status === 409) {
             throw new Error('EmailAlreadyExists'); 
         }
+        if (error.response?.status === 401) {
+            throw new Error('InvalidCredentials');
+        }
         throw error;
     }
 };

@@ -26,11 +26,28 @@ public class AuthService {
     public AuthResponseDTO register(RegisterRequestDTO request) {
         String normalizedEmail = request.getEmail().trim().toLowerCase();
         request.setEmail(normalizedEmail);
+        UserRole requestedRole = parseUserRole(request.getRole());
         
         // 1. Validación de Unicidad de Email (Crucial)
         Optional<User> existingUser = userRepository.findByEmail(normalizedEmail);
         if (existingUser.isPresent()) {
-            throw new EmailAlreadyExistsException("El correo " + normalizedEmail + " ya está registrado.");
+            User user = existingUser.get();
+            UserRole currentRole = user.getRole();
+
+            if (currentRole == requestedRole || currentRole == UserRole.BOTH) {
+                throw new EmailAlreadyExistsException("El correo " + normalizedEmail + " ya está registrado.");
+            }
+
+            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                throw new IllegalArgumentException("Credenciales inválidas.");
+            }
+
+            user.setRole(UserRole.BOTH);
+            User upgradedUser = userRepository.save(user);
+            AuthResponseDTO response = authMapper.toAuthResponseDTO(upgradedUser);
+            response.setToken(jwtService.generateToken(upgradedUser));
+            response.setRole(upgradedUser.getRole().name());
+            return response;
         }
 
         // 2. Creación y Mapeo de la Entidad
@@ -41,15 +58,8 @@ public class AuthService {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         user.setPassword(encodedPassword);
 
-        // 4. Asignación de Rol (Asegurarse de que el string coincida con el Enum)
-        try {
-            // Convierte 'driver' o 'owner' a mayúsculas para que coincida con el Enum (DRIVER, OWNER)
-            UserRole role = UserRole.valueOf(request.getRole().toUpperCase());
-            user.setRole(role);
-        } catch (IllegalArgumentException e) {
-             // Si el rol enviado no es válido, se podría lanzar una excepción o asignar un default.
-             throw new IllegalArgumentException("Rol de usuario inválido: " + request.getRole());
-        }
+        // 4. Asignación de Rol
+        user.setRole(requestedRole);
 
         // 5. Persistencia y Generación de Respuesta
         User savedUser = userRepository.save(user);
@@ -79,5 +89,13 @@ public class AuthService {
         response.setToken(jwtService.generateToken(user));
         response.setRole(user.getRole().name());
         return response;
+    }
+
+    private UserRole parseUserRole(String role) {
+        try {
+            return UserRole.valueOf(role.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Rol de usuario inválido: " + role);
+        }
     }
 }

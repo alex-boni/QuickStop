@@ -4,6 +4,7 @@
 */
 import React from "react";
 import { useAuth } from "../../../context/AuthContext";
+import { getRoleLabel } from "../roleUtils";
 
 export default function ViewAccountDetailsForm() {
   const { user, isAuthenticated } = useAuth();
@@ -46,7 +47,7 @@ export default function ViewAccountDetailsForm() {
           type="text"
           id="role"
           name="role"
-          value={user.role === 'DRIVER' ? 'Conductor' : user.role === 'OWNER' ? 'Propietario' : ''}
+          value={getRoleLabel(user.role)}
           readOnly
           className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
         />

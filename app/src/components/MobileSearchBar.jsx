@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useDebounce } from "../hooks/useDebounce";
 import { fetchGeocodingResults } from "../services/mapService";
+import { hasOwnerRole } from "../features/auth/roleUtils";
 const SuggestionItem = ({ place, onClick }) => {
   // Renderizado de error en el listado
   if (place.id === "error") {
@@ -169,7 +170,7 @@ const handleManualSearch = () => {
       return;
     }
 
-    if (user.role === "OWNER") {
+    if (hasOwnerRole(user.role)) {
       if (onOwnerAddParking) {
         onOwnerAddParking();
         return;
@@ -202,14 +203,14 @@ const handleManualSearch = () => {
         <button
           onClick={handleQuickAction}
           className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-700"
-          title={user?.role === "OWNER" ? "Añadir parking" : "Mis Reservas"}
+          title={hasOwnerRole(user?.role) ? "Añadir parking" : "Mis Reservas"}
           aria-label={
-            user?.role === "OWNER" ? "Seleccionar ubicación para añadir parking" : "Ir a mis reservas"
+            hasOwnerRole(user?.role) ? "Seleccionar ubicación para añadir parking" : "Ir a mis reservas"
           }
         >
-          {user?.role === "OWNER" ? <OwnerIcon /> : <DriverIcon />}
+          {hasOwnerRole(user?.role) ? <OwnerIcon /> : <DriverIcon />}
         </button>
-        {user?.role === "OWNER" && (
+        {hasOwnerRole(user?.role) && (
           <button
             onClick={onOwnerAddParkingAtCurrentLocation}
             className="qs-owner-location-btn p-2 bg-cyan-600 text-white rounded-full hover:bg-cyan-700 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-700"
