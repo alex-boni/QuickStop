@@ -171,30 +171,30 @@ export default function MyParkingsPage() {
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setFilter('all')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                                className={`qs-filter-button px-4 py-2 rounded-lg font-medium transition-colors ${
                                     filter === 'all'
-                                        ? 'bg-indigo-600 text-white'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                        ? 'qs-filter-active bg-indigo-600 text-white'
+                                        : 'qs-filter-inactive bg-gray-200 text-gray-700 hover:bg-gray-300'
                                 }`}
                             >
                                 Todos
                             </button>
                             <button
                                 onClick={() => setFilter('active')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                                className={`qs-filter-button px-4 py-2 rounded-lg font-medium transition-colors ${
                                     filter === 'active'
-                                        ? 'bg-green-600 text-white'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                        ? 'qs-filter-active bg-green-600 text-white'
+                                        : 'qs-filter-inactive bg-gray-200 text-gray-700 hover:bg-gray-300'
                                 }`}
                             >
                                 Activos
                             </button>
                             <button
                                 onClick={() => setFilter('inactive')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                                className={`qs-filter-button px-4 py-2 rounded-lg font-medium transition-colors ${
                                     filter === 'inactive'
-                                        ? 'bg-red-600 text-white'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                        ? 'qs-filter-active bg-red-600 text-white'
+                                        : 'qs-filter-inactive bg-gray-200 text-gray-700 hover:bg-gray-300'
                                 }`}
                             >
                                 Inactivos

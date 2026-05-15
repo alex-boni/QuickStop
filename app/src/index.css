@@ -63,3 +63,289 @@ body {
   box-sizing: border-box;
   background-position: center;
 }
+
+:root.qs-text-large {
+  font-size: 112.5%;
+}
+
+:root.qs-text-xlarge {
+  font-size: 125%;
+}
+
+:root.qs-high-contrast body {
+  background-color: #ffffff;
+}
+
+:root.qs-high-contrast a {
+  color: #111827;
+}
+
+:root.qs-high-contrast input,
+:root.qs-high-contrast textarea,
+:root.qs-high-contrast select {
+  border-color: #111827 !important;
+}
+
+:root.qs-dark-mode body,
+:root.qs-dark-mode #root {
+  background-color: #0f172a !important;
+  color: #e5e7eb;
+}
+
+:root.qs-dark-mode .bg-white {
+  background-color: #1f2937 !important;
+}
+
+:root.qs-dark-mode .bg-gray-50 {
+  background-color: #0f172a !important;
+}
+
+:root.qs-dark-mode .bg-gray-100 {
+  background-color: #1f2937 !important;
+}
+
+:root.qs-dark-mode .bg-gray-200 {
+  background-color: #374151 !important;
+}
+
+:root.qs-dark-mode .bg-gray-300 {
+  background-color: #4b5563 !important;
+}
+
+:root.qs-dark-mode .hover\:bg-gray-100:hover {
+  background-color: #374151 !important;
+}
+
+:root.qs-dark-mode .hover\:bg-gray-200:hover {
+  background-color: #4b5563 !important;
+}
+
+:root.qs-dark-mode .hover\:bg-gray-300:hover {
+  background-color: #6b7280 !important;
+}
+
+:root.qs-dark-mode .text-gray-900,
+:root.qs-dark-mode .text-gray-800,
+:root.qs-dark-mode .text-gray-700,
+:root.qs-dark-mode .text-gray-600,
+:root.qs-dark-mode .text-gray-500 {
+  color: #e5e7eb !important;
+}
+
+:root.qs-dark-mode .text-gray-400 {
+  color: #cbd5e1 !important;
+}
+
+:root.qs-dark-mode .border-gray-200,
+:root.qs-dark-mode .border-gray-300 {
+  border-color: #374151 !important;
+}
+
+:root.qs-dark-mode .border-indigo-100 {
+  border-color: #4b5563 !important;
+}
+
+:root.qs-dark-mode input,
+:root.qs-dark-mode textarea,
+:root.qs-dark-mode select {
+  background-color: #111827 !important;
+  color: #e5e7eb !important;
+}
+
+:root.qs-dark-mode .mapboxgl-popup-content {
+  background-color: #1f2937 !important;
+  color: #e5e7eb !important;
+  border: 1px solid #374151;
+}
+
+:root.qs-dark-mode .mapboxgl-popup-tip {
+  border-top-color: #1f2937 !important;
+  border-bottom-color: #1f2937 !important;
+}
+
+:root.qs-dark-mode .mapboxgl-ctrl-group,
+:root.qs-dark-mode .mapboxgl-ctrl-geocoder {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+:root.qs-dark-mode .mapboxgl-ctrl-group button {
+  color: #e5e7eb !important;
+  background-color: #1f2937 !important;
+}
+
+:root.qs-dark-mode .mapboxgl-ctrl-group button:hover,
+:root.qs-dark-mode .mapboxgl-ctrl-geocoder button:hover {
+  background-color: #374151 !important;
+}
+
+:root.qs-dark-mode .mapboxgl-ctrl-icon {
+  filter: invert(1) brightness(1.45);
+}
+
+:root.qs-dark-mode .qs-filter-inactive {
+  background-color: #374151 !important;
+  color: #e5e7eb !important;
+}
+
+:root.qs-dark-mode .qs-filter-inactive:hover {
+  background-color: #4b5563 !important;
+}
+
+:root.qs-dark-mode .qs-owner-map-btn {
+  background-color: #065f46 !important;
+  color: #ffffff !important;
+  border: 1px solid #34d399;
+}
+
+:root.qs-dark-mode .qs-owner-map-btn:hover {
+  background-color: #047857 !important;
+}
+
+:root.qs-dark-mode .qs-owner-location-btn {
+  background-color: #155e75 !important;
+  color: #ffffff !important;
+  border: 1px solid #22d3ee;
+}
+
+:root.qs-dark-mode .qs-owner-location-btn:hover {
+  background-color: #0e7490 !important;
+}
+
+:root.qs-dark-mode .bg-white\/90 {
+  background-color: rgba(31, 41, 55, 0.95) !important;
+}
+
+:root.qs-dark-mode .bg-white\/95 {
+  background-color: rgba(31, 41, 55, 0.96) !important;
+}
+
+:root.qs-dark-mode .text-indigo-600 {
+  color: #93c5fd !important;
+}
+
+:root.qs-dark-mode .text-indigo-700 {
+  color: #a5b4fc !important;
+}
+
+:root.qs-dark-mode .text-indigo-800 {
+  color: #c7d2fe !important;
+}
+
+:root.qs-dark-mode .text-indigo-900 {
+  color: #e0e7ff !important;
+}
+
+:root.qs-dark-mode .text-green-800,
+:root.qs-dark-mode .text-red-800,
+:root.qs-dark-mode .text-yellow-800 {
+  color: #e5e7eb !important;
+}
+
+:root.qs-dark-mode .text-green-700,
+:root.qs-dark-mode .text-red-700,
+:root.qs-dark-mode .text-yellow-700 {
+  color: #d1d5db !important;
+}
+
+:root.qs-dark-mode .bg-green-100,
+:root.qs-dark-mode .bg-red-100,
+:root.qs-dark-mode .bg-yellow-50,
+:root.qs-dark-mode .bg-indigo-100 {
+  background-color: #374151 !important;
+}
+
+:root.qs-dark-mode .border-yellow-100 {
+  border-color: #4b5563 !important;
+}
+
+:root.qs-dark-mode .bg-green-50 {
+  background-color: #064e3b !important;
+}
+
+:root.qs-dark-mode .border-green-200 {
+  border-color: #10b981 !important;
+}
+
+:root.qs-dark-mode .text-green-800 {
+  color: #ecfdf5 !important;
+}
+
+:root.qs-dark-mode .text-green-500 {
+  color: #6ee7b7 !important;
+}
+
+:root.qs-dark-mode .bg-red-50 {
+  background-color: #7f1d1d !important;
+}
+
+:root.qs-dark-mode .border-red-200 {
+  border-color: #f87171 !important;
+}
+
+:root.qs-dark-mode .text-red-800 {
+  color: #fee2e2 !important;
+}
+
+:root.qs-dark-mode .text-red-500 {
+  color: #fca5a5 !important;
+}
+
+:root.qs-dark-mode .text-amber-700 {
+  color: #fcd34d !important;
+}
+
+:root.qs-dyslexia body {
+  font-family: "OpenDyslexic", "Atkinson Hyperlegible", "Arial", sans-serif;
+  letter-spacing: 0.03em;
+  word-spacing: 0.08em;
+}
+
+:root.qs-buttons-large button,
+:root.qs-buttons-large a {
+  min-height: 48px;
+  padding-top: 0.7rem !important;
+  padding-bottom: 0.7rem !important;
+}
+
+:root.qs-buttons-xlarge button,
+:root.qs-buttons-xlarge a {
+  min-height: 56px;
+  padding-top: 0.85rem !important;
+  padding-bottom: 0.85rem !important;
+}
+
+:root.qs-buttons-large .qs-size-exempt,
+:root.qs-buttons-xlarge .qs-size-exempt {
+  min-height: auto !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+:root.qs-dark-mode .qs-menu-close-btn {
+  background-color: transparent !important;
+  color: #cbd5e1 !important;
+}
+
+:root.qs-dark-mode .qs-menu-close-btn:hover,
+:root.qs-dark-mode .qs-menu-close-btn:focus {
+  background-color: #374151 !important;
+  color: #e5e7eb !important;
+}
+
+:root.qs-line-spacing-relaxed body {
+  line-height: 1.75;
+}
+
+a:visited {
+  color: inherit;
+}
+
+:root.qs-reduced-motion *,
+:root.qs-reduced-motion *::before,
+:root.qs-reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}

@@ -212,7 +212,7 @@ const handleManualSearch = () => {
         {user?.role === "OWNER" && (
           <button
             onClick={onOwnerAddParkingAtCurrentLocation}
-            className="p-2 bg-cyan-600 text-white rounded-full hover:bg-cyan-700 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-700"
+            className="qs-owner-location-btn p-2 bg-cyan-600 text-white rounded-full hover:bg-cyan-700 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-700"
             title="Nueva plaza en mi ubicación actual"
             aria-label="Seleccionar nueva plaza en mi ubicación actual"
             type="button"

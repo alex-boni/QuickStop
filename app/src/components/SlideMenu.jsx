@@ -61,7 +61,7 @@ const SideMenu = ({ isOpen, onClose }) => {
         <button
           onClick={onClose}
           ref={closeButtonRef}
-          className="absolute top-12 right-6 p-2 font-bold text-3xl text-gray-600 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg"
+          className="qs-size-exempt qs-menu-close-btn absolute top-12 right-6 p-2 font-bold text-3xl text-gray-600 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-indigo-600 focus:ring-2 focus:ring-indigo-500 rounded-lg"
           aria-label="Cerrar menú lateral"
         >
           &times;
@@ -246,7 +246,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                   />
                 </svg>
-                <span className="font-medium">Configuración</span>
+                <span className="font-medium">Accesibilidad</span>
               </button>
             </>
           ) : (
