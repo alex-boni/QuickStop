@@ -111,13 +111,26 @@ export default function ViewParkingDetailsForm() {
                 <label htmlFor="isActive" className="block text-sm font-medium text-gray-700 mb-1">
                     Estado
                 </label>
-                <input
-                    type="text"
+                <div
                     id="isActive"
-                    value={parking.isActive ? 'Activo' : 'Inactivo'}
-                    readOnly
-                    className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
-                />
+                    className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50"
+                >
+                    <span
+                        role="status"
+                        aria-label={`Estado del aparcamiento: ${parking.isActive ? "activo" : "inactivo"}`}
+                        className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-semibold ${
+                            parking.isActive
+                                ? 'border-emerald-300 bg-emerald-100 text-emerald-900'
+                                : 'border-red-300 bg-red-100 text-red-900'
+                        }`}
+                    >
+                        <span
+                            aria-hidden="true"
+                            className={`h-2.5 w-2.5 rounded-full ${parking.isActive ? 'bg-emerald-700' : 'bg-red-700'}`}
+                        />
+                        {parking.isActive ? 'Activo' : 'Inactivo'}
+                    </span>
+                </div>
             </div>
 
             <div className="flex gap-4">

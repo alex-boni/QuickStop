@@ -117,7 +117,23 @@ const ParkingDetailsModal = ({ isOpen, onClose, parkingId }) => {
                 Estado
               </label>
               <div className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50">
-                {parking.isActive ? '✅ Activo' : '❌ Inactivo'}
+                <span
+                  role="status"
+                  aria-label={`Estado del aparcamiento: ${parking.isActive ? "activo" : "inactivo"}`}
+                  className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-semibold ${
+                    parking.isActive
+                      ? "border-emerald-300 bg-emerald-100 text-emerald-900"
+                      : "border-red-300 bg-red-100 text-red-900"
+                  }`}
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`h-2.5 w-2.5 rounded-full ${
+                      parking.isActive ? "bg-emerald-700" : "bg-red-700"
+                    }`}
+                  />
+                  {parking.isActive ? "Activo" : "Inactivo"}
+                </span>
               </div>
             </div>
 
