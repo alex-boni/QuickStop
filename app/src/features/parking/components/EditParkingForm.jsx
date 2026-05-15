@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getParkingById, updateParking } from '../ParkingService';
 import { useAuth } from '../../../context/AuthContext';
+import StatusMessage from '../../../components/StatusMessage';
 
 export default function EditParkingForm() {
     const { id } = useParams();
@@ -15,6 +16,7 @@ export default function EditParkingForm() {
     const [submitError, setSubmitError] = useState(null);
     const [fieldErrors, setFieldErrors] = useState({});
     const [success, setSuccess] = useState(false);
+    const [statusMessage, setStatusMessage] = useState({ type: null, message: '' });
     const [showDescriptionHelp, setShowDescriptionHelp] = useState(false);
     const backButtonRef = useRef(null);
     const redirectTimeoutRef = useRef(null);
@@ -144,6 +146,7 @@ export default function EditParkingForm() {
         }
         setSaving(true);
         setSubmitError(null);
+        setStatusMessage({ type: null, message: '' });
         setSuccess(false);
 
         try {
@@ -156,6 +159,10 @@ export default function EditParkingForm() {
             
             await updateParking(id, updatedData);
             setSuccess(true);
+            setStatusMessage({
+                type: 'success',
+                message: 'Aparcamiento actualizado correctamente.'
+            });
         } catch (err) {
             setSubmitError(getApiErrorMessage(err, 'Error al actualizar el aparcamiento'));
             console.error(err);
@@ -217,7 +224,14 @@ export default function EditParkingForm() {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <>
+            <StatusMessage
+                type={statusMessage.type}
+                message={statusMessage.message}
+                onClose={() => setStatusMessage({ type: null, message: '' })}
+            />
+
+            <form onSubmit={handleSubmit} className="space-y-4">
             {/* Nombre y Descripción */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -365,7 +379,7 @@ export default function EditParkingForm() {
                             i
                         </button>
                     </div>
-                    <div className="relative inline-flex items-center cursor-pointer">
+                    <label htmlFor="isActive" className={`relative inline-flex items-center ${saving ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                         <input
                             type="checkbox"
                             id="isActive"
@@ -377,7 +391,7 @@ export default function EditParkingForm() {
                             disabled={saving}
                         />
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                    </div>
+                    </label>
                 </div>
                 <p className="mt-2 text-xs text-gray-600">
                     {formData.isActive
@@ -385,15 +399,6 @@ export default function EditParkingForm() {
                         : "Esta plaza no acepta nuevas reservas."}
                 </p>
             </div>
-
-            {success && (
-                <div className="p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
-                    <span className="text-2xl">✅</span>
-                    <div>
-                        <p className="text-sm font-medium text-green-800">Cambios guardados.</p>
-                    </div>
-                </div>
-            )}
 
             {submitError && parking && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
@@ -423,6 +428,7 @@ export default function EditParkingForm() {
                     Volver
                 </button>
             </div>
-        </form>
+            </form>
+        </>
     );
 }

@@ -338,7 +338,7 @@ const AddParkingForm = () => {
                 isActive: formData.isActive
             };
 
-            await createParking(parkingData);
+            const createdParking = await createParking(parkingData);
             
             setStatusMessage({
                 type: 'success',
@@ -347,7 +347,16 @@ const AddParkingForm = () => {
             
             // Redirigir después de 2 segundos
             setTimeout(() => {
-                navigate('/');
+                navigate('/', {
+                    state: {
+                        centerOn: {
+                            latitude: createdParking?.latitude ?? parkingData.latitude,
+                            longitude: createdParking?.longitude ?? parkingData.longitude
+                        },
+                        parkingId: createdParking?.id,
+                        openParkingPopup: true
+                    }
+                });
             }, 2000);
             
         } catch (error) {
@@ -597,7 +606,7 @@ const AddParkingForm = () => {
                             i
                         </button>
                     </div>
-                    <div className="relative inline-flex items-center cursor-pointer">
+                    <label htmlFor="isActive" className={`relative inline-flex items-center ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                         <input
                             id="isActive"
                             name="isActive"
@@ -609,7 +618,7 @@ const AddParkingForm = () => {
                             disabled={isLoading}
                         />
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                    </div>
+                    </label>
                 </div>
                 {showAvailabilityHelp && (
                     <p id="availability-help-add-parking" className="mt-2 text-xs text-gray-600">

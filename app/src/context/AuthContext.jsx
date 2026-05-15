@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { logoutUser } from '../features/auth/AuthService';
 import { getCurrentUser } from '../features/user/UserService';
 import { AUTH_STATE_CHANGED_EVENT, notifyAuthStateChanged } from '../features/auth/authSession';
+import { applyAccessibilityPreferences, clearAccessibilityPreferences, getStoredSettingsForUser } from '../features/accessibility/accessibilitySettings';
 
 const AuthContext = createContext(null);
 
@@ -79,13 +80,16 @@ export const AuthProvider = ({ children }) => {
 
       setIsAuthenticated(!!token);
 
-      if (!storedUser) {
+      if (!token || !storedUser) {
         setUser(null);
+        clearAccessibilityPreferences();
         return;
       }
 
       try {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        applyAccessibilityPreferences(getStoredSettingsForUser(parsedUser?.id));
       } catch (error) {
         console.error('Error leyendo userData desde localStorage:', error);
         localStorage.removeItem('userData');
@@ -107,6 +111,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('userData', JSON.stringify(userData));
     setIsAuthenticated(true);
     setUser(userData);
+    applyAccessibilityPreferences(getStoredSettingsForUser(userData?.id));
     notifyAuthStateChanged();
   };
 
@@ -114,6 +119,7 @@ export const AuthProvider = ({ children }) => {
     logoutUser();
     setIsAuthenticated(false);
     setUser(null);
+    clearAccessibilityPreferences();
   };
 
   const updateUser = (updatedData) => {

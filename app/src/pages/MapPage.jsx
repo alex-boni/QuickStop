@@ -314,8 +314,14 @@ export default function MapPage() {
   useEffect(() => {
     const hasAutoLocated = sessionStorage.getItem("hasAutoLocated");
     const savedView = sessionStorage.getItem("lastMapView");
-    if (location.state?.centerOn && location.state?.isReservation) {
-      const { latitude, longitude } = location.state.centerOn;
+    const centerOn = location.state?.centerOn;
+    const focusedParkingId =
+      location.state?.parkingId ?? location.state?.centerOn?.parkingId ?? null;
+    const shouldOpenParkingPopup =
+      Boolean(location.state?.openParkingPopup) || Boolean(location.state?.isReservation);
+
+    if (centerOn) {
+      const { latitude, longitude } = centerOn;
       setViewState({
         latitude,
         longitude,
@@ -329,13 +335,26 @@ export default function MapPage() {
         distance: 0, // Solo queremos ese punto exacto para mostrar su popup
       };
       setSearchLocation(coordsReservation);
-      //abrir el popup del parking reservado
-      setQuickViewModalState({
-        isOpen: true,
-        parkingIds: [location.state.parkingId],
-        longitude,
-        latitude,
-      });
+
+      if (focusedParkingId && shouldOpenParkingPopup) {
+        if (hasOwnerRole(user?.role)) {
+          setModalState({
+            isOpen: true,
+            parkingIds: [focusedParkingId],
+            longitude,
+            latitude,
+            parkingName: "",
+          });
+        } else {
+          setQuickViewModalState({
+            isOpen: true,
+            parkingIds: [focusedParkingId],
+            longitude,
+            latitude,
+          });
+        }
+      }
+
       setShowSearchHere(true);
     } else if (!location.state?.centerOn && !hasAutoLocated && !savedView) {
       if ("geolocation" in navigator) {

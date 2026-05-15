@@ -113,9 +113,10 @@ export default function MyParkingsPage() {
             state: {
                 centerOn: {
                     longitude: parking.longitude,
-                    latitude: parking.latitude,
-                    parkingId: parking.id
-                }
+                    latitude: parking.latitude
+                },
+                parkingId: parking.id,
+                openParkingPopup: true
             }
         });
     };

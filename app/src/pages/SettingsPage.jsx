@@ -2,96 +2,31 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import StatusMessage from "../components/StatusMessage";
-
-const STORAGE_KEY_GLOBAL = "quickstop:settings:v1";
-
-const DEFAULT_SETTINGS = {
-  textScale: "normal",
-  buttonSize: "normal",
-  lineSpacing: "normal",
-  highContrast: false,
-  reducedMotion: false,
-  darkMode: false,
-  dyslexiaFont: false,
-};
-
-const getStorageKeyForUser = (userId) =>
-  userId ? `quickstop:settings:user:${userId}` : STORAGE_KEY_GLOBAL;
-
-const getStoredSettings = (storageKey) => {
-  if (typeof window === "undefined") {
-    return DEFAULT_SETTINGS;
-  }
-
-  const raw = localStorage.getItem(storageKey) ?? localStorage.getItem(STORAGE_KEY_GLOBAL);
-  if (!raw) {
-    return DEFAULT_SETTINGS;
-  }
-
-  try {
-    const parsed = JSON.parse(raw);
-    const normalized = parsed?.accessibility ?? parsed;
-    return { ...DEFAULT_SETTINGS, ...normalized };
-  } catch (error) {
-    console.error("Error leyendo la configuración local:", error);
-    return DEFAULT_SETTINGS;
-  }
-};
-
-const applyAccessibilityPreferences = (settings) => {
-  if (typeof document === "undefined") {
-    return;
-  }
-
-  const root = document.documentElement;
-
-  root.classList.toggle("qs-high-contrast", settings.highContrast);
-  root.classList.toggle("qs-reduced-motion", settings.reducedMotion);
-  root.classList.toggle("qs-dark-mode", settings.darkMode);
-  root.classList.toggle("qs-dyslexia", settings.dyslexiaFont);
-
-  root.classList.remove("qs-text-normal", "qs-text-large", "qs-text-xlarge");
-  if (settings.textScale === "large") {
-    root.classList.add("qs-text-large");
-  } else if (settings.textScale === "xlarge") {
-    root.classList.add("qs-text-xlarge");
-  } else {
-    root.classList.add("qs-text-normal");
-  }
-
-  root.classList.remove("qs-buttons-normal", "qs-buttons-large", "qs-buttons-xlarge");
-  if (settings.buttonSize === "large") {
-    root.classList.add("qs-buttons-large");
-  } else if (settings.buttonSize === "xlarge") {
-    root.classList.add("qs-buttons-xlarge");
-  } else {
-    root.classList.add("qs-buttons-normal");
-  }
-
-  root.classList.remove("qs-line-spacing-normal", "qs-line-spacing-relaxed");
-  if (settings.lineSpacing === "relaxed") {
-    root.classList.add("qs-line-spacing-relaxed");
-  } else {
-    root.classList.add("qs-line-spacing-normal");
-  }
-};
+import {
+  DEFAULT_ACCESSIBILITY_SETTINGS,
+  applyAccessibilityPreferences,
+  getStorageKeyForUser,
+  getStoredSettingsForUser,
+} from "../features/accessibility/accessibilitySettings";
 
 export default function SettingsPage() {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
   const storageKey = useMemo(() => getStorageKeyForUser(user?.id), [user?.id]);
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState(DEFAULT_ACCESSIBILITY_SETTINGS);
   const [status, setStatus] = useState({ type: null, message: null });
   const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !user?.id || !storageKey) {
+      setSettings(DEFAULT_ACCESSIBILITY_SETTINGS);
+      setIsDirty(false);
       return;
     }
-    const loaded = getStoredSettings(storageKey);
+    const loaded = getStoredSettingsForUser(user.id);
     setSettings(loaded);
     setIsDirty(false);
-  }, [isAuthenticated, storageKey]);
+  }, [isAuthenticated, storageKey, user?.id]);
 
   useEffect(() => {
     applyAccessibilityPreferences(settings);
@@ -104,6 +39,7 @@ export default function SettingsPage() {
 
   const handleSave = () => {
     try {
+      if (!storageKey) return;
       localStorage.setItem(storageKey, JSON.stringify(settings));
       setIsDirty(false);
       setStatus({
@@ -121,7 +57,7 @@ export default function SettingsPage() {
   };
 
   const handleReset = () => {
-    setSettings(DEFAULT_SETTINGS);
+    setSettings(DEFAULT_ACCESSIBILITY_SETTINGS);
     setIsDirty(true);
     setStatus({
       type: "success",
