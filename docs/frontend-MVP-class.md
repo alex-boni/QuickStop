@@ -1,4 +1,16 @@
 ```mermaid
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'background': '#ffffff',
+    'primaryColor': '#f3f4f6',
+    'primaryTextColor': '#111827',
+    'primaryBorderColor': '#4f46e5',
+    'lineColor': '#374151',
+    'secondaryColor': '#e0e7ff',
+    'tertiaryColor': '#ffffff'
+  }
+}}%%
 classDiagram
     %% ======= Core =======
 
@@ -17,28 +29,18 @@ classDiagram
       +navigate(path: string): void
     }
 
-    class UserRoutes {
+    class ModuleRoutes {
       <<Routing>>
+      +UserRoutes
+      +ParkingRoutes
+      +ReservationRoutes
     }
 
-    class ParkingRoutes {
-      <<Routing>>
-    }
-
-    class ReservationRoutes {
-      <<Routing>>
-    }
-
-    class RealeseRoutes {
-      <<Routing>>
-    }
     
     Main --> App : create
     Main --> ServiceWorker : register
-    AppRoutes --> UserRoutes : add routes of
-    AppRoutes --> ParkingRoutes : add routes of
-    AppRoutes --> ReservationRoutes : add routes of
-    AppRoutes --> RealeseRoutes : add routes of
+    AppRoutes --> ModuleRoutes : add routes of
+
 
     %%======== Views =================
     class LoginPage {
@@ -51,10 +53,6 @@ classDiagram
       +render(): ReactElement
     }
 
-    class UserPage {
-        <<View>>
-      +render(): ReactElement
-    }
 
     class MapPage {
         <<Principal View>>
@@ -64,13 +62,12 @@ classDiagram
 
     App --> AppRoutes : navigate("/")
     AppRoutes --> MapPage : render("/")
-    AppRoutes --> UserPage : render("/profile")
     AppRoutes --> LoginPage : render("/login")
     AppRoutes --> RegisterPage : render("/register")
 
     %%=================== User =====================
-    class UserIndex {
-      <<façade>>
+    class UserFeature {
+      <<Feature>>
       +components
       +hooks
       +controller
@@ -100,13 +97,12 @@ classDiagram
     }
 
 
-    UserPage --> UserIndex : use
-    RegisterPage --> UserIndex : use
-    LoginPage --> UserIndex : use
-    UserIndex --> UserController : access
-    UserIndex --> LoginForm : contains
-    UserIndex --> RegisterForm : contains
-    UserIndex --> hook1 : contains
+    RegisterPage --> UserFeature : use
+    LoginPage --> UserFeature : use
+    UserFeature --> UserController : access
+    UserFeature --> LoginForm : contains
+    UserFeature --> RegisterForm : contains
+    UserFeature --> hook1 : contains
     UserController --> UserService : calls
     UserService --> ApiClient : uses
 
@@ -114,47 +110,16 @@ classDiagram
     %%=================== Parking =====================
 
 
-    class RealeseIndex {
-      <<Façade>>
-      +components
-      +hooks
-      +controller
-    }
-
-    class RealeseController{
-      <<Controller>>
-    }
-
-    class RealeseService {
-      <<Service>>
-    }
-    RealeseIndex --> RealeseController : access
-    RealeseController --> RealeseService : calls
-    RealeseService --> ApiClient : uses
-
-    class ReservationIndex {
-      <<façade>>
-      +components
-      +hooks
-      +controller
-    }
-
-    class ReservationController{
-      <<Controller>>
-    }
 
     class ReservationService {
       <<Service>>
     }
-    MapPage --> ParkingIndex : uses
-    MapPage --> RealeseIndex : uses
-    MapPage --> ReservationIndex : uses
-    ReservationIndex --> ReservationController : access
-    ReservationController --> ReservationService : calls
+    MapPage --> ParkingFeature : uses
+    ParkingController --> ReservationService : calls
     ReservationService --> ApiClient : uses
 
-    class ParkingIndex {
-      <<Façade>>
+    class ParkingFeature {
+      <<Feature>>
       +components
       +hooks
       +controller
@@ -164,20 +129,18 @@ classDiagram
       <<Controller>>
       -radiusMeters: number
       -parkings: Parking[]
-      +ParkingController(coords: Coordinates): Parking[]
     }
 
     class ParkingService {
       <<Service>>
-      +getNearby(coords: Coordinates, radius: number): Parking[]
     }
 
     class MyGeolocation  {
         <<hooks>>
       +coords: Coordinates
     }
-    ParkingIndex --> ParkingController : access
-    ParkingIndex --> MyGeolocation : contains
+    ParkingFeature --> ParkingController : access
+    ParkingFeature --> MyGeolocation : contains
     ParkingController --> ParkingService : calls
     ParkingService --> ApiClient : uses
     class ApiClient {
@@ -194,7 +157,7 @@ classDiagram
       +render(): ReactElement
     }
 
-    ParkingIndex --> MapContainer : passes {center, markers}
+    ParkingFeature --> MapContainer : passes {center, markers}
 
     class Parking {
       <<Transfer>>
@@ -215,18 +178,7 @@ classDiagram
     MapContainer o--> Parking : displays *
     MyGeolocation --> Coordinates : returns
 
-    %% ======= Realtime (WebSockets) =======
-    class WebsocketService {
-      +configure(opts): void
-      +connect(topicId: string): void
-      +subsribe(topic, handler)
-      +unsubsribe(topic, handler)
-      +disconnect(): void
-      +onMessage(cb: function): void
-    }
 
-    WebsocketService ..> MapPage : dispatches UI updates
-    MapPage -- WebsocketService : mount/unmount
 
     %% ======= PWA Layer =======
     class ServiceWorker {
@@ -247,8 +199,6 @@ classDiagram
       <<external>>
       +GET /api/parkings
       +POST /api/user/login
-      +WS /user/queue/updates
     }
 
     ApiClient --> BackendAPI : HTTPS
-    WebsocketService --> BackendAPI : STOMP over WS
