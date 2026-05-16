@@ -132,7 +132,7 @@ const ParkingDetailsModal = ({ isOpen, onClose, parkingId }) => {
                       parking.isActive ? "bg-emerald-700" : "bg-red-700"
                     }`}
                   />
-                  {parking.isActive ? "Activo" : "Inactivo"}
+                  {parking.isActive ? "Disponible" : "No disponible"}
                 </span>
               </div>
             </div>

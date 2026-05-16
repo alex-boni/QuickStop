@@ -521,7 +521,7 @@ const AddParkingForm = () => {
                         </span>
                     )}
                 </div>
-                <div style={{ height: '300px' }}>
+                <div style={{ height: '300px'  } } className="nonefocus">
                     <Map
                         ref={mapRef}
                         {...viewState}
@@ -530,6 +530,9 @@ const AddParkingForm = () => {
                         mapboxAccessToken={MAPBOX_TOKEN}
                         mapStyle="mapbox://styles/mapbox/streets-v12"
                         style={{ width: '100%', height: '100%' }}
+                        tabIndex={-1}
+                        keyboard={false}
+                        
                     >
                         {markerPosition && (
                             <Marker

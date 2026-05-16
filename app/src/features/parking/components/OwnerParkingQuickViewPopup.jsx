@@ -63,7 +63,7 @@ const OwnerParkingQuickViewPopup = ({
       return (
         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
           <span className="w-1.5 h-1.5 mr-1.5 bg-red-400 rounded-full"></span>
-          Inactivo
+          No disponible
         </span>
       );
     } else {
