@@ -9,7 +9,7 @@ graph LR
     FE[React/Vite]
   end
   subgraph Backend["Backend / Spring Boot"]
-    API[REST + WS]
+    API[REST]
     DB[(PostgreSQL/PostGIS)]
   end
 
