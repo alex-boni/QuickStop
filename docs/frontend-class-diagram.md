@@ -70,7 +70,7 @@ classDiagram
       <<Feature>>
       +components
       +hooks
-      +controller
+      +service
     }
 
     class LoginForm {
@@ -88,10 +88,6 @@ classDiagram
       +function()
     }
 
-    class UserController {
-      <<Controller>>
-    }
-
     class UserService {
       <<Service>>
     }
@@ -99,11 +95,10 @@ classDiagram
 
     RegisterPage --> UserFeature : use
     LoginPage --> UserFeature : use
-    UserFeature --> UserController : access
+    UserFeature --> UserService : calls
     UserFeature --> LoginForm : contains
     UserFeature --> RegisterForm : contains
     UserFeature --> hook1 : contains
-    UserController --> UserService : calls
     UserService --> ApiClient : uses
 
 
@@ -115,20 +110,14 @@ classDiagram
       <<Service>>
     }
     MapPage --> ParkingFeature : uses
-    ParkingController --> ReservationService : calls
+    ParkingFeature --> ReservationService : calls
     ReservationService --> ApiClient : uses
 
     class ParkingFeature {
       <<Feature>>
       +components
       +hooks
-      +controller
-    }
-
-    class ParkingController {
-      <<Controller>>
-      -radiusMeters: number
-      -parkings: Parking[]
+      +service
     }
 
     class ParkingService {
@@ -139,9 +128,8 @@ classDiagram
         <<hooks>>
       +coords: Coordinates
     }
-    ParkingFeature --> ParkingController : access
     ParkingFeature --> MyGeolocation : contains
-    ParkingController --> ParkingService : calls
+    ParkingFeature --> ParkingService : calls
     ParkingService --> ApiClient : uses
     class ApiClient {
       -baseURL: string
